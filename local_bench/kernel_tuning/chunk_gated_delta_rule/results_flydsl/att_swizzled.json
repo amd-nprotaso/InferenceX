@@ -1,0 +1,52 @@
+{
+  "code_object": 20,
+  "wave_iterations": 2048.0,
+  "methodology": "Sum of attributed instruction latency / wave-iterations; includes prologue and epilogue; not median wall-clock loop duration.",
+  "buckets": {
+    "other": {
+      "cycles": 94.734375,
+      "issues": 21.16015625,
+      "percent": 3.052264939919389
+    },
+    "lgkmcnt wait": {
+      "cycles": 169.693359375,
+      "issues": 10.0078125,
+      "percent": 5.46738278853324
+    },
+    "VALU": {
+      "cycles": 669.19921875,
+      "issues": 128.271484375,
+      "percent": 21.561057569779404
+    },
+    "global load": {
+      "cycles": 566.5546875,
+      "issues": 17.06640625,
+      "percent": 18.2539337933378
+    },
+    "vmcnt wait": {
+      "cycles": 160.642578125,
+      "issues": 14.009765625,
+      "percent": 5.1757739370656
+    },
+    "LDS": {
+      "cycles": 268.416015625,
+      "issues": 21.0,
+      "percent": 8.648146924546053
+    },
+    "global store": {
+      "cycles": 398.71484375,
+      "issues": 6.00390625,
+      "percent": 12.846269779090878
+    },
+    "barrier": {
+      "cycles": 712.56640625,
+      "issues": 2.0,
+      "percent": 22.95831327499898
+    },
+    "MFMA": {
+      "cycles": 63.21875,
+      "issues": 8.0,
+      "percent": 2.0368569927286573
+    }
+  }
+}

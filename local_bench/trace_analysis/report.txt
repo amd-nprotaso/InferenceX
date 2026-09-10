@@ -1,0 +1,497 @@
+====================================================================================================
+SGLang kernel-time report
+====================================================================================================
+
+-- traces --------------------------------------------------------------
+               run  rank  conc  n_kernels kernel_time   gpu_busy       wall  busy%  streams
+  isl32768_osl4_c1     0     1       5501  653.309 ms 652.850 ms 659.685 ms   99.0        2
+  isl32768_osl4_c2     0     2       8125     1.814 s    1.285 s    1.292 s   99.5        2
+  isl32768_osl4_c4     0     4      13601     4.196 s    2.583 s    2.592 s   99.7        2
+  isl32768_osl4_c8     0     8      25004     8.619 s    5.142 s    5.151 s   99.8        2
+ isl32768_osl4_c16     0    16      49190    15.587 s   10.460 s   10.469 s   99.9        2
+1788266656.4728987     0  <NA>     815026     8.640 s    8.586 s    8.661 s   99.1        1
+1788267123.4024477     0  <NA>     827760     9.505 s    8.664 s    9.762 s   88.7        1
+
+
+====================================================================================================
+RUN isl32768_osl4_c1
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels       time   pct
+EXTEND   2623       51 630.460 ms 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND        comm    126        2 210.722 ms 33.42
+EXTEND         moe    608        8 126.133 ms 20.01
+EXTEND        gemm    351        3 109.551 ms 17.38
+EXTEND linear_attn    420        8  94.530 ms 14.99
+EXTEND        norm    187        4  30.272 ms  4.80
+EXTEND   attention     34        3  28.749 ms  4.56
+EXTEND       other    120        5  11.402 ms  1.81
+EXTEND       quant    168        2   6.831 ms  1.08
+EXTEND elementwise    121        4   6.422 ms  1.02
+EXTEND  index_copy    373        6   3.551 ms  0.56
+EXTEND  activation     76        2   1.985 ms  0.31
+EXTEND   embedding      3        2   186.9 us  0.03
+EXTEND      memcpy     33        3   116.5 us  0.02
+EXTEND    kv_cache      1        1     5.2 us  0.00
+EXTEND      memset      2        1     4.0 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean    max   pct
+       comm                               quickreduce::allreduce_prototype_twoshot  124.0 210.668 ms 1698.9 2023.2 33.41
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1...  304.0 107.424 ms  353.4 1581.9 17.04
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64   45.0  58.070 ms 1290.4 1338.1  9.21
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...   60.0  46.392 ms  773.2  796.6  7.36
+        moe                                                 moe_reduction_kernel_0   60.0  33.881 ms  564.7  580.7  5.37
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32   60.0  29.992 ms  499.9  510.4  4.76
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950   16.0  28.320 ms 1770.0 1884.6  4.49
+       norm                                        _gemma_fused_add_rmsnorm_kernel  122.0  22.227 ms  182.2  189.0  3.53
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel   60.0  10.927 ms  182.1  193.6  1.73
+      other                                                     chunk_fwd_kernel_o   45.0   9.052 ms  201.1  206.1  1.44
+linear_attn                                              _causal_conv1d_fwd_kernel   45.0   8.852 ms  196.7  206.1  1.40
+        moe                                               ck::kernel_moe_gemm_2lds    2.0   6.440 ms 3219.9 4557.5  1.02
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel   45.0   6.055 ms  134.6  139.4  0.96
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel  120.0   6.030 ms   50.2   70.0  0.96
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel   45.0   5.845 ms  129.9  142.8  0.93
+linear_attn                                               recompute_w_u_fwd_kernel   45.0   5.745 ms  127.7  132.8  0.91
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel   16.0   4.104 ms  256.5  272.1  0.65
+        moe                                          aiter::opus_moe_sorting_entry  244.0   3.601 ms   14.8  101.7  0.57
+        moe                                           aiter::mxfp4_moe_sort_kernel  120.0   3.507 ms   29.2   53.1  0.56
+       norm                                           _layer_norm_fwd_1pass_kernel   45.0   3.356 ms   74.6   77.8  0.53
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel   45.0   2.795 ms   62.1   65.9  0.44
+        moe                                           vllm::moe::topkGatingSoftmax   61.0   2.241 ms   36.7   37.4  0.36
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x192x128_MI16x16x1...   45.0   1.962 ms   43.6   46.7  0.31
+      other                                            _triton_mrope_forward_fused   15.0   1.674 ms  111.6  117.8  0.27
+linear_attn                                                      l2norm_fwd_kernel   90.0   1.483 ms   16.5   17.7  0.24
+ index_copy                              at::native::vectorized_elementwise_kernel   92.0   1.375 ms   14.9   21.0  0.22
+ index_copy                                   at::native::index_elementwise_kernel  201.0   1.131 ms    5.6    8.1  0.18
+ activation                                              _fused_sigmoid_mul_kernel   16.0   1.033 ms   64.5   66.8  0.16
+ activation                                sgl_hip::activation::act_and_mul_kernel   60.0   952.1 us   15.9   16.2  0.15
+linear_attn                                                fused_gdn_gating_kernel   45.0   813.1 us   18.1   19.6  0.13
+      quant                              at::native::vectorized_elementwise_kernel   48.0   801.4 us   16.7   38.3  0.13
+      other                                       chunk_local_cumsum_scalar_kernel   45.0   625.9 us   13.9   15.0  0.10
+       norm                                                  _gemma_rmsnorm_kernel    4.0   585.0 us  146.2  150.7  0.09
+ index_copy                                 at::native::CatArrayBatchedCopy_contig    4.0   449.1 us  112.3  411.9  0.07
+ index_copy                           at::native::elementwise_kernel_manual_unroll   72.0   406.9 us    5.7   11.4  0.06
+  attention                                                reshape_and_cache_flash   16.0   380.9 us   23.8   25.8  0.06
+elementwise                              at::native::vectorized_elementwise_kernel   62.0   253.1 us    4.1    9.4  0.04
+ index_copy                                        at::native::CatArrayBatchedCopy    2.0   182.7 us   91.4  156.8  0.03
+  embedding                                       _vocab_parallel_embedding_kernel    2.0   175.6 us   87.8   87.9  0.03
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x16x128_MI16x16x1...    2.0   164.5 us   82.3   83.2  0.03
+
+====================================================================================================
+RUN isl32768_osl4_c2
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels    time   pct
+EXTEND   5246       51 1.789 s 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND        comm    252        2 956.456 ms 53.45
+EXTEND         moe   1216        8 246.466 ms 13.77
+EXTEND        gemm    702        3 218.692 ms 12.22
+EXTEND linear_attn    840        8 188.917 ms 10.56
+EXTEND        norm    374        4  60.652 ms  3.39
+EXTEND   attention     68        3  57.137 ms  3.19
+EXTEND       other    240        5  22.805 ms  1.27
+EXTEND       quant    336        2  13.670 ms  0.76
+EXTEND elementwise    242        4  12.822 ms  0.72
+EXTEND  index_copy    746        6   7.081 ms  0.40
+EXTEND  activation    152        2   3.955 ms  0.22
+EXTEND   embedding      6        2   362.0 us  0.02
+EXTEND      memcpy     66        3   277.5 us  0.02
+EXTEND    kv_cache      2        1    11.0 us  0.00
+EXTEND      memset      4        1     8.7 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean      max   pct
+       comm                               quickreduce::allreduce_prototype_twoshot  248.0 956.331 ms 3856.2 534815.9 53.45
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1...  608.0 214.427 ms  352.7   1579.6 11.98
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64   90.0 116.017 ms 1289.1   1328.8  6.48
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...  120.0  88.453 ms  737.1    806.1  4.94
+        moe                                                 moe_reduction_kernel_0  120.0  68.021 ms  566.8    589.1  3.80
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32  120.0  58.363 ms  486.4    513.4  3.26
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950   32.0  56.273 ms 1758.5   1924.3  3.14
+       norm                                        _gemma_fused_add_rmsnorm_kernel  244.0  44.588 ms  182.7    195.1  2.49
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel  120.0  21.952 ms  182.9    196.0  1.23
+      other                                                     chunk_fwd_kernel_o   90.0  18.133 ms  201.5    206.2  1.01
+linear_attn                                              _causal_conv1d_fwd_kernel   90.0  17.676 ms  196.4    207.2  0.99
+        moe                                               ck::kernel_moe_gemm_2lds    4.0  12.606 ms 3151.5   4591.3  0.70
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel   90.0  12.074 ms  134.2    139.6  0.67
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel  240.0  12.073 ms   50.3     71.8  0.67
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel   90.0  11.601 ms  128.9    149.4  0.65
+linear_attn                                               recompute_w_u_fwd_kernel   90.0  11.490 ms  127.7    133.9  0.64
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel   32.0   8.228 ms  257.1    286.3  0.46
+        moe                                          aiter::opus_moe_sorting_entry  488.0   7.597 ms   15.6    108.0  0.42
+        moe                                           aiter::mxfp4_moe_sort_kernel  240.0   6.828 ms   28.4     53.2  0.38
+       norm                                           _layer_norm_fwd_1pass_kernel   90.0   6.640 ms   73.8     77.9  0.37
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel   90.0   5.584 ms   62.0     66.6  0.31
+        moe                                           vllm::moe::topkGatingSoftmax  122.0   4.439 ms   36.4     37.1  0.25
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x192x128_MI16x16x1...   90.0   3.935 ms   43.7     46.2  0.22
+      other                                            _triton_mrope_forward_fused   30.0   3.330 ms  111.0    119.7  0.19
+linear_attn                                                      l2norm_fwd_kernel  180.0   2.975 ms   16.5     18.0  0.17
+ index_copy                              at::native::vectorized_elementwise_kernel  184.0   2.740 ms   14.9     21.3  0.15
+ index_copy                                   at::native::index_elementwise_kernel  402.0   2.239 ms    5.6      8.0  0.13
+ activation                                              _fused_sigmoid_mul_kernel   32.0   2.067 ms   64.6     66.6  0.12
+ activation                                sgl_hip::activation::act_and_mul_kernel  120.0   1.888 ms   15.7     16.1  0.11
+linear_attn                                                fused_gdn_gating_kernel   90.0   1.623 ms   18.0     21.0  0.09
+      quant                              at::native::vectorized_elementwise_kernel   96.0   1.596 ms   16.6     39.8  0.09
+      other                                       chunk_local_cumsum_scalar_kernel   90.0   1.246 ms   13.8     17.8  0.07
+       norm                                                  _gemma_rmsnorm_kernel    8.0   1.196 ms  149.5    161.1  0.07
+ index_copy                                 at::native::CatArrayBatchedCopy_contig    8.0   915.0 us  114.4    417.9  0.05
+ index_copy                           at::native::elementwise_kernel_manual_unroll  144.0   807.0 us    5.6     11.5  0.05
+  attention                                                reshape_and_cache_flash   32.0   755.4 us   23.6     25.9  0.04
+elementwise                              at::native::vectorized_elementwise_kernel  124.0   516.6 us    4.2     10.1  0.03
+ index_copy                                        at::native::CatArrayBatchedCopy    4.0   367.1 us   91.8    157.8  0.02
+  embedding                                       _vocab_parallel_embedding_kernel    4.0   339.5 us   84.9     87.9  0.02
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x16x128_MI16x16x1...    4.0   329.4 us   82.3     85.2  0.02
+
+====================================================================================================
+RUN isl32768_osl4_c4
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels    time   pct
+EXTEND  10802       55 4.164 s 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND        comm    504        2    1.910 s 45.87
+EXTEND       other    528        6 605.777 ms 14.55
+EXTEND         moe   2432        8 494.428 ms 11.87
+EXTEND        gemm   1404        4 438.848 ms 10.54
+EXTEND linear_attn   1680        8 382.669 ms  9.19
+EXTEND   attention    136        3 133.519 ms  3.21
+EXTEND        norm    748        4 121.317 ms  2.91
+EXTEND       quant    640        2  27.160 ms  0.65
+EXTEND elementwise    645        6  26.343 ms  0.63
+EXTEND  index_copy   1453        6  13.893 ms  0.33
+EXTEND  activation    304        2   7.924 ms  0.19
+EXTEND   embedding     91        2   1.247 ms  0.03
+EXTEND      memcpy    226        3   791.3 us  0.02
+EXTEND      memset      8        1    18.2 us  0.00
+EXTEND    kv_cache      3        1    17.4 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean      max   pct
+       comm                               quickreduce::allreduce_prototype_twoshot  496.0    1.909 s 3849.6 540064.8 45.86
+      other                                                     chunk_fwd_kernel_o  180.0 595.932 ms 3310.7 559971.5 14.31
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1... 1216.0 430.264 ms  353.8   1594.6 10.33
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64  180.0 230.552 ms 1280.8   1332.8  5.54
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...  240.0 178.785 ms  744.9    796.4  4.29
+        moe                                                 moe_reduction_kernel_0  240.0 135.252 ms  563.6    587.2  3.25
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950   64.0 131.791 ms 2059.2   3166.0  3.17
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32  240.0 117.004 ms  487.5    510.2  2.81
+       norm                                        _gemma_fused_add_rmsnorm_kernel  488.0  89.331 ms  183.1    196.3  2.15
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel  240.0  43.608 ms  181.7    194.2  1.05
+linear_attn                                              _causal_conv1d_fwd_kernel  180.0  41.296 ms  229.4    346.8  0.99
+        moe                                               ck::kernel_moe_gemm_2lds    8.0  25.231 ms 3153.9   4568.9  0.61
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel  480.0  24.207 ms   50.4     72.3  0.58
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel  180.0  24.030 ms  133.5    140.2  0.58
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel  180.0  23.941 ms  133.0    153.9  0.58
+linear_attn                                               recompute_w_u_fwd_kernel  180.0  22.959 ms  127.5    134.0  0.55
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel   64.0  16.359 ms  255.6    284.1  0.39
+        moe                                          aiter::opus_moe_sorting_entry  976.0  15.127 ms   15.5    108.3  0.36
+        moe                                           aiter::mxfp4_moe_sort_kernel  480.0  13.758 ms   28.7     52.6  0.33
+       norm                                           _layer_norm_fwd_1pass_kernel  180.0  13.263 ms   73.7     77.5  0.32
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel  180.0  11.112 ms   61.7     66.6  0.27
+        moe                                           vllm::moe::topkGatingSoftmax  244.0   8.958 ms   36.7     38.3  0.22
+      other                                            _triton_mrope_forward_fused   60.0   6.607 ms  110.1    116.6  0.16
+linear_attn                                                      l2norm_fwd_kernel  360.0   5.926 ms   16.5     18.4  0.14
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x192x128_MI16x16x1...  135.0   5.883 ms   43.6     46.0  0.14
+ index_copy                              at::native::vectorized_elementwise_kernel  384.0   5.491 ms   14.3     22.0  0.13
+ index_copy                                   at::native::index_elementwise_kernel  789.0   4.410 ms    5.6      7.7  0.11
+ activation                                              _fused_sigmoid_mul_kernel   64.0   4.055 ms   63.4     68.9  0.10
+ activation                                sgl_hip::activation::act_and_mul_kernel  240.0   3.869 ms   16.1     17.8  0.09
+linear_attn                                                fused_gdn_gating_kernel  180.0   3.273 ms   18.2     20.3  0.08
+      quant                              at::native::vectorized_elementwise_kernel  160.0   2.954 ms   18.5     39.3  0.07
+      other                                       chunk_local_cumsum_scalar_kernel  180.0   2.649 ms   14.7     20.6  0.06
+       norm                                                  _gemma_rmsnorm_kernel   16.0   2.364 ms  147.8    161.0  0.06
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x224x128_MI16x16x1...   45.0   2.046 ms   45.5     47.5  0.05
+ index_copy                                 at::native::CatArrayBatchedCopy_contig   16.0   1.798 ms  112.3    416.8  0.04
+  attention                                                reshape_and_cache_flash   64.0   1.500 ms   23.4     26.3  0.04
+ index_copy                           at::native::elementwise_kernel_manual_unroll  232.0   1.365 ms    5.9     13.0  0.03
+elementwise                              at::native::vectorized_elementwise_kernel  312.0   1.240 ms    4.0     12.1  0.03
+ index_copy                                        at::native::CatArrayBatchedCopy    8.0   735.9 us   92.0    161.0  0.02
+  embedding                                       _vocab_parallel_embedding_kernel    8.0   676.4 us   84.5     86.4  0.02
+
+====================================================================================================
+RUN isl32768_osl4_c8
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels    time   pct
+EXTEND  21667       55 8.572 s 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND  activation    608        2    2.703 s 31.53
+EXTEND        comm   1008        2    1.694 s 19.76
+EXTEND         moe   4864        8 987.789 ms 11.52
+EXTEND        gemm   2808        4 874.420 ms 10.20
+EXTEND linear_attn   3360        8 764.400 ms  8.92
+EXTEND       other   1056        6 651.807 ms  7.60
+EXTEND  index_copy   2967        6 279.696 ms  3.26
+EXTEND   attention    272        3 263.959 ms  3.08
+EXTEND        norm   1496        4 241.673 ms  2.82
+EXTEND       quant   1280        2  54.233 ms  0.63
+EXTEND elementwise   1306        6  52.680 ms  0.61
+EXTEND   embedding    182        2   2.505 ms  0.03
+EXTEND      memcpy    437        3   1.566 ms  0.02
+EXTEND    kv_cache      7        1    38.1 us  0.00
+EXTEND      memset     16        1    33.1 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean      max   pct
+ activation                                sgl_hip::activation::act_and_mul_kernel  480.0    2.695 s 5614.6 541587.7 31.44
+       comm                               quickreduce::allreduce_prototype_twoshot  992.0    1.693 s 1707.2   4202.8 19.76
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1... 2432.0 857.373 ms  352.5   1598.4 10.00
+      other                                                     chunk_fwd_kernel_o  360.0 632.183 ms 1756.1 560176.3  7.38
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64  360.0 460.511 ms 1279.2   1365.7  5.37
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...  480.0 357.130 ms  744.0    799.0  4.17
+        moe                                                 moe_reduction_kernel_0  480.0 270.069 ms  562.6    586.6  3.15
+ index_copy                                   at::native::index_elementwise_kernel 1594.0 260.542 ms  163.5 251676.7  3.04
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950  128.0 260.474 ms 2035.0   3200.2  3.04
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32  480.0 234.052 ms  487.6    514.8  2.73
+       norm                                        _gemma_fused_add_rmsnorm_kernel  976.0 177.855 ms  182.2    195.4  2.07
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel  480.0  87.023 ms  181.3    193.5  1.02
+linear_attn                                              _causal_conv1d_fwd_kernel  360.0  82.420 ms  228.9    345.0  0.96
+        moe                                               ck::kernel_moe_gemm_2lds   16.0  50.283 ms 3142.7   4576.4  0.59
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel  960.0  48.327 ms   50.3     73.3  0.56
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel  360.0  48.048 ms  133.5    157.3  0.56
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel  360.0  47.899 ms  133.1    140.4  0.56
+linear_attn                                               recompute_w_u_fwd_kernel  360.0  45.794 ms  127.2    137.6  0.53
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel  128.0  32.641 ms  255.0    288.2  0.38
+        moe                                          aiter::opus_moe_sorting_entry 1952.0  30.170 ms   15.5    106.8  0.35
+        moe                                           aiter::mxfp4_moe_sort_kernel  960.0  27.589 ms   28.7     54.1  0.32
+       norm                                           _layer_norm_fwd_1pass_kernel  360.0  26.437 ms   73.4     77.6  0.31
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel  360.0  22.214 ms   61.7     67.4  0.26
+        moe                                           vllm::moe::topkGatingSoftmax  488.0  17.865 ms   36.6     39.1  0.21
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x192x128_MI16x16x1...  315.0  13.731 ms   43.6     46.8  0.16
+      other                                            _triton_mrope_forward_fused  120.0  13.199 ms  110.0    120.4  0.15
+linear_attn                                                      l2norm_fwd_kernel  720.0  11.843 ms   16.4     18.8  0.14
+ index_copy                              at::native::vectorized_elementwise_kernel  768.0  10.982 ms   14.3     20.4  0.13
+ activation                                              _fused_sigmoid_mul_kernel  128.0   8.135 ms   63.6     68.1  0.09
+linear_attn                                                fused_gdn_gating_kernel  360.0   6.548 ms   18.2     20.7  0.08
+      quant                              at::native::vectorized_elementwise_kernel  320.0   5.906 ms   18.5     40.9  0.07
+      other                                       chunk_local_cumsum_scalar_kernel  360.0   5.270 ms   14.6     19.8  0.06
+       norm                                                  _gemma_rmsnorm_kernel   32.0   4.740 ms  148.1    159.8  0.06
+ index_copy                                 at::native::CatArrayBatchedCopy_contig   32.0   3.617 ms  113.0    422.0  0.04
+  attention                                                reshape_and_cache_flash  128.0   3.009 ms   23.5     27.2  0.04
+ index_copy                           at::native::elementwise_kernel_manual_unroll  509.0   2.895 ms    5.7     13.3  0.03
+elementwise                              at::native::vectorized_elementwise_kernel  624.0   2.501 ms    4.0     10.8  0.03
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x224x128_MI16x16x1...   45.0   2.005 ms   44.6     46.6  0.02
+ index_copy                                        at::native::CatArrayBatchedCopy   16.0   1.474 ms   92.1    161.8  0.02
+  embedding                                       _vocab_parallel_embedding_kernel   16.0   1.350 ms   84.4     87.5  0.02
+
+====================================================================================================
+RUN isl32768_osl4_c16
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels     time   pct
+EXTEND  46415       54 15.531 s 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND        comm   2016        2    3.370 s 21.70
+EXTEND  activation   1216        2    2.170 s 13.97
+EXTEND         moe   9728        8    1.992 s 12.83
+EXTEND        gemm   5616        3    1.753 s 11.28
+EXTEND       quant   2336        2    1.599 s 10.30
+EXTEND linear_attn   6720        8    1.551 s  9.99
+EXTEND  index_copy   6599        6    1.086 s  6.99
+EXTEND       other   2448        6 746.082 ms  4.80
+EXTEND   attention    544        3 655.253 ms  4.22
+EXTEND        norm   2992        4 483.389 ms  3.11
+EXTEND elementwise   3867        6 112.100 ms  0.72
+EXTEND   embedding    872        2   8.664 ms  0.06
+EXTEND      memcpy   1414        3   5.103 ms  0.03
+EXTEND    kv_cache     15        1    89.7 us  0.00
+EXTEND      memset     32        1    70.2 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean      max   pct
+       comm                               quickreduce::allreduce_prototype_twoshot 1984.0    3.369 s 1697.9   2023.8 21.69
+ activation                                sgl_hip::activation::act_and_mul_kernel  960.0    2.154 s 2243.6 538864.8 13.87
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1... 4864.0    1.719 s  353.3   1600.1 11.07
+      quant                              at::native::vectorized_elementwise_kernel  416.0    1.503 s 3612.0 249794.6  9.67
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64  720.0 904.400 ms 1256.1   1341.3  5.82
+ index_copy                                   at::native::index_elementwise_kernel 3346.0 762.260 ms  227.8 248044.2  4.91
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...  960.0 727.229 ms  757.5    808.6  4.68
+      other                                                     chunk_fwd_kernel_o  720.0 704.230 ms  978.1 559464.1  4.53
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950  256.0 648.280 ms 2532.3   3195.4  4.17
+        moe                                                 moe_reduction_kernel_0  960.0 540.714 ms  563.2    587.9  3.48
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32  960.0 470.048 ms  489.6    515.9  3.03
+       norm                                        _gemma_fused_add_rmsnorm_kernel 1952.0 355.319 ms  182.0    195.5  2.29
+ index_copy                              at::native::vectorized_elementwise_kernel 1648.0 306.142 ms  185.8 283875.9  1.97
+linear_attn                                              _causal_conv1d_fwd_kernel  720.0 205.011 ms  284.7    348.6  1.32
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel  960.0 173.694 ms  180.9    194.1  1.12
+        moe                                               ck::kernel_moe_gemm_2lds   32.0 101.718 ms 3178.7   4600.3  0.65
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel 1920.0  96.802 ms   50.4     74.2  0.62
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel  720.0  95.896 ms  133.2    143.9  0.62
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel  720.0  95.707 ms  132.9    155.0  0.62
+linear_attn                                               recompute_w_u_fwd_kernel  720.0  91.245 ms  126.7    133.8  0.59
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel  256.0  65.326 ms  255.2    285.1  0.42
+        moe                                          aiter::opus_moe_sorting_entry 3904.0  59.680 ms   15.3    113.8  0.38
+        moe                                           aiter::mxfp4_moe_sort_kernel 1920.0  55.781 ms   29.1     55.1  0.36
+       norm                                           _layer_norm_fwd_1pass_kernel  720.0  53.281 ms   74.0     78.6  0.34
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel  720.0  44.223 ms   61.4     67.4  0.28
+        moe                                           vllm::moe::topkGatingSoftmax  976.0  35.750 ms   36.6     39.5  0.23
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x192x128_MI16x16x1...  720.0  31.366 ms   43.6     47.1  0.20
+      other                                            _triton_mrope_forward_fused  240.0  26.453 ms  110.2    118.3  0.17
+linear_attn                                                      l2norm_fwd_kernel 1440.0  23.395 ms   16.2     18.9  0.15
+ activation                                              _fused_sigmoid_mul_kernel  256.0  15.794 ms   61.7     68.9  0.10
+linear_attn                                                fused_gdn_gating_kernel  720.0  13.193 ms   18.3     22.6  0.08
+      other                                       chunk_local_cumsum_scalar_kernel  720.0  10.450 ms   14.5     22.0  0.07
+       norm                                                  _gemma_rmsnorm_kernel   64.0   9.464 ms  147.9    161.6  0.06
+ index_copy                                 at::native::CatArrayBatchedCopy_contig   64.0   7.244 ms  113.2    420.1  0.05
+ index_copy                           at::native::elementwise_kernel_manual_unroll 1301.0   6.557 ms    5.0     13.4  0.04
+elementwise                                              at::native::reduce_kernel  699.0   6.488 ms    9.3     15.2  0.04
+elementwise                              at::native::vectorized_elementwise_kernel 1696.0   6.406 ms    3.8     11.7  0.04
+  attention                                                reshape_and_cache_flash  256.0   6.014 ms   23.5     27.8  0.04
+  embedding                                   at::native::vectorized_gather_kernel  840.0   5.931 ms    7.1     14.6  0.04
+     memcpy                                                            Memcpy DtoD 1221.0   4.304 ms    3.5      7.8  0.03
+
+====================================================================================================
+RUN 1788266656.4728987
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels    time   pct
+EXTEND  10564       59 1.325 s 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND        comm    504        3 455.900 ms 34.40
+EXTEND        gemm   1404        8 344.263 ms 25.98
+EXTEND         moe   2432        9 251.266 ms 18.96
+EXTEND linear_attn   1680        8 125.181 ms  9.45
+EXTEND        norm    748        4  57.482 ms  4.34
+EXTEND       other    480        5  22.922 ms  1.73
+EXTEND   attention    136        3  21.280 ms  1.61
+EXTEND       quant    672        2  14.215 ms  1.07
+EXTEND elementwise    486        5  12.193 ms  0.92
+EXTEND  index_copy   1222        6   9.480 ms  0.72
+EXTEND      memcpy    378        3   5.816 ms  0.44
+EXTEND  activation    304        2   4.247 ms  0.32
+EXTEND   embedding    106        2   823.8 us  0.06
+EXTEND    kv_cache      4        1    25.4 us  0.00
+EXTEND      memset      8        1    15.6 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean      max   pct
+       comm                               quickreduce::allreduce_prototype_twoshot  248.0 305.125 ms 1230.3   2581.5 23.03
+       comm                                      aiter::cross_device_reduce_2stage  248.0 150.662 ms  607.5   1692.5 11.37
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x240x64_MI16x16x1...  244.0 124.682 ms  511.0   1240.6  9.41
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x32x512_MI16x16x1_...   90.0 105.412 ms 1171.2 103849.0  7.95
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...  240.0  88.449 ms  368.5    565.5  6.67
+        moe                                                 moe_reduction_kernel_0  240.0  62.788 ms  261.6    411.0  4.74
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64  180.0  55.446 ms  308.0    376.0  4.18
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32  120.0  46.172 ms  384.8    395.0  3.48
+       norm                                        _gemma_fused_add_rmsnorm_kernel  488.0  42.364 ms   86.8    136.2  3.20
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1...  306.0  39.287 ms  128.4   1146.5  2.96
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x208x64_MI16x16x1...  150.0  30.651 ms  204.3    292.9  2.31
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x192x64_MI16x16x1...  274.0  29.138 ms  106.3    254.3  2.20
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950   64.0  20.414 ms  319.0    486.3  1.54
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel  240.0  19.741 ms   82.3    132.1  1.49
+        moe       mfma_moe1_silu_mul_afp4_wfp4_bf16_t64x128x256_pm1_async_xcd4_v32  120.0  19.514 ms  162.6    175.2  1.47
+      other                                                     chunk_fwd_kernel_o  180.0  17.959 ms   99.8    157.4  1.36
+linear_attn                                              _causal_conv1d_fwd_kernel  180.0  15.929 ms   88.5    141.2  1.20
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel  180.0  13.335 ms   74.1    104.5  1.01
+        moe                                               ck::kernel_moe_gemm_2lds    8.0  12.457 ms 1557.2   3200.3  0.94
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel  480.0  12.326 ms   25.7     67.0  0.93
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT128x128x256_MI16x16x...  242.0  11.673 ms   48.2     52.2  0.88
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel  180.0  10.919 ms   60.7     99.1  0.82
+linear_attn                                               recompute_w_u_fwd_kernel  180.0  10.529 ms   58.5     89.5  0.79
+        moe                                          aiter::opus_moe_sorting_entry  976.0   9.128 ms    9.4     77.7  0.69
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel   64.0   7.216 ms  112.8    197.4  0.54
+        moe                                           aiter::mxfp4_moe_sort_kernel  480.0   7.013 ms   14.6     41.4  0.53
+       norm                                           _layer_norm_fwd_1pass_kernel  180.0   6.803 ms   37.8     58.2  0.51
+     memcpy                                                            Memcpy DtoD  330.0   5.604 ms   17.0     28.0  0.42
+        moe                                           vllm::moe::topkGatingSoftmax  244.0   5.597 ms   22.9     30.1  0.42
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel  180.0   5.330 ms   29.6     45.8  0.40
+ index_copy                                   at::native::index_elementwise_kernel  710.0   4.056 ms    5.7      9.9  0.31
+ index_copy                              at::native::vectorized_elementwise_kernel  368.0   3.517 ms    9.6     17.4  0.27
+      other                                            _triton_mrope_forward_fused   60.0   3.171 ms   52.8     80.8  0.24
+linear_attn                                                      l2norm_fwd_kernel  360.0   3.064 ms    8.5     13.3  0.23
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x96x256_MI16x16x1_...   90.0   2.766 ms   30.7     32.0  0.21
+ activation                                sgl_hip::activation::act_and_mul_kernel  240.0   2.247 ms    9.4     12.8  0.17
+ activation                                              _fused_sigmoid_mul_kernel   64.0   1.999 ms   31.2     49.7  0.15
+      quant                              at::native::vectorized_elementwise_kernel  192.0   1.889 ms    9.8     28.1  0.14
+linear_attn                                                fused_gdn_gating_kernel  180.0   1.806 ms   10.0     16.4  0.14
+      other                                       chunk_local_cumsum_scalar_kernel  180.0   1.602 ms    8.9     13.0  0.12
+
+====================================================================================================
+RUN 1788267123.4024477
+====================================================================================================
+
+-- phases (per-rank GPU op time) ---------------------------------------
+ phase  calls  kernels    time   pct
+EXTEND   8260       63 2.057 s 100.0
+
+-- categories ----------------------------------------------------------
+ phase    category  calls  kernels       time   pct
+EXTEND elementwise    525        6 841.027 ms 40.89
+EXTEND        comm    378        3 426.818 ms 20.75
+EXTEND         moe   1824        9 245.819 ms 11.95
+EXTEND        gemm   1053       10 222.103 ms 10.80
+EXTEND        norm    561        4 136.234 ms  6.62
+EXTEND linear_attn   1260        8 113.152 ms  5.50
+EXTEND       other    408        6  22.463 ms  1.09
+EXTEND   attention    102        3  20.090 ms  0.98
+EXTEND       quant    472        2  13.170 ms  0.64
+EXTEND  index_copy    990        6   8.469 ms  0.41
+EXTEND  activation    228        2   4.078 ms  0.20
+EXTEND      memcpy    316        3   2.418 ms  0.12
+EXTEND   embedding    135        2   954.7 us  0.05
+EXTEND    kv_cache      2        1    13.5 us  0.00
+EXTEND      memset      6        1    12.9 us  0.00
+
+-- top 40 kernels in phase EXTEND --------------------------------------
+   category                                                                 kernel  calls      total   mean      max   pct
+elementwise                              at::native::vectorized_elementwise_kernel  250.0 828.980 ms 3315.9 482627.6 40.30
+       comm                               quickreduce::allreduce_prototype_twoshot  248.0 368.085 ms 1484.2   4279.5 17.90
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI16x16x1...  426.0 133.480 ms  313.3   1604.5  6.49
+        moe mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1...  180.0  88.598 ms  492.2    801.7  4.31
+       norm                                           _layer_norm_fwd_1pass_kernel  135.0  85.201 ms  631.1  78582.6  4.14
+        moe                                                 moe_reduction_kernel_0  180.0  63.468 ms  352.6    579.8  3.09
+       comm                                      aiter::cross_device_reduce_2stage  124.0  58.631 ms  472.8    820.0  2.85
+        moe      mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32  120.0  52.945 ms  441.2    508.0  2.57
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x240x64_MI16x16x1...   61.0  49.505 ms  811.6    842.6  2.41
+linear_attn                         chunk_gated_delta_rule_fwd_kernel_h_blockdim64  135.0  42.901 ms  317.8    429.5  2.09
+       norm                                        _gemma_fused_add_rmsnorm_kernel  366.0  42.361 ms  115.7    200.4  2.06
+linear_attn                                     _fused_gate_sigmoid_mul_add_kernel  180.0  20.612 ms  114.5    193.1  1.00
+  attention                          aiter::fmha_fwd_hd256_fp8_causal_group_gfx950   48.0  19.271 ms  401.5    567.2  0.94
+      other                                                     chunk_fwd_kernel_o  135.0  17.521 ms  129.8    215.7  0.85
+linear_attn                                              _causal_conv1d_fwd_kernel  135.0  16.542 ms  122.5    207.5  0.80
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x192x64_MI16x16x1...  137.0  13.569 ms   99.0    175.8  0.66
+linear_attn                            chunk_gated_delta_rule_fwd_kkt_solve_kernel  135.0  12.407 ms   91.9    147.4  0.60
+        moe                                               ck::kernel_moe_gemm_2lds    6.0  12.311 ms 2051.8   4559.7  0.60
+      quant                           aiter::dynamic_per_group_scaled_quant_kernel  360.0  11.568 ms   32.1     69.6  0.56
+elementwise                       fused_qkvzba_split_reshape_cat_contiguous_kernel  135.0  11.285 ms   83.6    139.6  0.55
+linear_attn                                               recompute_w_u_fwd_kernel  135.0  10.700 ms   79.3    132.1  0.52
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x224x64_MI16x16x1...   45.0   8.505 ms  189.0    192.4  0.41
+        moe       mfma_moe1_silu_mul_afp4_wfp4_bf16_t64x128x256_pm1_async_xcd4_v32   60.0   8.304 ms  138.4    150.1  0.40
+        moe                                          aiter::opus_moe_sorting_entry  732.0   8.045 ms   11.0    104.6  0.39
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x176x64_MI16x16x1...  122.0   7.696 ms   63.1    322.4  0.37
+       norm                                    _fused_qk_gemma_rmsnorm_gate_kernel   48.0   7.567 ms  157.6    282.2  0.37
+        moe                                           aiter::mxfp4_moe_sort_kernel  360.0   6.963 ms   19.3     52.2  0.34
+linear_attn                                     fused_qkv_split_gdn_prefill_kernel  135.0   5.294 ms   39.2     66.3  0.26
+        moe                                           vllm::moe::topkGatingSoftmax  183.0   5.036 ms   27.5     38.0  0.24
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT128x96x128_MI16x16x1...  121.0   4.830 ms   39.9     43.7  0.23
+ index_copy                                   at::native::index_elementwise_kernel  541.0   3.216 ms    5.9     13.8  0.16
+ index_copy                              at::native::vectorized_elementwise_kernel  292.0   3.182 ms   10.9     21.1  0.15
+      other                                            _triton_mrope_forward_fused   45.0   3.135 ms   69.7    112.9  0.15
+linear_attn                                                      l2norm_fwd_kernel  270.0   2.992 ms   11.1     18.7  0.15
+     memcpy                                                            Memcpy DtoD  281.0   2.271 ms    8.1     17.8  0.11
+ activation                                sgl_hip::activation::act_and_mul_kernel  180.0   2.114 ms   11.7     74.0  0.10
+       gemm Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x192x128_MI16x16x1...   45.0   1.981 ms   44.0     45.8  0.10
+ activation                                              _fused_sigmoid_mul_kernel   48.0   1.964 ms   40.9     67.8  0.10
+linear_attn                                                fused_gdn_gating_kernel  135.0   1.703 ms   12.6     20.5  0.08
+      quant                              at::native::vectorized_elementwise_kernel  112.0   1.602 ms   14.3     38.6  0.08

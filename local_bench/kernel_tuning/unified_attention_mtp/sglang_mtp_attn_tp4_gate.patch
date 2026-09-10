@@ -1,0 +1,143 @@
+diff --git a/python/sglang/kernels/ops/attention/unified_attention_3d_mtp.py b/python/sglang/kernels/ops/attention/unified_attention_3d_mtp.py
+index 720a2d2099..d1efdaa036 100644
+--- a/python/sglang/kernels/ops/attention/unified_attention_3d_mtp.py
++++ b/python/sglang/kernels/ops/attention/unified_attention_3d_mtp.py
+@@ -11,17 +11,25 @@ upstream's heuristics are tuned for prefill/decode and mis-fit MTP verify.
+ Divergences from upstream (upstream refs are in aiter/ops/triton/attention/
+ unified_attention.py):
+ 
+-  block_m = 32 -> BLOCK_Q = 2    upstream: BLOCK_M = 16 if nqpkv <= 16, BLOCK_Q = 1
+-  tile_size = 32, fixed          upstream: select_2d_config / select_3d_config
+-  always 3D split-K              upstream: use_2d_kernel() picks 2D or 3D
+-  num_segments computed here     upstream: config table
+-  num_warps / waves_per_eu       upstream: config table
++  block_m = 32 -> BLOCK_Q = 32//nqpkv   upstream: BLOCK_M = 16 if nqpkv <= 16
++  tile_size = 32, fixed                 upstream: select_2d_config / select_3d_config
++  always 3D split-K                     upstream: use_2d_kernel() picks 2D or 3D
++  num_segments computed here            upstream: config table
++  num_warps / waves_per_eu              upstream: config table
+ 
+ The core win is block_m. MTP verify has q_len 2-4, so upstream packs one query
+-token x 16 heads per tile and fills only half the MFMA M dimension; block_m=32
+-stacks two draft tokens into one tile. Forcing 3D then recovers the CU occupancy
+-that a low batch would otherwise leave idle. Both are tied to the 16:1 GQA
+-ratio, not to head_dim.
++token x nqpkv heads per tile and leaves the MFMA M dimension part-empty;
++block_m=32 stacks 32//nqpkv draft tokens into one tile -- 2 at 16:1 GQA, 4 at
++8:1. Every live q-block re-reads the whole KV, so that multiplier is also a
++straight divisor on HBM traffic. Forcing 3D then recovers the CU occupancy a low
++batch would otherwise leave idle. Neither is tied to head_dim.
++
++Do not mistake the traffic argument for a bandwidth argument. Measured at 8:1 /
++ISL 32768 / CONC 4, BLOCK_Q=4 cut KV traffic per layer from 134 MB to 67 MB and
++the kernel stayed at ~53 us -- 2.51 -> 1.27 TB/s on an 8 TB/s part. It is bound
++by workgroups in flight, not bytes. The measured win at 8:1 came almost entirely
++from num_segments dropping 128 -> 64, which is what makes reduce_segments cheap
++(20.30 -> 8.40 us); the attention kernel itself barely moved (53.44 -> 52.66).
+ 
+ Real constraints, mirrored by the gate in srt/layers/attention/aiter_backend.py:
+ 
+@@ -30,8 +38,8 @@ Real constraints, mirrored by the gate in srt/layers/attention/aiter_backend.py:
+     correct but is not tuned (num_warps=2 balances VGPR pressure at 256).
+   - Causal only. seq_mask carries no tree mask, so spec decoding needs topk==1.
+ 
+-The gate is on shape, not on model; Qwen3.5-397B-A17B at TP1/TP2 (16:1 GQA,
+-head_dim 256) is the only config known to match today.
++The gate is on shape, not on model; Qwen3.5-397B-A17B matches at TP1/TP2 (16:1
++GQA, head_dim 256) and TP4 (8:1).
+ """
+ 
+ import math
+@@ -622,22 +630,45 @@ def unified_attention_3d_mtp_func(
+     num_queries_per_kv = num_query_heads // num_kv_heads
+ 
+     assert 1 < max_seqlen_q <= 4
+-    # Ratio, not absolute counts: block_m=32 // num_queries_per_kv gives block_q=2,
+-    # which packs two draft tokens per tile. Any (16N : N) GQA layout works because
+-    # the kernel indexes KV through kv_head_idx = program_id(1).
++    # Ratio, not absolute counts: block_m=32 // num_queries_per_kv gives the number
++    # of draft tokens packed per tile -- 2 at 16:1 GQA (TP1/TP2), 4 at 8:1 (TP4).
++    # Any (N*num_queries_per_kv : N) GQA layout is *correct* because the kernel
++    # indexes KV through kv_head_idx = program_id(1) and derives both query_pos and
++    # the head index from num_queries_per_kv (see :209, :212, :274) -- nothing below
++    # the launcher hardcodes 16. It is not, however, equally *fast*: BLOCK_M stays
++    # 32 but the rows now mean something different (4 tokens x 8 heads instead of
++    # 2 x 16), which changes how K/V tiles are reused down the inner loop and moves
++    # the (tile_size, num_warps) optimum. Hence the per-ratio table below --
++    # measured, not derived; the tile dimensions alone do not predict it.
+     assert num_query_heads % num_kv_heads == 0
+-    assert num_queries_per_kv == 16
++    assert num_queries_per_kv in (8, 16)
+     assert head_size == 256 and k.shape[1] == 16
+     assert q.dtype == torch.bfloat16
+     assert k.dtype == e4m3_dtype and v.dtype == e4m3_dtype
+ 
+     block_m = 32
+     block_q = block_m // num_queries_per_kv
+-    tile_size = 32
++
+     total_num_q_blocks = num_tokens // block_q + num_seqs
+     num_2d_programs = total_num_q_blocks * num_kv_heads
+-
+     num_cus = torch.cuda.get_device_properties(q.device).multi_processor_count
++
++    # tile_size stays 32 at every ratio. tile_size=64 was tried and is a measured
++    # REGRESSION in production at 8:1 -- 83.26 us against 52.66 us for the kernel
++    # alone, on matched traces (ISL 32768 / CONC 4, batch_size 4, 315 calls each).
++    #
++    # A standalone bench said the opposite (46.4 us vs 53.5 us for the pair) and
++    # was wrong, because its whole KV working set was 64-128 MB and therefore
++    # resident in the 256 MB LLC. In production, 15 attention layers cycle ~2 GB
++    # of KV per decode step, so every read is cold. That difference matters
++    # because this kernel is NOT bandwidth-bound here: halving KV traffic via
++    # BLOCK_Q=4 (134 -> 67 MB) left the kernel at ~53 us, i.e. 2.51 -> 1.27 TB/s.
++    # It is bound by how many workgroups are in flight, and tile_size=64 halves
++    # the segment axis, which is the only parallelism left once BLOCK_Q has
++    # collapsed the q-blocks. Do not re-litigate this from a microbenchmark
++    # whose working set fits in cache.
++    tile_size = 32
++
+     max_segments = min(64, math.ceil(max_seqlen_k / tile_size))
+     parallel_segments = math.ceil(num_cus * 2 / max(1, num_2d_programs))
+     work_segments = math.ceil(max_seqlen_k / (tile_size * 32))
+diff --git a/python/sglang/srt/layers/attention/aiter_backend.py b/python/sglang/srt/layers/attention/aiter_backend.py
+index 0e73867d2f..279f2f4b68 100755
+--- a/python/sglang/srt/layers/attention/aiter_backend.py
++++ b/python/sglang/srt/layers/attention/aiter_backend.py
+@@ -2441,13 +2441,20 @@ class AiterAttnBackend(AttentionBackend):
+                     v_unified = v_cache.view(
+                         -1, self.page_size, layer.tp_v_head_num, layer.v_head_dim
+                     )
+-                    # Shape gate, not a model gate: the kernel is tuned for a 16:1
+-                    # GQA ratio (block_m=32 -> block_q=2 packs two draft tokens per
+-                    # tile), and head_dim 256 is the only validated size. The kv-head
+-                    # count itself is free (kv_head_idx = program_id(1)), but K and V
+-                    # must share it -- the kernel has a single kv-head grid dim.
+-                    # Qwen3.5-397B-A17B at TP1/TP2 is the only config known to
+-                    # match today; any model with the same shapes qualifies.
++                    # Shape gate, not a model gate: block_m=32 is split into
++                    # block_q = 32 // num_queries_per_kv draft tokens per tile, so a
++                    # 16:1 GQA ratio (TP1/TP2) packs 2 and 8:1 (TP4) packs 4. head_dim
++                    # 256 is the only validated size. The kv-head count itself is free
++                    # (kv_head_idx = program_id(1)), but K and V must share it -- the
++                    # kernel has a single kv-head grid dim.
++                    # Qwen3.5-397B-A17B matches at TP1/TP2 (16:1) and TP4 (8:1); any
++                    # model with the same shapes qualifies.
++                    #
++                    # 8:1 is the TP4 serving config and is why this list is not just
++                    # {16}: the unified_attention fallback picks BLOCK_M=16 for any
++                    # ratio <= 16, hence block_q = 16 // 8 = 2, which splits 4 draft
++                    # tokens across two q-blocks and streams the entire KV twice per
++                    # sequence per layer. block_q=4 streams it once.
+                     # TODO(yichiche): relax the head_dim gate once other sizes are
+                     # measured -- the wrapper passes HEAD_SIZE_PADDED unpadded, so
+                     # only powers of 2 work (128/256 OK, 192 is not).
+@@ -2456,7 +2463,7 @@ class AiterAttnBackend(AttentionBackend):
+                         is_gfx95_supported()
+                         and 1 < self.forward_metadata.max_q_len <= 4
+                         and max_kv_len > 512
+-                        and num_queries_per_kv == 16
++                        and num_queries_per_kv in (8, 16)
+                         and layer.tp_k_head_num == layer.tp_v_head_num
+                         and layer.qk_head_dim == 256
+                         and layer.v_head_dim == 256

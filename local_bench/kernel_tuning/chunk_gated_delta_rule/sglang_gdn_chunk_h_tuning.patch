@@ -1,0 +1,95 @@
+diff --git a/python/sglang/kernels/ops/attention/fla/chunk_delta_h.py b/python/sglang/kernels/ops/attention/fla/chunk_delta_h.py
+index 2fe5e623d4..4ae4a8a95e 100644
+--- a/python/sglang/kernels/ops/attention/fla/chunk_delta_h.py
++++ b/python/sglang/kernels/ops/attention/fla/chunk_delta_h.py
+@@ -16,14 +16,78 @@ from sglang.kernels.ops.attention.fla.index import (
+ from sglang.kernels.ops.attention.fla.op import exp, exp2, safe_exp
+ from sglang.kernels.ops.attention.fla.utils import (
+     autotune_cache_kwargs,
++    is_amd,
+     is_nvidia_hopper,
+ )
+ 
+ NUM_WARPS = [2, 4] if is_nvidia_hopper else [2, 4, 8, 16]
+ CHUNK_SIZE = 64
+-GDN_CHUNK_H_BV = int(os.getenv("SGLANG_GDN_CHUNK_H_BV", "32"))
+-GDN_CHUNK_H_NUM_WARPS = int(os.getenv("SGLANG_GDN_CHUNK_H_NUM_WARPS", "4"))
+-GDN_CHUNK_H_NUM_STAGES = int(os.getenv("SGLANG_GDN_CHUNK_H_NUM_STAGES", "2"))
++
++# Launch geometry for chunk_gated_delta_rule_fwd_kernel_h_blockdim64.
++#
++# The grid is (cdiv(V, BV), N * H) and nothing else, so BV is the only knob that
++# changes workgroup count. On MI350X the (32, 4, 2) triple leaves the device at
++# 25% fill (64 workgroups of 256 CUs) and is 1.47x slower than the same Triton
++# source on GB200. Measured on the Qwen3.5-397B-A17B TP4 prefill shape
++# (B=1 T=32768 Hg=4 H=16 K=128 V=128), 20 reps, bitwise-identical output:
++#
++#     BV=32 w=4 s=2   1.345 ms    64 WGs   25% fill   <- previous default
++#     BV=16 w=4 s=3   0.921 ms   128 WGs   50% fill   1.46x
++#
++# The kernel is per-workgroup latency-bound: every workgroup delivers ~20 GB/s
++# regardless of shape or BV, so aggregate throughput tracks workgroup count.
++# Confirmed by running the same tile at TP2, which has twice the heads and
++# therefore twice the workgroups, and scales ~linearly (5.31 vs 2.87 TB/s).
++#
++# BV=8 is NOT the next step down that curve: it reaches 100% fill but halves the
++# per-workgroup rate (11.0 vs 22.4 GB/s) because the [BV, 64] accumulator tile
++# gets too narrow for the MFMA path, and it perturbs numerics. 50% fill is the
++# practical ceiling without an algorithmic change.
++#
++# AMD-only. The NVIDIA path keeps its original (32, 4, 2) because none of the
++# above was measured there, and this file is shared across all GDN models.
++if is_amd:
++    _DEFAULT_BV, _DEFAULT_NUM_WARPS, _DEFAULT_NUM_STAGES = 16, 4, 3
++else:
++    _DEFAULT_BV, _DEFAULT_NUM_WARPS, _DEFAULT_NUM_STAGES = 32, 4, 2
++
++GDN_CHUNK_H_BV = int(os.getenv("SGLANG_GDN_CHUNK_H_BV", str(_DEFAULT_BV)))
++GDN_CHUNK_H_NUM_WARPS = int(
++    os.getenv("SGLANG_GDN_CHUNK_H_NUM_WARPS", str(_DEFAULT_NUM_WARPS))
++)
++GDN_CHUNK_H_NUM_STAGES = int(
++    os.getenv("SGLANG_GDN_CHUNK_H_NUM_STAGES", str(_DEFAULT_NUM_STAGES))
++)
++
++# waves_per_eu is an AMD backend compile option (triton/backends/amd/compiler.py),
++# not a kernel parameter -- it rides in Config.kwargs and the backend parses it
++# out. It is worth a further 1.085x here (0.960 -> 0.885 ms, 60 reps x 3 trials,
++# std <= 0.010), taking the total to ~1.53x.
++#
++# It is ONLY valid coupled to (BV=16, num_warps=4). Everywhere else it is
++# neutral or catastrophic, measured on the same shape:
++#
++#     BV=16 w=4 + wpe=4    0.885 ms    1.08x BETTER
++#     BV=16 w=2 + wpe=4    1.258 ms    1.26x worse
++#     BV=32 w=4 + wpe=4    4.397 ms    3.3x  WORSE
++#     BV=32 w=2 + wpe=4    5.674 ms    4.5x  WORSE
++#
++# Hence the exact-match gate rather than three independent knobs: if BV or
++# num_warps is overridden away from the tuned pair -- by env, by a future edit,
++# or by a different arch branch -- waves_per_eu drops out silently instead of
++# leaving the kernel 3-4x slower than it was before this change. Do not relax
++# this to a >= or an "if not None". wpe=8 aborts the Triton compiler outright
++# (LLVM assertion, SIGABRT), so the value is not a free parameter either.
++GDN_CHUNK_H_WAVES_PER_EU = int(os.getenv("SGLANG_GDN_CHUNK_H_WAVES_PER_EU", "4"))
++
++_gdn_chunk_h_config_kwargs = {"BV": GDN_CHUNK_H_BV}
++if (
++    is_amd
++    and GDN_CHUNK_H_WAVES_PER_EU > 0
++    and GDN_CHUNK_H_BV == 16
++    and GDN_CHUNK_H_NUM_WARPS == 4
++):
++    _gdn_chunk_h_config_kwargs["waves_per_eu"] = GDN_CHUNK_H_WAVES_PER_EU
+ 
+ 
+ @triton.autotune(
+@@ -41,7 +105,7 @@ GDN_CHUNK_H_NUM_STAGES = int(os.getenv("SGLANG_GDN_CHUNK_H_NUM_STAGES", "2"))
+     # tile without corrupting the state pool through multi-config autotune.
+     configs=[
+         triton.Config(
+-            {"BV": GDN_CHUNK_H_BV},
++            _gdn_chunk_h_config_kwargs,
+             num_warps=GDN_CHUNK_H_NUM_WARPS,
+             num_stages=GDN_CHUNK_H_NUM_STAGES,
+         )

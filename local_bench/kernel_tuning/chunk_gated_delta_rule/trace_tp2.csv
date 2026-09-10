@@ -1,0 +1,4 @@
+shape,config,dispatches,median_ms,min_ms,max_ms,std_ms,workgroups,block_threads,vgpr,agpr,sgpr,lds_bytes,n_regs,n_spills,scratch_bytes,trace_csv
+qwen35-397b-tp2,BV=32 w=4 s=2,20,1.3939,1.3877,1.4093,0.0058,128,256,108,0,96,76160,214,0,0,/var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/traces/qwen35-397b-tp2/BV32_w4_s2/gdn_kernel_trace.csv
+qwen35-397b-tp2,BV=16 w=4 s=3,20,0.9818,0.9548,1.0619,0.0359,256,256,64,0,112,103296,124,0,0,/var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/traces/qwen35-397b-tp2/BV16_w4_s3/gdn_kernel_trace.csv
+qwen35-397b-tp2,BV=16 w=4 s=3 wpe=4,20,0.9531,0.9138,1.0299,0.0352,256,256,56,0,112,103296,110,0,0,/var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/traces/qwen35-397b-tp2/BV16_w4_s3_wpe4/gdn_kernel_trace.csv

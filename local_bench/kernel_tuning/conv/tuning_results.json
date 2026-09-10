@@ -1,0 +1,62 @@
+[
+  {
+    "channels": 3072,
+    "length": 32768,
+    "batch": 1,
+    "block": 64,
+    "tokens": 16,
+    "flydsl_ms": 0.17825568338845996,
+    "triton_ms": 0.18027717431686777,
+    "speedup": 1.011340400990203
+  },
+  {
+    "channels": 3072,
+    "length": 32768,
+    "batch": 1,
+    "block": 128,
+    "tokens": 8,
+    "flydsl_ms": 0.18202988073201729,
+    "triton_ms": 0.18000811482523824,
+    "speedup": 0.9888932196260928
+  },
+  {
+    "channels": 3072,
+    "length": 32768,
+    "batch": 1,
+    "block": 128,
+    "tokens": 32,
+    "flydsl_ms": 0.17676911093971948,
+    "triton_ms": 0.18000647650824653,
+    "speedup": 1.0183140909139439
+  },
+  {
+    "channels": 3072,
+    "length": 32768,
+    "batch": 1,
+    "block": 256,
+    "tokens": 8,
+    "flydsl_ms": 0.1793215233734931,
+    "triton_ms": 0.18004134232607116,
+    "speedup": 1.0040141246797174
+  },
+  {
+    "channels": 3072,
+    "length": 32768,
+    "batch": 1,
+    "block": 256,
+    "tokens": 16,
+    "flydsl_ms": 0.17390057113675053,
+    "triton_ms": 0.18001117145313936,
+    "speedup": 1.0351384718086039
+  },
+  {
+    "channels": 3072,
+    "length": 32768,
+    "batch": 1,
+    "block": 256,
+    "tokens": 32,
+    "flydsl_ms": 0.1741487863901499,
+    "triton_ms": 0.18010764617086109,
+    "speedup": 1.034217061767869
+  }
+]

@@ -1,0 +1,19 @@
+[
+  "rocprofv3",
+  "--kernel-trace",
+  "--output-format",
+  "csv",
+  "-d",
+  "/var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/triton_s4_trial0",
+  "-o",
+  "gdn",
+  "--",
+  "/opt/venv/bin/python3",
+  "/var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py",
+  "--backend",
+  "triton",
+  "--stages",
+  "4",
+  "--launches",
+  "60"
+]

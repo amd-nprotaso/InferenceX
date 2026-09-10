@@ -1,0 +1,11 @@
+{"backend": "permuted", "stages": 3, "launches": 60, "exact": true, "event_median_ms": 0.8285645246505737}
+W20260909 14:04:25.865157 137839796997632 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000408 sec
+W20260909 14:04:25.865285 137839796997632 simple_timer.cpp:55] [rocprofv3] '/opt/venv/bin/python3 /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py --backend permuted --stages 3 --launches 60' ::     0.000000 sec
+W20260909 14:04:27.499251 137839796997632 tool.cpp:2422] HSA version 8.20.0 initialized (instance=0)
+W20260909 14:04:28.482490 129818428620288 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000405 sec
+W20260909 14:04:28.482602 129818428620288 simple_timer.cpp:55] [rocprofv3] '/bin/sh /sbin/ldconfig -p' ::     0.000000 sec
+W20260909 14:04:30.722497 137839796997632 simple_timer.cpp:55] [rocprofv3] '/opt/venv/bin/python3 /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py --backend permuted --stages 3 --launches 60' ::     4.857213 sec
+E20260909 14:04:30.736337 137839796997632 output_stream.cpp:111] Opened result file: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/permuted_s3_trial2/gdn_kernel_trace.csv
+E20260909 14:04:30.740811 137839796997632 output_stream.cpp:111] Opened result file: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/permuted_s3_trial2/gdn_agent_info.csv
+W20260909 14:04:30.742324 137839796997632 simple_timer.cpp:55] [rocprofv3] output generation ::     0.010288 sec
+W20260909 14:04:30.743855 137839796997632 simple_timer.cpp:55] [rocprofv3] tool finalization ::     0.011851 sec

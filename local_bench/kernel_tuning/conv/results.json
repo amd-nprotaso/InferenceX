@@ -1,0 +1,14 @@
+{
+  "device": "AMD Instinct MI355X",
+  "correctness_cases": 39,
+  "benchmark": {
+    "channels": 2048,
+    "length": 32768,
+    "batch": 1,
+    "block": 128,
+    "tokens": 16,
+    "flydsl_ms": 0.0800889669810438,
+    "triton_ms": 0.09469977501017642,
+    "speedup": 1.1824322198161308
+  }
+}

@@ -1,0 +1,13 @@
+{"backend": "flydsl", "stages": 3, "launches": 60, "exact": true, "event_median_ms": 0.7500439882278442}
+W20260909 14:03:48.119999 135973513973248 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000374 sec
+W20260909 14:03:48.120104 135973513973248 simple_timer.cpp:55] [rocprofv3] '/opt/venv/bin/python3 /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py --backend flydsl --stages 3 --launches 60' ::     0.000000 sec
+W20260909 14:03:49.723442 135973513973248 tool.cpp:2422] HSA version 8.20.0 initialized (instance=0)
+W20260909 14:03:50.676612 135043677568512 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000366 sec
+W20260909 14:03:50.676711 135043677568512 simple_timer.cpp:55] [rocprofv3] '/bin/sh /sbin/ldconfig -p' ::     0.000000 sec
+W20260909 14:03:52.992538 139236370064064 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000403 sec
+W20260909 14:03:52.994337 139236370064064 simple_timer.cpp:55] [rocprofv3] 'ld.lld -shared /tmp/kernel95-968d3d.o -o /tmp/kernel-65fb9d.hsaco' ::     0.000000 sec
+W20260909 14:03:53.980616 135973513973248 simple_timer.cpp:55] [rocprofv3] '/opt/venv/bin/python3 /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py --backend flydsl --stages 3 --launches 60' ::     5.860513 sec
+E20260909 14:03:53.992768 135973513973248 output_stream.cpp:111] Opened result file: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/flydsl_s3_trial0/gdn_kernel_trace.csv
+E20260909 14:03:53.996778 135973513973248 output_stream.cpp:111] Opened result file: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/flydsl_s3_trial0/gdn_agent_info.csv
+W20260909 14:03:53.998155 135973513973248 simple_timer.cpp:55] [rocprofv3] output generation ::     0.009502 sec
+W20260909 14:03:53.999647 135973513973248 simple_timer.cpp:55] [rocprofv3] tool finalization ::     0.011030 sec

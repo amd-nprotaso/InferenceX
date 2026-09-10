@@ -1,0 +1,11 @@
+{"backend": "triton", "stages": 3, "launches": 60, "exact": true, "event_median_ms": 0.8572250008583069}
+W20260909 14:04:20.419371 129920678940160 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000371 sec
+W20260909 14:04:20.419476 129920678940160 simple_timer.cpp:55] [rocprofv3] '/opt/venv/bin/python3 /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py --backend triton --stages 3 --launches 60' ::     0.000000 sec
+W20260909 14:04:22.040445 129920678940160 tool.cpp:2422] HSA version 8.20.0 initialized (instance=0)
+W20260909 14:04:23.015332 139098621644288 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.000405 sec
+W20260909 14:04:23.015449 139098621644288 simple_timer.cpp:55] [rocprofv3] '/bin/sh /sbin/ldconfig -p' ::     0.000000 sec
+W20260909 14:04:25.280008 129920678940160 simple_timer.cpp:55] [rocprofv3] '/opt/venv/bin/python3 /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/profile_flydsl.py --backend triton --stages 3 --launches 60' ::     4.860532 sec
+E20260909 14:04:25.294078 129920678940160 output_stream.cpp:111] Opened result file: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/triton_s3_trial2/gdn_kernel_trace.csv
+E20260909 14:04:25.298635 129920678940160 output_stream.cpp:111] Opened result file: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule/results_flydsl/triton_s3_trial2/gdn_agent_info.csv
+W20260909 14:04:25.300313 129920678940160 simple_timer.cpp:55] [rocprofv3] output generation ::     0.010911 sec
+W20260909 14:04:25.301874 129920678940160 simple_timer.cpp:55] [rocprofv3] tool finalization ::     0.012509 sec
