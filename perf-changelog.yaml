@@ -7058,3 +7058,15 @@
   description:
     - "Remove the unstable concurrency-1152 2P DEP8 prefill plus DEP12 decode point after repeated benchmark failures."
   pr-link: https://github.com/SemiAnalysisAI/InferenceX/pull/2623
+
+- config-keys:
+    - qwen3.5-fp4-mi355x-sglang
+    - qwen3.5-fp4-mi355x-sglang-mtp
+  scenario-type:
+    - fixed-seq-len
+  description:
+    - "Optimize the opt-in local_bench/kernel_tuning/conv FlyDSL causal prefill convolution with grouped token prefetch, safe clamped tail loads, earlier weight loads, and adjacent-channel packing."
+    - "MI350X TP=4 kernel-only alternating trials measured 1.54x, 1.10x, and 1.53x speedups over the original FlyDSL implementation for 32K, 4K, and packed 4x8K inputs; serving throughput has not been measured."
+    - "优化可选的 local_bench/kernel_tuning/conv FlyDSL 因果 prefill 卷积：分组预取 token、将尾部读取地址钳制在有效范围内、提前读取权重，并打包相邻通道。"
+    - "MI350X TP=4 内核交替测试中，32K、4K 和打包 4x8K 输入相较原始 FlyDSL 实现分别加速 1.54x、1.10x、1.53x；尚未测量服务吞吐量。"
+  pr-link: XXX

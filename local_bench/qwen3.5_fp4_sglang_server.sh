@@ -15,6 +15,7 @@ set -x
 #   SIMULATE_ACC=0 ./qwen3.5_fp4_sglang_server.sh     # real MTP acceptance
 #
 # Env: MODEL MODEL_PATH PORT TP EP_SIZE CONC MEM_FRAC_STATIC PREFILL_TOKENS
+#      PREFILL_MAX_REQUESTS
 #      MAX_RUNNING_REQUESTS CUDA_GRAPH_MAX_BS SIMULATE_ACC DISABLE_RADIX_CACHE
 #      KV_OFFLOADING(none|dram) SCHEDULER_RECV_INTERVAL SKIP_DOWNLOAD
 #      SGLANG_GDN_CHUNK_H_{BV,NUM_WARPS,NUM_STAGES} QR_QUANT QR_MAX_MB
@@ -107,6 +108,16 @@ if [ "$TP" -ge 4 ]; then
     TOKENIZER_ARGS=(--tokenizer-worker-num 6)
 fi
 
+# One request per prefill batch. Unset by default (SGLang packs prefills up to
+# the token budget, so a 32k batch routinely carries 2-3 sequences). Set to 1
+# when a kernel needs single-sequence cu_seqlens -- e.g. the FlyDSL GDN chunk_h
+# specialization in kernel_tuning/chunk_gated_delta_rule, which falls back to
+# Triton whenever cu_seqlens.numel() != 2.
+SCHEDULE_ARGS=()
+if [[ -n "${PREFILL_MAX_REQUESTS:-}" ]]; then
+    SCHEDULE_ARGS+=(--prefill-max-requests "$PREFILL_MAX_REQUESTS")
+fi
+
 CACHE_ARGS=()
 if [[ "$DISABLE_RADIX_CACHE" == "1" ]]; then
     # Cleanest fixed-seq-len numbers: no prefix reuse across requests at all.
@@ -159,6 +170,7 @@ SGLANG_CMD=(
     --chunked-prefill-size "$PREFILL_TOKENS"
     --scheduler-recv-interval "$SCHEDULER_RECV_INTERVAL"
     --stream-interval 50
+    "${SCHEDULE_ARGS[@]}"
     "${TOKENIZER_ARGS[@]}"
     --tokenizer-path "$MODEL"
     --reasoning-parser qwen3

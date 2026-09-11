@@ -1,0 +1,46 @@
+W20260910 14:32:02.979261 140437449172288 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.045041 sec
+W20260910 14:32:02.979458 140437449172288 simple_timer.cpp:55] [rocprofv3] 'python compare_conv.py --shapes qwen35-397b-tp4 --warmup 2 --repeats 2 --trials 1' ::     0.000000 sec
+W20260910 14:32:03.114969 140437449172288 tool.cpp:2422] HIP (compiler) version 7.2.0 initialized (instance=0)
+W20260910 14:32:04.061952 140437449172288 tool.cpp:2422] HIP (runtime) version 7.2.0 initialized (instance=0)
+W20260910 14:32:04.296102 140437449172288 tool.cpp:2422] HSA version 8.20.0 initialized (instance=0)
+GPU: AMD Instinct MI350X | TP=4, channels=3072, BF16, width=4, SiLU
+Shape                               Tokens Batch   SGLang ms   FlyDSL ms   Speedup
+E20260910 14:32:06.571715 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_1.out
+E20260910 14:32:06.596523 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_2.out
+E20260910 14:32:06.629757 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_3.out
+E20260910 14:32:06.645002 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_4.out
+E20260910 14:32:06.651625 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_5.out
+E20260910 14:32:06.661547 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_6.out
+E20260910 14:32:06.844707 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_7.out
+E20260910 14:32:07.164715 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_8.out
+E20260910 14:32:07.311976 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_9.out
+E20260910 14:32:07.323553 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_10.out
+W20260910 14:32:07.565293 140498289788224 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.044200 sec
+W20260910 14:32:07.565455 140498289788224 simple_timer.cpp:55] [rocprofv3] '/bin/sh /sbin/ldconfig -p' ::     0.000000 sec
+E20260910 14:32:08.520623 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_11.out
+W20260910 14:32:10.139778 140282365307328 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.044345 sec
+W20260910 14:32:10.141003 140282365307328 simple_timer.cpp:55] [rocprofv3] '/opt/rocm/llvm/bin/ld.lld -shared /tmp/kernel3a-dea528.o -o /tmp/kernel-a4b8e7.hsaco' ::     0.000000 sec
+E20260910 14:32:10.167536 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_12.out
+E20260910 14:32:10.179233 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_13.out
+E20260910 14:32:10.212171 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_14.out
+E20260910 14:32:10.229631 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_15.out
+E20260910 14:32:10.254400 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_16.out
+E20260910 14:32:10.275250 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_17.out
+E20260910 14:32:10.296158 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_18.out
+E20260910 14:32:10.323099 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_19.out
+E20260910 14:32:10.342528 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_gfx950_code_object_id_20.out
+E20260910 14:32:10.401569 140427982272064 output_stream.cpp:111] Opened result file: optimization/att_32k/out_24517_shader_engine_0_153.att
+E20260910 14:32:10.403312 140427982272064 output_stream.cpp:111] Opened result file: optimization/att_32k/out_24517_shader_engine_1_153.att
+E20260910 14:32:10.404190 140427982272064 output_stream.cpp:111] Opened result file: optimization/att_32k/out_24517_shader_engine_2_153.att
+E20260910 14:32:10.405083 140427982272064 output_stream.cpp:111] Opened result file: optimization/att_32k/out_24517_shader_engine_3_153.att
+qwen35-397b-tp4                      32768     1    0.231242    0.142461    1.623x
+Correctness passed. Speedup = SGLang / FlyDSL (>1 favors FlyDSL). Kernel-only timing.
+W20260910 14:32:11.053416 140437449172288 simple_timer.cpp:55] [rocprofv3] 'python compare_conv.py --shapes qwen35-397b-tp4 --warmup 2 --repeats 2 --trials 1' ::     8.073958 sec
+E20260910 14:32:11.140214 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_kernel_trace.csv
+E20260910 14:32:11.146838 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_hsa_api_trace.csv
+E20260910 14:32:11.362870 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_hip_api_trace.csv
+E20260910 14:32:12.141426 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_memory_allocation_trace.csv
+E20260910 14:32:12.147067 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_scratch_memory_trace.csv
+E20260910 14:32:12.150374 140437449172288 output_stream.cpp:111] Opened result file: optimization/att_32k/out_agent_info.csv
+W20260910 14:32:14.070009 140437449172288 simple_timer.cpp:55] [rocprofv3] output generation ::     2.935646 sec
+W20260910 14:32:14.073971 140437449172288 simple_timer.cpp:55] [rocprofv3] tool finalization ::     2.939956 sec

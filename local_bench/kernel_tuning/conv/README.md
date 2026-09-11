@@ -132,8 +132,14 @@ with the history update. Short sequences use a register snapshot of old state.
 Accumulation and SiLU use FP32, with explicit output/state dtype conversion.
 
 The default launch is 128 threads and 16 tokens per tile. Standalone callers can
-set `block` (64/128/256) and `tokens` (`width-1` through 64). Kernels specialize on
-geometry, strides, dtype, and optional inputs. Warm each signature before graph
+set `block` (64/128/256), `tokens` (`width-1` through 64), `prefetch`
+(1/2/4/8/16; default 16), and `channels_per_thread` (1/2; default automatic).
+The kernel loads raw token groups before consumption and clamps unused tail
+load addresses inside the sequence, retaining output masks. Weights are loaded
+before the input halo. Automatic mapping uses two adjacent channels per thread
+for BF16/FP16 channel-contiguous inputs with an even channel count and at least
+8192 packed tokens; other inputs use one. Explicit pairing requires even channels.
+Kernels specialize on geometry, strides, dtype, optional inputs, and tuning values. Warm each signature before graph
 capture; compilation executes the first call once and updates state once.
 
 ## Validation and timings
@@ -145,11 +151,13 @@ python3 kernel_tuning/conv/check_conv.py --bench \
   --output kernel_tuning/conv/results_tp4.json
 ```
 
-The suite checks 39 cases against an independent FP32 PyTorch reference and,
+The suite checks scalar and paired-channel paths against an independent FP32 PyTorch reference and,
 for widths 2–4, installed SGLang Triton. It covers channel tails, short and empty
 sequences, mixed initial history, padded/indirect cache slots, extra state
 capacity, three layouts and dtypes, bias/activation options, a nondefault stream,
-and graph capture/replay. Additional checks cover missing state, repeated
+and graph capture/replay. Paired-path checks include a partial final wave,
+non-power-of-two token tiles, offset input with an odd token stride, and FP32
+bias with BF16 input. Additional checks cover missing state, repeated
 dispatch, all-empty input, and inconsistent metadata. State comparison is exact;
 outputs use dtype-dependent tolerances (BF16: `atol=rtol=0.016`, FP16: `0.002`,
 FP32: `2e-6`). The no-state grouped-convolution check uses BF16 `atol=0.03125`.
@@ -166,6 +174,20 @@ To benchmark a split packed batch with the same total token budget:
 python3 kernel_tuning/conv/check_conv.py --bench-only \
   --channels 3072 --length 8192 --batch 4
 ```
+
+The September 2026 optimization uses grouped prefetch and adjacent-channel
+packing. Five alternating trials on MI350X measured original/optimized FlyDSL
+latency of 198.042/128.341 µs (32K), 30.920/28.120 µs (4K), and
+198.562/129.761 µs (packed 4×8K): 1.54×, 1.10×, and 1.53× speedups.
+See [the optimization report](optimization/REPORT.md) for tuning, correctness,
+source hashes, and the new ATT capture. From this directory:
+
+```bash
+python compare_conv.py --output optimized_vs_sglang.json
+python optimization/compare_versions.py
+```
+
+Historical measurements before this optimization follow.
 
 Initial MI355X graph timings at 3072 channels and 32768 tokens were approximately
 171 µs FlyDSL versus 178 µs Triton (1.04×). The earlier 2048-channel measurement

@@ -16,7 +16,8 @@ set -euo pipefail
 # For trace collection use ./qwen3.5_fp4_sglang_profile.sh instead.
 #
 # Env: HOST PORT MODEL MODE ISL OSL CONC_LIST RANDOM_RANGE_RATIO
-#      NUM_PROMPTS_MULT WARMUP_MULT RESULT_DIR FLUSH_CACHE PROFILE PROFILE_DIR
+#      NUM_PROMPTS_MULT WARMUP_MULT RESULT_DIR FLUSH_CACHE TOKENIZE_PROMPT
+#      PROFILE PROFILE_DIR
 
 HOST=${HOST:-127.0.0.1}
 PORT=${PORT:-8888}
@@ -40,7 +41,7 @@ case "$MODE" in
         # Mirrors configs/amd-master.yaml -> qwen3.5-fp4-mi355x-sglang-mtp
         # (fixed-seq-len isl 8192 / osl 1024, tp 4, conc 4..16) with the CI-wide
         # RANDOM_RANGE_RATIO=0.8 from .github/workflows/benchmark-tmpl.yml.
-        ISL=${ISL:-8192};  OSL=${OSL:-1024}
+        ISL=${ISL:-32768};  OSL=${OSL:-1024}
         CONC_LIST=${CONC_LIST:-"4 8 16"}
         RANDOM_RANGE_RATIO=${RANDOM_RANGE_RATIO:-0.8}
         ;;
@@ -54,6 +55,7 @@ NUM_PROMPTS_MULT=${NUM_PROMPTS_MULT:-10}   # num-prompts = mult * concurrency
 WARMUP_MULT=${WARMUP_MULT:-2}              # warmup reqs = mult * concurrency
 RESULT_DIR=${RESULT_DIR:-./bench_results}
 FLUSH_CACHE=${FLUSH_CACHE:-1}
+TOKENIZE_PROMPT=${TOKENIZE_PROMPT:-0}
 PROFILE=${PROFILE:-0}
 PROFILE_DIR=${PROFILE_DIR:-/var/home/sglang_profiling}
 
@@ -110,6 +112,13 @@ for CONC in $CONC_LIST; do
     # ignore_eos is ON by default (opt out with --disable-ignore-eos), so OSL is
     # honored exactly -- required for comparable decode/TPOT numbers under MTP.
     [[ "$FLUSH_CACHE" == "1" ]] && bench_cmd+=(--flush-cache)
+
+    # Send token ids instead of text. Without this the random dataset detokenizes
+    # then re-tokenizes, and prompts land a few tokens short of ISL even at
+    # range-ratio 1 (observed 31858 / 32359 / 32462 for ISL=32768). Set this when
+    # a kernel needs the prefill token count to be an exact multiple of its chunk
+    # size -- e.g. the FlyDSL GDN chunk_h specialization, which requires T%64==0.
+    [[ "$TOKENIZE_PROMPT" == "1" ]] && bench_cmd+=(--tokenize-prompt)
 
     # For trace collection prefer ./qwen3.5_fp4_sglang_profile.sh -- it sizes the
     # request set for profiling instead of for throughput. This stays as an

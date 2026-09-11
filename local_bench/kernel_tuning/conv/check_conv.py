@@ -12,15 +12,19 @@ from causal_conv1d_flydsl import causal_conv1d_fn
 def check(lengths: list[int], channels: int = 65, width: int = 4,
           dtype: torch.dtype = torch.bfloat16, layout: str = "channel_last",
           bias_on: bool = True, activation: str | None = "silu", graph: bool = False,
-          compare: bool = True, block: int = 128, tokens: int = 16) -> None:
+          compare: bool = True, block: int = 128, tokens: int = 16,
+          prefetch: int = 16, channels_per_thread: int | None = None,
+          bias_dtype: torch.dtype | None = None) -> None:
     total, batch = sum(lengths), len(lengths)
     x = torch.randn(total, channels, device="cuda", dtype=dtype).T
     if layout == "channel_first":
         x = x.contiguous()
     elif layout == "strided":
         x = torch.randn(total*2, channels, device="cuda", dtype=dtype)[::2, :].T
+    elif layout == "offset":
+        x = torch.randn(total, channels+1, device="cuda", dtype=dtype)[:, 1:].T
     w = torch.randn(channels, width, device="cuda", dtype=dtype)*0.25
-    bias = torch.randn(channels, device="cuda", dtype=dtype) if bias_on else None
+    bias = torch.randn(channels, device="cuda", dtype=bias_dtype or dtype) if bias_on else None
     state = torch.randn(batch+3, width+2, channels, device="cuda", dtype=dtype).transpose(1, 2)
     slots = list(reversed(range(batch)))
     if batch > 2:
@@ -54,8 +58,9 @@ def check(lengths: list[int], channels: int = 65, width: int = 4,
         expected[:, lo:lo+n] = acc
         expected_state[slot, :, :width-1] = joined[:, -(width-1):]
     kwargs = dict(cache_indices=ids, has_initial_state=init, activation=activation)
+    tuning = dict(prefetch=prefetch, channels_per_thread=channels_per_thread)
     got = causal_conv1d_fn(x, w, bias, state, q, lengths, validate_data=True,
-                          block=block, tokens=tokens, **kwargs)
+                          block=block, tokens=tokens, **tuning, **kwargs)
     tol = 0.016 if dtype == torch.bfloat16 else 0.002 if dtype == torch.float16 else 2e-6
     torch.testing.assert_close(got[:, mask], expected[:, mask], atol=tol, rtol=tol)
     torch.testing.assert_close(state, expected_state, atol=0, rtol=0)
@@ -69,12 +74,12 @@ def check(lengths: list[int], channels: int = 65, width: int = 4,
         stream = torch.cuda.Stream()
         stream.wait_stream(torch.cuda.current_stream())
         with torch.cuda.stream(stream):
-            causal_conv1d_fn(x, w, bias, state, q, lengths, block=block, tokens=tokens, **kwargs)
+            causal_conv1d_fn(x, w, bias, state, q, lengths, block=block, tokens=tokens, **tuning, **kwargs)
         torch.cuda.current_stream().wait_stream(stream)
         state.copy_(original)
         g = torch.cuda.CUDAGraph()
         with torch.cuda.graph(g):
-            yg = causal_conv1d_fn(x, w, bias, state, q, lengths, block=block, tokens=tokens, **kwargs)
+            yg = causal_conv1d_fn(x, w, bias, state, q, lengths, block=block, tokens=tokens, **tuning, **kwargs)
         state.copy_(original)
         g.replay()
         torch.testing.assert_close(yg[:, mask], expected[:, mask], atol=tol, rtol=tol)
@@ -156,6 +161,18 @@ def main() -> None:
                       compare=width < 5, block=args.block, tokens=args.tokens)
                 count += 1
                 print(f"passed {count}: {width=} {dtype=} {layout=}", flush=True)
+    # Paired lanes with an incomplete final wave, strided input/state, padded
+    # cache slots, and a prefetch window larger than a non-power-of-two tile.
+    for width in (2, 3, 4, 5):
+        for dtype in (torch.bfloat16, torch.float16, torch.float32):
+            check([1, 7, 2, 0, 3, 17, 33], channels=130, width=width,
+                  dtype=dtype, layout="strided", tokens=7, prefetch=16,
+                  channels_per_thread=2, compare=width < 5, graph=True)
+            count += 1
+            print(f"passed paired {count}: {width=} {dtype=}", flush=True)
+    check([1, 15, 16, 17], channels=130, channels_per_thread=2,
+          bias_dtype=torch.float32, prefetch=2, layout="offset", graph=True)
+    count += 1
     for activation in (None, "swish"):
         check([65, 3], channels=256, bias_on=False, activation=activation, graph=True,
               block=args.block, tokens=args.tokens)

@@ -119,8 +119,13 @@ ISL=32768 OSL=1024 CONC_LIST="4" bash qwen3.5_fp4_sglang_bench.sh
 显式转换为相应类型。
 
 默认每个线程块包含 128 个线程，处理 16 个 token。独立调用时可设置 `block`
-（64/128/256）及 `tokens`（从 `width-1` 到 64）。内核按几何参数、步长、类型及可选
-输入进行特化。图捕获前需预热每种签名；首次编译会执行一次计算并更新一次状态。
+（64/128/256）、`tokens`（从 `width-1` 到 64）、`prefetch`
+（1/2/4/8/16，默认 16）和 `channels_per_thread`（1/2，默认自动）。
+内核先分组读取原始 token，再进行转换和计算；尾部无效读取地址钳制在序列内，
+输出仍受 mask 保护。权重在输入 halo 之前读取。对于 BF16/FP16、通道连续、
+通道数为偶数且打包 token 总数至少为 8192 的输入，自动采用每线程双通道；
+其他输入每线程处理一个通道。显式双通道要求通道数为偶数。
+内核按几何参数、步长、类型、可选输入及调优参数进行特化。图捕获前需预热每种签名；首次编译会执行一次计算并更新一次状态。
 
 ## 验证与耗时
 
@@ -131,10 +136,12 @@ python3 kernel_tuning/conv/check_conv.py --bench \
   --output kernel_tuning/conv/results_tp4.json
 ```
 
-测试包含 39 个用例，对照独立 FP32 PyTorch 参考实现；宽度 2–4 还与已安装的
+测试覆盖单通道和双通道路径，对照独立 FP32 PyTorch 参考实现；宽度 2–4 还与已安装的
 SGLang Triton 比较。覆盖通道尾部、短序列和空序列、混合初始历史、填充及间接槽位、
 额外状态容量、三种布局和类型、bias/激活选项、非默认 stream 以及图捕获和重放。
-另外检查无状态、重复调用、全空输入及元数据不一致的情况。状态要求完全一致；
+双通道路径还覆盖不完整的最后一个 wave、非 2 的幂次 token 分块、带偏移且 token
+步长为奇数的输入，以及 BF16 输入配合 FP32 bias。另检查无状态、重复调用、
+全空输入及元数据不一致的情况。状态要求完全一致；
 输出采用按类型设置的容差（BF16：`atol=rtol=0.016`，FP16：`0.002`，FP32：`2e-6`）。
 无状态分组卷积检查采用 BF16 `atol=0.03125`。宽度 5 仅与独立参考实现比较，因为
 当前 Triton forward 的计算逻辑只处理宽度 2–4。
@@ -148,6 +155,19 @@ SGLang Triton 比较。覆盖通道尾部、短序列和空序列、混合初始
 python3 kernel_tuning/conv/check_conv.py --bench-only \
   --channels 3072 --length 8192 --batch 4
 ```
+
+2026 年 9 月的优化采用分组预取和相邻通道打包。在 MI350X 上进行五轮交替测试，
+原始/优化 FlyDSL 耗时为：32K 198.042/128.341 µs、4K 30.920/28.120 µs、
+打包 4×8K 198.562/129.761 µs，加速比分别为 1.54×、1.10×、1.53×。
+调优、正确性、源码哈希及新 ATT 数据见[优化报告](optimization/REPORT_zh.md)。
+在此目录运行：
+
+```bash
+python compare_conv.py --output optimized_vs_sglang.json
+python optimization/compare_versions.py
+```
+
+以下为本次优化前的历史测量。
 
 MI355X 上首次测得 3072 通道、32768 token 的图执行耗时约为 FlyDSL 171 µs、
 Triton 178 µs（1.04×）。此前 `results.json` 中的 2048 通道测量为 80 µs 和

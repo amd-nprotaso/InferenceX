@@ -1,0 +1,194 @@
+{
+  "model": "Qwen3.5-397B-A17B-MXFP4",
+  "tp": 4,
+  "argv": [
+    "compare_conv.py",
+    "--lengths",
+    "1",
+    "7",
+    "17",
+    "--history",
+    "mixed",
+    "--warmup",
+    "2",
+    "--repeats",
+    "5",
+    "--trials",
+    "2",
+    "--output",
+    "optimization/prefetch4_smoke.json"
+  ],
+  "method": "GPU events around one graph replay; state reset excluded; median of alternating trial medians",
+  "gpu": "AMD Instinct MI350X",
+  "architecture": "gfx950:sramecc+:xnack-",
+  "versions": {
+    "torch": "2.9.1+rocm7.2.0.lw.git7e1940d4",
+    "triton": "3.7.0+amd.rocm7.2.0.git89002410",
+    "flydsl": "0.3.2",
+    "sglang": "0.5.19.dev20260908+g554f817948"
+  },
+  "sources": {
+    "flydsl": {
+      "path": "/var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/conv/causal_conv1d_flydsl.py",
+      "sha256": "5c5a2aa31c24fa0bf018c951c1180eed1bff53677c304ce441a7e9f63e480d21"
+    },
+    "sglang": {
+      "path": "/sgl-workspace/sglang/python/sglang/kernels/ops/mamba/causal_conv1d_triton.py",
+      "sha256": "31cb0e1e34b26ed0f77c28bd7505af8a1499a2e4c73efb039eb41a23f74f5c8c"
+    }
+  },
+  "options": {
+    "shapes": null,
+    "lengths": [
+      1,
+      7,
+      17
+    ],
+    "flydsl_file": "/var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/conv/causal_conv1d_flydsl.py",
+    "device": 0,
+    "warmup": 2,
+    "repeats": 5,
+    "trials": 2,
+    "seed": 0,
+    "pool_slots": 1243,
+    "history": "mixed",
+    "state_layout": "channel-first",
+    "prefetch": null,
+    "block": 128,
+    "tokens": 16,
+    "rtol": 0.016,
+    "atol": 0.016,
+    "output": "optimization/prefetch4_smoke.json"
+  },
+  "environment": {},
+  "results": [
+    {
+      "name": "custom-tp4",
+      "lengths": [
+        1,
+        7,
+        17
+      ],
+      "total_tokens": 25,
+      "channels": 3072,
+      "width": 4,
+      "dtype": "bfloat16",
+      "pool_slots": 1243,
+      "initial_history": [
+        true,
+        false,
+        true
+      ],
+      "strides": {
+        "x": [
+          1,
+          3072
+        ],
+        "weight": [
+          4,
+          1
+        ],
+        "conv_states": [
+          9216,
+          3,
+          1
+        ],
+        "query_start_loc": [
+          1
+        ],
+        "cache_indices": [
+          1
+        ],
+        "has_initial_state": [
+          1
+        ]
+      },
+      "eager_correctness": {
+        "output_exact": false,
+        "state_exact": true,
+        "max_abs_error": 0.015625
+      },
+      "graph_correctness": {
+        "sglang": {
+          "output_exact": true,
+          "state_exact": true,
+          "max_abs_error": 0.0
+        },
+        "flydsl": {
+          "output_exact": false,
+          "state_exact": true,
+          "max_abs_error": 0.015625
+        }
+      },
+      "trials": [
+        {
+          "trial": 1,
+          "order": [
+            "sglang",
+            "flydsl"
+          ],
+          "timings": {
+            "sglang": {
+              "median_ms": 0.02152100019156933,
+              "stdev_ms": 0.013974428405959308,
+              "samples_ms": [
+                0.05268000066280365,
+                0.02483999915421009,
+                0.02152100019156933,
+                0.020959999412298203,
+                0.01960100047290325
+              ]
+            },
+            "flydsl": {
+              "median_ms": 0.021640000864863396,
+              "stdev_ms": 0.0032826089208764066,
+              "samples_ms": [
+                0.021640000864863396,
+                0.024119999259710312,
+                0.02800000086426735,
+                0.01979999989271164,
+                0.020800000056624413
+              ]
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "order": [
+            "flydsl",
+            "sglang"
+          ],
+          "timings": {
+            "flydsl": {
+              "median_ms": 0.019081000238656998,
+              "stdev_ms": 0.0005109251268626201,
+              "samples_ms": [
+                0.019081000238656998,
+                0.0188400000333786,
+                0.018959999084472656,
+                0.02012000046670437,
+                0.01916000060737133
+              ]
+            },
+            "sglang": {
+              "median_ms": 0.017921000719070435,
+              "stdev_ms": 0.0013410935667602128,
+              "samples_ms": [
+                0.01852099969983101,
+                0.01916000060737133,
+                0.017921000719070435,
+                0.016200000420212746,
+                0.01624000072479248
+              ]
+            }
+          }
+        }
+      ],
+      "median_ms": {
+        "sglang": 0.01972100045531988,
+        "flydsl": 0.020360500551760197
+      },
+      "speedup": 0.9685911407327837
+    }
+  ]
+}

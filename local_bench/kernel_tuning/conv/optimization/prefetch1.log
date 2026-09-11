@@ -1,0 +1,6 @@
+GPU: AMD Instinct MI350X | TP=4, channels=3072, BF16, width=4, SiLU
+Shape                               Tokens Batch   SGLang ms   FlyDSL ms   Speedup
+qwen35-397b-tp4                      32768     1    0.203162    0.188961    1.075x
+qwen35-397b-tp4-4k                    4096     1    0.033120    0.032160    1.030x
+qwen35-397b-tp4-packed4              32768     4    0.203922    0.192622    1.059x
+Correctness passed. Speedup = SGLang / FlyDSL (>1 favors FlyDSL). Kernel-only timing.

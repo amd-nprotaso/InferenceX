@@ -1,0 +1,6 @@
+jobs:
+  - kernel_include_regex: "^kernel_0$"
+    kernel_iteration_range: "[3]"
+    pmc: [TCC_HIT_sum, TCC_MISS_sum]
+    output_file: l2
+    output_format: [csv]
