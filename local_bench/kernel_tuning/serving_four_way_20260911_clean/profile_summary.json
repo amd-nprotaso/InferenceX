@@ -1,0 +1,858 @@
+{
+  "baseline": [
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/baseline/profile/isl32768_osl1024_c4/1789124270.7958584/1789124270.7979014-TP-0.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 44.38362399999999,
+          "median_us": 243.041,
+          "min_us": 159.32,
+          "max_us": 353.681,
+          "p95_us": 338.161
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.373372000000001,
+          "median_us": 162.56,
+          "min_us": 159.32,
+          "max_us": 168.92,
+          "p95_us": 168.36
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 152.71264200000002,
+          "median_us": 851.125,
+          "min_us": 752.004,
+          "max_us": 930.406,
+          "p95_us": 919.166
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 14.841341000000003,
+          "median_us": 324.961,
+          "min_us": 319.481,
+          "max_us": 353.681,
+          "p95_us": 348.882
+        },
+        "conv_shape_(1875, 2)": {
+          "count": 45,
+          "sum_ms": 14.320658,
+          "median_us": 316.002,
+          "min_us": 306.321,
+          "max_us": 338.161,
+          "p95_us": 337.401
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.8482530000000015,
+          "median_us": 173.6,
+          "min_us": 169.56,
+          "max_us": 179.761,
+          "p95_us": 177.441
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/baseline/profile/isl32768_osl1024_c4/1789124270.7958584/1789124270.7979014-TP-1.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 43.788463,
+          "median_us": 239.9005,
+          "min_us": 160.0,
+          "max_us": 346.042,
+          "p95_us": 333.322
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.305251,
+          "median_us": 161.681,
+          "min_us": 160.0,
+          "max_us": 165.96,
+          "p95_us": 165.48
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 151.058483,
+          "median_us": 850.2655,
+          "min_us": 735.725,
+          "max_us": 931.646,
+          "p95_us": 915.326
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 14.650420999999996,
+          "median_us": 321.321,
+          "min_us": 316.441,
+          "max_us": 346.042,
+          "p95_us": 341.921
+        },
+        "conv_shape_(1875, 2)": {
+          "count": 45,
+          "sum_ms": 14.094820000000002,
+          "median_us": 309.681,
+          "min_us": 303.041,
+          "max_us": 334.721,
+          "p95_us": 331.201
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.737970999999998,
+          "median_us": 171.28,
+          "min_us": 169.24,
+          "max_us": 176.76,
+          "p95_us": 175.72
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/baseline/profile/isl32768_osl1024_c4/1789124270.7958584/1789124270.7979014-TP-2.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 43.803981,
+          "median_us": 241.0805,
+          "min_us": 159.48,
+          "max_us": 347.562,
+          "p95_us": 333.881
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.275566999999999,
+          "median_us": 161.44,
+          "min_us": 159.48,
+          "max_us": 168.24,
+          "p95_us": 163.84
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 151.32372599999994,
+          "median_us": 849.2049999999999,
+          "min_us": 743.965,
+          "max_us": 941.806,
+          "p95_us": 912.806
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 14.676381000000001,
+          "median_us": 320.601,
+          "min_us": 317.922,
+          "max_us": 347.562,
+          "p95_us": 342.081
+        },
+        "conv_shape_(1875, 2)": {
+          "count": 45,
+          "sum_ms": 14.116901,
+          "median_us": 311.642,
+          "min_us": 304.801,
+          "max_us": 331.642,
+          "p95_us": 330.081
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.735132,
+          "median_us": 171.32,
+          "min_us": 169.72,
+          "max_us": 177.36,
+          "p95_us": 174.96
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/baseline/profile/isl32768_osl1024_c4/1789124270.7958584/1789124270.7979014-TP-3.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 43.91153399999999,
+          "median_us": 239.781,
+          "min_us": 159.24,
+          "max_us": 345.241,
+          "p95_us": 336.682
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.2751269999999995,
+          "median_us": 161.12,
+          "min_us": 159.24,
+          "max_us": 165.441,
+          "p95_us": 164.521
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 149.29174700000002,
+          "median_us": 836.165,
+          "min_us": 724.044,
+          "max_us": 920.006,
+          "p95_us": 903.645
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 14.690219,
+          "median_us": 322.082,
+          "min_us": 317.321,
+          "max_us": 345.241,
+          "p95_us": 341.722
+        },
+        "conv_shape_(1875, 2)": {
+          "count": 45,
+          "sum_ms": 14.224381999999999,
+          "median_us": 313.842,
+          "min_us": 305.602,
+          "max_us": 339.282,
+          "p95_us": 334.481
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.721805999999999,
+          "median_us": 171.64,
+          "min_us": 168.84,
+          "max_us": 173.96,
+          "p95_us": 173.441
+        }
+      }
+    }
+  ],
+  "conv": [
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/conv/profile/isl32768_osl1024_c4/1789123901.8411129/1789123901.84331-TP-0.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.80420700000001,
+          "median_us": 105.82,
+          "min_us": 89.879,
+          "max_us": 127.96,
+          "p95_us": 122.76
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.144508,
+          "median_us": 90.6,
+          "min_us": 89.879,
+          "max_us": 99.48,
+          "p95_us": 97.84
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 154.02952299999998,
+          "median_us": 859.405,
+          "min_us": 744.124,
+          "max_us": 960.526,
+          "p95_us": 930.326
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 5.254954999999998,
+          "median_us": 116.6,
+          "min_us": 108.239,
+          "max_us": 127.96,
+          "p95_us": 125.84
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 5.056753999999999,
+          "median_us": 108.84,
+          "min_us": 107.0,
+          "max_us": 125.24,
+          "p95_us": 122.36
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.347990000000001,
+          "median_us": 95.92,
+          "min_us": 93.719,
+          "max_us": 104.64,
+          "p95_us": 99.719
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/conv/profile/isl32768_osl1024_c4/1789123901.8411129/1789123901.84331-TP-1.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.41916399999998,
+          "median_us": 102.44,
+          "min_us": 88.2,
+          "max_us": 121.6,
+          "p95_us": 119.04
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.045705,
+          "median_us": 89.12,
+          "min_us": 88.2,
+          "max_us": 94.08,
+          "p95_us": 93.88
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 153.5885230000001,
+          "median_us": 862.1855,
+          "min_us": 752.964,
+          "max_us": 954.286,
+          "p95_us": 934.126
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 5.143994000000001,
+          "median_us": 114.52,
+          "min_us": 106.08,
+          "max_us": 121.6,
+          "p95_us": 120.36
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 4.9576340000000005,
+          "median_us": 107.4,
+          "min_us": 106.319,
+          "max_us": 121.16,
+          "p95_us": 118.0
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.271831000000001,
+          "median_us": 94.28,
+          "min_us": 93.4,
+          "max_us": 98.8,
+          "p95_us": 97.839
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/conv/profile/isl32768_osl1024_c4/1789123901.8411129/1789123901.84331-TP-2.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.431884999999998,
+          "median_us": 103.38,
+          "min_us": 88.76,
+          "max_us": 123.64,
+          "p95_us": 119.32
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.054150999999999,
+          "median_us": 89.479,
+          "min_us": 88.76,
+          "max_us": 95.4,
+          "p95_us": 93.56
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 152.73064899999997,
+          "median_us": 850.7655,
+          "min_us": 743.405,
+          "max_us": 946.527,
+          "p95_us": 927.286
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 5.144477000000001,
+          "median_us": 113.88,
+          "min_us": 106.72,
+          "max_us": 123.64,
+          "p95_us": 121.6
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 4.952230999999999,
+          "median_us": 107.36,
+          "min_us": 106.32,
+          "max_us": 122.24,
+          "p95_us": 118.6
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.281026,
+          "median_us": 94.52,
+          "min_us": 93.56,
+          "max_us": 100.44,
+          "p95_us": 98.119
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/conv/profile/isl32768_osl1024_c4/1789123901.8411129/1789123901.84331-TP-3.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.425294000000005,
+          "median_us": 102.5795,
+          "min_us": 88.8,
+          "max_us": 122.52,
+          "p95_us": 117.92
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.05995,
+          "median_us": 89.479,
+          "min_us": 88.8,
+          "max_us": 94.0,
+          "p95_us": 93.32
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 151.843244,
+          "median_us": 858.6859999999999,
+          "min_us": 736.165,
+          "max_us": 936.566,
+          "p95_us": 927.406
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 5.1247169999999995,
+          "median_us": 114.04,
+          "min_us": 107.079,
+          "max_us": 122.16,
+          "p95_us": 119.08
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 4.969516,
+          "median_us": 108.559,
+          "min_us": 106.28,
+          "max_us": 122.52,
+          "p95_us": 117.6
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.2711109999999985,
+          "median_us": 94.4,
+          "min_us": 93.04,
+          "max_us": 98.879,
+          "p95_us": 97.56
+        }
+      }
+    }
+  ],
+  "gdn": [
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-0.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 44.32877100000002,
+          "median_us": 242.5805,
+          "min_us": 161.16,
+          "max_us": 349.361,
+          "p95_us": 339.281
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.409640000000002,
+          "median_us": 163.56,
+          "min_us": 161.16,
+          "max_us": 169.92,
+          "p95_us": 168.8
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 139.70626900000002,
+          "median_us": 783.5840000000001,
+          "min_us": 694.483,
+          "max_us": 849.324,
+          "p95_us": 837.084
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 14.777482999999998,
+          "median_us": 324.121,
+          "min_us": 317.521,
+          "max_us": 349.361,
+          "p95_us": 346.441
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 14.300282000000005,
+          "median_us": 313.601,
+          "min_us": 305.801,
+          "max_us": 342.641,
+          "p95_us": 335.721
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.841365999999996,
+          "median_us": 173.48,
+          "min_us": 171.4,
+          "max_us": 179.36,
+          "p95_us": 177.56
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-1.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 43.651202,
+          "median_us": 240.22050000000002,
+          "min_us": 158.52,
+          "max_us": 347.481,
+          "p95_us": 335.441
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.247038,
+          "median_us": 160.2,
+          "min_us": 158.52,
+          "max_us": 166.48,
+          "p95_us": 164.28
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 139.05286600000002,
+          "median_us": 780.6434999999999,
+          "min_us": 682.083,
+          "max_us": 858.404,
+          "p95_us": 835.004
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 14.585403,
+          "median_us": 319.321,
+          "min_us": 313.801,
+          "max_us": 347.481,
+          "p95_us": 342.081
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 14.095481,
+          "median_us": 306.8,
+          "min_us": 304.281,
+          "max_us": 338.441,
+          "p95_us": 331.481
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.723280000000002,
+          "median_us": 171.0,
+          "min_us": 169.2,
+          "max_us": 176.16,
+          "p95_us": 174.68
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-2.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 43.75840900000001,
+          "median_us": 240.66049999999998,
+          "min_us": 158.88,
+          "max_us": 344.322,
+          "p95_us": 332.881
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.260439000000002,
+          "median_us": 160.84,
+          "min_us": 158.88,
+          "max_us": 165.48,
+          "p95_us": 164.24
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 138.14061500000003,
+          "median_us": 775.0235,
+          "min_us": 681.163,
+          "max_us": 841.004,
+          "p95_us": 829.204
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 14.620528,
+          "median_us": 320.401,
+          "min_us": 316.241,
+          "max_us": 344.322,
+          "p95_us": 340.722
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 14.147519999999998,
+          "median_us": 310.081,
+          "min_us": 306.561,
+          "max_us": 331.161,
+          "p95_us": 330.401
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.729922000000001,
+          "median_us": 171.6,
+          "min_us": 169.6,
+          "max_us": 174.76,
+          "p95_us": 174.28
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-3.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 279.8622080000002,
+          "median_us": 240.6005,
+          "min_us": 158.88,
+          "max_us": 236526.888,
+          "p95_us": 336.561
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 7.254116999999999,
+          "median_us": 160.68,
+          "min_us": 158.88,
+          "max_us": 164.68,
+          "p95_us": 164.4
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 137.94469000000004,
+          "median_us": 773.663,
+          "min_us": 679.843,
+          "max_us": 847.324,
+          "p95_us": 827.925
+        },
+        "conv_shape_(1963, 2)": {
+          "count": 45,
+          "sum_ms": 14.611562999999997,
+          "median_us": 321.321,
+          "min_us": 314.881,
+          "max_us": 345.001,
+          "p95_us": 339.441
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 250.31180500000005,
+          "median_us": 308.04,
+          "min_us": 305.761,
+          "max_us": 236526.888,
+          "p95_us": 327.921
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 7.684722999999998,
+          "median_us": 170.28,
+          "min_us": 168.92,
+          "max_us": 175.44,
+          "p95_us": 173.92
+        }
+      }
+    }
+  ],
+  "both": [
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/both/profile/isl32768_osl1024_c4/1789123173.9797037/1789123173.981191-TP-0.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 254.726303,
+          "median_us": 105.3395,
+          "min_us": 90.8,
+          "max_us": 236005.565,
+          "p95_us": 122.52
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.199823,
+          "median_us": 92.119,
+          "min_us": 90.8,
+          "max_us": 99.96,
+          "p95_us": 96.999
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 140.57795799999994,
+          "median_us": 786.524,
+          "min_us": 682.883,
+          "max_us": 871.804,
+          "p95_us": 858.524
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 5.131507,
+          "median_us": 112.759,
+          "min_us": 107.36,
+          "max_us": 127.04,
+          "p95_us": 124.8
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 240.99106800000004,
+          "median_us": 110.76,
+          "min_us": 108.48,
+          "max_us": 236005.565,
+          "p95_us": 122.52
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.403905,
+          "median_us": 96.52,
+          "min_us": 94.08,
+          "max_us": 103.319,
+          "p95_us": 102.119
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/both/profile/isl32768_osl1024_c4/1789123173.9797037/1789123173.981191-TP-1.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.220943999999996,
+          "median_us": 102.1595,
+          "min_us": 88.439,
+          "max_us": 123.28,
+          "p95_us": 116.6
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.056058999999999,
+          "median_us": 89.319,
+          "min_us": 88.439,
+          "max_us": 94.56,
+          "p95_us": 93.36
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 140.7240360000001,
+          "median_us": 788.2239999999999,
+          "min_us": 684.003,
+          "max_us": 868.884,
+          "p95_us": 860.204
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 4.970349,
+          "median_us": 109.08,
+          "min_us": 106.08,
+          "max_us": 123.28,
+          "p95_us": 121.24
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 4.932472,
+          "median_us": 107.24,
+          "min_us": 105.96,
+          "max_us": 120.16,
+          "p95_us": 116.64
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.262064,
+          "median_us": 94.16,
+          "min_us": 93.04,
+          "max_us": 98.359,
+          "p95_us": 97.76
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/both/profile/isl32768_osl1024_c4/1789123173.9797037/1789123173.981191-TP-2.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.266572999999998,
+          "median_us": 103.759,
+          "min_us": 88.679,
+          "max_us": 122.679,
+          "p95_us": 116.32
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.060377,
+          "median_us": 89.599,
+          "min_us": 88.679,
+          "max_us": 95.079,
+          "p95_us": 93.12
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 139.84126799999999,
+          "median_us": 779.9435000000001,
+          "min_us": 685.083,
+          "max_us": 867.684,
+          "p95_us": 853.765
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 4.974107,
+          "median_us": 109.52,
+          "min_us": 106.48,
+          "max_us": 120.52,
+          "p95_us": 117.2
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 4.953588,
+          "median_us": 107.92,
+          "min_us": 106.479,
+          "max_us": 122.679,
+          "p95_us": 117.76
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.278501,
+          "median_us": 94.4,
+          "min_us": 93.28,
+          "max_us": 101.039,
+          "p95_us": 98.199
+        }
+      }
+    },
+    {
+      "file": "kernel_tuning/serving_four_way_20260911_clean/round_2/both/profile/isl32768_osl1024_c4/1789123173.9797037/1789123173.981191-TP-3.trace.json.gz",
+      "groups": {
+        "conv": {
+          "count": 180,
+          "sum_ms": 18.25209600000001,
+          "median_us": 102.479,
+          "min_us": 88.24,
+          "max_us": 121.04,
+          "p95_us": 115.76
+        },
+        "conv_shape_(1693, 1)": {
+          "count": 45,
+          "sum_ms": 4.064145000000001,
+          "median_us": 89.519,
+          "min_us": 88.24,
+          "max_us": 94.04,
+          "p95_us": 93.039
+        },
+        "gdn": {
+          "count": 180,
+          "sum_ms": 139.91831200000001,
+          "median_us": 779.1835,
+          "min_us": 679.683,
+          "max_us": 873.125,
+          "p95_us": 859.684
+        },
+        "conv_shape_(1976, 2)": {
+          "count": 45,
+          "sum_ms": 4.9533049999999985,
+          "median_us": 108.36,
+          "min_us": 106.4,
+          "max_us": 119.24,
+          "p95_us": 115.799
+        },
+        "conv_shape_(1891, 2)": {
+          "count": 45,
+          "sum_ms": 4.9520659999999985,
+          "median_us": 108.12,
+          "min_us": 106.399,
+          "max_us": 121.04,
+          "p95_us": 117.68
+        },
+        "conv_shape_(1790, 1)": {
+          "count": 45,
+          "sum_ms": 4.282580000000001,
+          "median_us": 94.399,
+          "min_us": 93.479,
+          "max_us": 98.559,
+          "p95_us": 98.119
+        }
+      }
+    }
+  ]
+}

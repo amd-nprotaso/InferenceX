@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(PROFILE_DIR=/var/home/sglang_profiling2 OUT_DIR=./trace_analysis2 TOP=60 JOBS=8 ./analyze_traces.sh)",
+      "Bash(rocm-smi --showproductname)",
+      "Bash(rocminfo)",
+      "Bash(HIP_VISIBLE_DEVICES=0 timeout 1800 python3 moe_decode_bench.py --only \"conc=4 \" --iters 30)",
+      "Read(//tmp/**)",
+      "Bash(rm -rf /tmp/flydump)",
+      "Bash(FLYDSL_DUMP_IR=1 FLYDSL_DUMP_DIR=/tmp/flydump HIP_VISIBLE_DEVICES=0 python3 /tmp/smoke_fused_sort.py)",
+      "Bash(python3 compare_moe_decode.py --tokens 16 --iters 30)",
+      "Bash(python3 *)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "inferencemax-repos"
+  ]
+}

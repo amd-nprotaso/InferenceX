@@ -3,9 +3,11 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import torch
 
+import causal_conv1d_flydsl as conv
 from causal_conv1d_flydsl import causal_conv1d_fn
 
 
@@ -130,11 +132,28 @@ def check_optional_state() -> None:
         raise AssertionError("mismatched sequence offsets accepted")
 
 
+def check_cache_reuse() -> None:
+    """Growing/shrinking requests reuse compilation and launch the current grid."""
+    for lanes in (1, 2):
+        for layout in ("channel_last", "strided", "offset"):
+            conv._build.cache_clear()
+            with patch.object(conv.flyc, "compile", wraps=conv.flyc.compile) as compile_call:
+                for lengths in ([3], [17, 2, 33, 0], [65, 3], [2]):
+                    # check() compares output and mutated state with independent
+                    # PyTorch and Triton references, then captures/replays a graph.
+                    check(lengths, channels=130, layout=layout,
+                          channels_per_thread=lanes, graph=True)
+                assert compile_call.call_count == 1, compile_call.call_count
+            assert conv._build.cache_info().misses == 1, conv._build.cache_info()
+    print("variable-shape cache reuse passed", flush=True)
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--smoke", action="store_true")
     p.add_argument("--bench", action="store_true")
     p.add_argument("--bench-only", action="store_true")
+    p.add_argument("--cache-only", action="store_true")
     p.add_argument("--channels", type=int, default=3072)
     p.add_argument("--length", type=int, default=32768)
     p.add_argument("--batch", type=int, default=1)
@@ -143,6 +162,9 @@ def main() -> None:
     p.add_argument("--output", type=Path)
     args = p.parse_args()
     torch.manual_seed(1234)
+    if args.cache_only:
+        check_cache_reuse()
+        return
     if args.bench_only:
         result = bench(args.channels, args.length, args.batch, args.block, args.tokens)
         print(json.dumps(result, indent=2))
@@ -179,6 +201,7 @@ def main() -> None:
         count += 1
     check([args.length], channels=args.channels, bias_on=False, block=args.block, tokens=args.tokens)
     check_optional_state()
+    check_cache_reuse()
     result = dict(device=torch.cuda.get_device_name(), correctness_cases=count+1,
                   optional_state_checks="passed", torch_version=torch.__version__,
                   hip_version=torch.version.hip, seed=1234,

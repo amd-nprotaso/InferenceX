@@ -1,0 +1,44 @@
+{
+  "model": "amd/Qwen3.5-397B-A17B-MXFP4",
+  "gpu": "AMD Instinct MI355X (gfx950)",
+  "tp": 4,
+  "concurrency": 4,
+  "input_length": 32768,
+  "output_length": 1024,
+  "random_range_ratio": 0.8,
+  "requests_per_trial": 40,
+  "warmups_per_trial": 8,
+  "rounds": 3,
+  "trials_per_arm_per_round": 2,
+  "simulate_acc": true,
+  "simulated_acceptance_length": 3.39,
+  "arms": {
+    "baseline": "stock SGLang/aiter (FLYDSL_CONV=0 FLYDSL_GDN=0 FLYDSL_MOE=0)",
+    "all": "FlyDSL causal conv + GDN chunk_h + fused decode-MoE router/sort + atomic stage-2 epilogue"
+  },
+  "arm_order_alternates_per_round": true,
+  "source_hashes": {
+    "qwen3.5_fp4_sglang_server.sh": "ae8a549d0145482e90a5fa9139efe745dfff3ffcab02c0fba2f35c17873edd98",
+    "qwen3.5_fp4_sglang_bench.sh": "14cef7823ca079f11bbe0fcd45c836537e42c6d6cf4471e4499a8de429b697ba",
+    "kernel_tuning/run_server_both.sh": "2bc03872ceefbf88aa360ad4a10ebea68c7830d3b958d0209509e894e282c647",
+    "kernel_tuning/bootstrap_both/sitecustomize.py": "ca9fc72629abbb753402ed263edf05ef1e4318e125ca39a16abd7ca594d66a22",
+    "kernel_tuning/conv/causal_conv1d_flydsl.py": "29458b1fd3549f4d6b839c44e9f406a0018d5dcd3f85ff52de0bd8be77a1ab43",
+    "kernel_tuning/conv/bootstrap/sitecustomize.py": "1720440a0a38bc4fd6c0facf7421979988016ba671e4e1a142c75516988faf28",
+    "kernel_tuning/chunk_gated_delta_rule/chunk_delta_h_flydsl.py": "8bee853ccf172f49a99e9a75c0ad2588c76f81d4baae407acd58cbe113658228",
+    "kernel_tuning/chunk_gated_delta_rule/bootstrap/sitecustomize.py": "a404445240df25837ed00282dcd76dd5544d9cca97d528d3a07f7b329a7bd0a1",
+    "kernel_tuning/moe_decode/moe_fused_route_sort_flydsl.py": "9106472654d56a057694f376f29f12b8099fad5e4883fc9240b041590978d948",
+    "kernel_tuning/moe_decode/moe_decode_patch.py": "c3118780e51c6592bf218ca0bbd86ec21bf6b3bec2944a0665b3d7c536493481",
+    "kernel_tuning/moe_decode/bootstrap/sitecustomize.py": "6fef183b4dfbc7f4e452fb4ac674ad1491e0549c364828943396595672094a52",
+    "kernel_tuning/moe_decode/fmoe_chain.py": "b801519ddfacd05ac9088ddc040f05ab2178207e5f0f67b189b62144d229a764",
+    "kernel_tuning/moe_decode/qwen3_5_397b_fp4_tuned_fmoe.atomic.csv": "fff77ce23ebb87beb4919e6d83e779c2ecb5e2165b54c3f5b78be8930e784b3d",
+    "kernel_tuning/serving_all_kernels_20260911/run.sh": "c853759305db8e1728cacb2f6c0b204aebe7b20b6d683b95f40792bc6869b098"
+  },
+  "versions": {
+    "torch": "2.9.1+rocm7.2.0.git7e1940d4",
+    "triton": "3.7.0",
+    "flydsl": "0.3.2",
+    "sglang": "0.5.19.dev20260908+g554f817948",
+    "aiter_git": "4ad998328",
+    "sglang_git": "5097f9ac95"
+  }
+}

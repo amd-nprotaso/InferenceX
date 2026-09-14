@@ -1,0 +1,68 @@
+====================================================================================================
+kernel time across runs -- metric: GPU time per rank (us)   (all phases)
+runs: isl32768_osl1024_c4
+====================================================================================================
+
+-- by category ---------------------------------------------------------
+run         isl32768_osl1024_c4       total
+category                                   
+gemm                    2.126 s     2.126 s
+moe                     1.774 s     1.774 s
+comm                    1.737 s     1.737 s
+memcpy                  1.218 s     1.218 s
+linear_attn          710.831 ms  710.831 ms
+attention            607.058 ms  607.058 ms
+norm                 547.529 ms  547.529 ms
+other                348.979 ms  348.979 ms
+elementwise          277.153 ms  277.153 ms
+index_copy           115.455 ms  115.455 ms
+activation           109.264 ms  109.264 ms
+sampling              54.491 ms   54.491 ms
+quant                 18.626 ms   18.626 ms
+embedding             13.631 ms   13.631 ms
+kv_cache               5.189 ms    5.189 ms
+memset                  31.7 us     31.7 us
+
+-- top 40 kernels ------------------------------------------------------
+run                                                                          isl32768_osl1024_c4       total
+category    kernel                                                                                          
+comm        ncclDevKernel_Generic_1                                                      1.325 s     1.325 s
+memcpy      Memcpy HtoD                                                                  1.190 s     1.190 s
+gemm        Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x256x64_MI1...          760.867 ms  760.867 ms
+moe         mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_asy...          514.433 ms  514.433 ms
+comm        aiter::cross_device_reduce_1stage                                         374.313 ms  374.313 ms
+attention   reshape_and_cache_flash                                                   351.914 ms  351.914 ms
+moe         mfma_moe1_silu_mul_afp4_wfp4_fp4_t64x128x256_pm1_fp4q_sort_as...          277.081 ms  277.081 ms
+gemm        gemm2_a4w4_port_hmax8192_imax256_bm64_bn128_bk256_reduce_tk10...          254.261 ms  254.261 ms
+norm        _gemma_fused_add_rmsnorm_kernel                                           251.391 ms  251.391 ms
+            _layer_norm_fwd_1pass_kernel                                              239.725 ms  239.725 ms
+gemm        gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_nt_reduce_t...          236.252 ms  236.252 ms
+            Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT32x16x1024_MI1...          233.321 ms  233.321 ms
+moe         moe_reduction_kernel_0                                                    230.176 ms  230.176 ms
+other       chunk_fwd_kernel_o                                                        204.856 ms  204.856 ms
+moe         vllm::moe::topkGatingSoftmax                                              194.602 ms  194.602 ms
+gemm        hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0                          185.507 ms  185.507 ms
+moe         aiter::opus_moe_sorting_entry                                             180.260 ms  180.260 ms
+            aiter::mxfp4_moe_sort_kernel                                              179.873 ms  179.873 ms
+linear_attn chunk_gated_delta_rule_fwd_kernel_h_blockdim64                            168.569 ms  168.569 ms
+            fused_sigmoid_gating_delta_rule_update_kernel                             158.017 ms  158.017 ms
+            _fused_gate_sigmoid_mul_add_kernel                                        134.538 ms  134.538 ms
+attention   aiter::fmha_fwd_hd256_fp8_causal_group_gfx950                             133.012 ms  133.012 ms
+gemm        hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0                         127.095 ms  127.095 ms
+            Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT256x16x128_MI1...          113.037 ms  113.037 ms
+attention   vattn_asm                                                                 103.690 ms  103.690 ms
+moe         aiter::fused_mx_quant_moe_sort_kernel                                      98.231 ms   98.231 ms
+gemm        _gemm_a16_w16_kernel_BLOCK_SIZE_M_16_BLOCK_SIZE_N_16_BLOCK_SI...           97.890 ms   97.890 ms
+elementwise fused_qkvzba_split_reshape_cat_contiguous_kernel                           84.188 ms   84.188 ms
+activation  sgl_hip::activation::act_and_mul_kernel                                    83.072 ms   83.072 ms
+gemm        Cijk_Alik_Bljk_BBS_BH_Bias_HA_S_SAV_UserArgs_MT16x16x128_MI16...           78.743 ms   78.743 ms
+linear_attn fused_qkv_split_gdn_prefill_kernel                                         71.773 ms   71.773 ms
+other       at::native::cunn_SoftMaxForwardGmem                                        71.636 ms   71.636 ms
+moe         ck::kernel_moe_gemm                                                        69.943 ms   69.943 ms
+elementwise at::native::reduce_kernel                                                  64.337 ms   64.337 ms
+linear_attn _causal_conv1d_update_kernel                                               61.204 ms   61.204 ms
+elementwise at::native::vectorized_elementwise_kernel                                  57.895 ms   57.895 ms
+linear_attn _causal_conv1d_fwd_kernel                                                  41.835 ms   41.835 ms
+norm        _fused_qk_gemma_rmsnorm_gate_kernel                                        40.848 ms   40.848 ms
+elementwise at::native::elementwise_kernel_manual_unroll                               38.718 ms   38.718 ms
+index_copy  at::native::elementwise_kernel_manual_unroll                               38.413 ms   38.413 ms

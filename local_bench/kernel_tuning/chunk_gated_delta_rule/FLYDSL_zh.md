@@ -7,6 +7,29 @@ Triton 配置**。FlyDSL 为 0.719 ms，交换网格维度并使用四级流水�
 0.720 ms。差异处于测量波动范围内，尚未达到 0.65 ms 或 0.50 ms 的目标。
 虽然超过了历史上的 0.850 ms 基准，但仅与这个旧结果比较会夸大收益。
 
+## BV8 实现更新（2026-09-11）
+
+当前内核在 `build` 和 `build_varlen` 中均使用 `VALUE_TILE=8`。
+对于 TP4（`H=16`、`V=128`），变长网格为 `(16, 16, n_seq)`，每个序列的
+workgroup 数由 128 增至 256。重启通过 `../run_server_both.sh` 启动的服务即可
+加载修改，无需增加参数。
+
+保留 `MFMA(16,16,32)` 指令及其物理 16 列 LDS 布局。第 8–15 列的状态和输入为零，
+不能读写全局 value/state 张量。所有 lane 仍参与 MFMA 和 barrier，避免相邻逻辑
+BV8 tile 之间发生重叠写入。对外要求 V 可被 16 整除的约束保持不变。
+增加 workgroup 也会重复 K/W 读取和矩阵运算，因此这是一项实验，尚未证明服务吞吐量
+有提升。下文数据是历史 BV16 结果，并非此次 BV8 实现的测量结果。
+
+验证命令（不加载服务 bootstrap）：
+
+```bash
+python3 check_varlen.py
+python3 check_chunk_h.py --output /tmp/gdn_bv8_generic.json
+SGLANG_FLYDSL_GDN_STATIC=1 python3 check_chunk_h.py --output /tmp/gdn_bv8_static.json
+```
+
+图测试在 capture 前准备 GPU 序列元数据，与服务端一致。
+
 ## 重复设备端测量
 
 TP4：B=1、T=32768、Hg=4、H=16、K=V=128、BT=64。每个单元格都是 60 次设备端

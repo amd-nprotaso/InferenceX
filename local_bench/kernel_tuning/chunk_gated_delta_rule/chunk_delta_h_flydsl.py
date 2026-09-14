@@ -1,4 +1,4 @@
-"""MI355X BF16 K128/BV16 chunk-state recurrence with explicit MFMA fragments.
+"""MI355X BF16 K128/BV8 chunk-state recurrence with explicit MFMA fragments.
 
 Two kernels share the same math:
 
@@ -26,6 +26,7 @@ from flydsl.expr.typing import T
 
 PREFETCH_DEPTH = 2
 CHUNK_SIZE = 64
+VALUE_TILE = 8
 
 
 @flyc.jit
@@ -118,8 +119,10 @@ def build(
         lane = tid % 64
         wave = tid // 64
         head = fx.Int64(fx.block_idx.x)
-        vb = fx.Int64(fx.block_idx.y) * 16
-        # MFMA C owns K/T rows group*4+[0:4], and V column lane%16.
+        vb = fx.Int64(fx.block_idx.y) * VALUE_TILE
+        # MFMA keeps 16 physical columns; only VALUE_TILE columns own values.
+        # The remaining columns have zero state/input and never write globally.
+        # Keep all lanes active for MFMA, LDS staging and workgroup barriers.
         col = lane % 16
         group = lane // 16
         kr = wave * 16 + group * 4
@@ -148,7 +151,7 @@ def build(
         tc = fx.make_tiled_copy_A(cp, tiled).get_slice(fx.Int32(tid))
     
         if const_expr(has_state):
-            if slot >= 0:
+            if (slot >= 0) & (col < VALUE_TILE):
                 h1 = load_vec(ss, sb + kr, 4, fx.BFloat16).to(fx.Float32)
                 h2 = load_vec(ss, sb + kr + 64, 4, fx.BFloat16).to(fx.Float32)
 
@@ -166,7 +169,10 @@ def build(
             gv = []
             for e in range_constexpr(4):
                 off = ((chunk * 64 + kr + e) * H + head) * V + vb + col
-                uv.append(load_vec(ub, off, 1, fx.BFloat16)[0].to(fx.Float32))
+                uv_value = fx.Float32(0.0)
+                if col < VALUE_TILE:
+                    uv_value = load_vec(ub, off, 1, fx.BFloat16)[0].to(fx.Float32)
+                uv.append(uv_value)
                 gv_value = fx.Float32(0.0)
                 if const_expr(has_g):
                     gv_value = fx.Float32(gg[(chunk * 64 + kr + e) * H + head])
@@ -190,8 +196,9 @@ def build(
             kp = kp_base + (it % 2) * 8192
             next_data = prefetch((it + depth) % (length // 64))
             outbase = ((it * H + head) * V + vb + col) * 128 + kr
-            store_vec(hb, outbase, a1.to(fx.BFloat16), fx.BFloat16)
-            store_vec(hb, outbase + 64, a2.to(fx.BFloat16), fx.BFloat16)
+            if col < VALUE_TILE:
+                store_vec(hb, outbase, a1.to(fx.BFloat16), fx.BFloat16)
+                store_vec(hb, outbase + 64, a2.to(fx.BFloat16), fx.BFloat16)
             lds_store(hp, col * 128 + (kr ^ ((col % 8) * 8)), a1.to(fx.BFloat16))
             lds_store(hp, col * 128 + ((kr + 64) ^ ((col % 8) * 8)), a2.to(fx.BFloat16))
             for j in range_constexpr(4):
@@ -218,7 +225,8 @@ def build(
                 uv = carry[10][e]
                 vv = uv - predicted[e]
                 if const_expr(save):
-                    store_vec(ob, off, fx.Vector.from_elements([vv.to(fx.BFloat16)], fx.BFloat16), fx.BFloat16)
+                    if col < VALUE_TILE:
+                        store_vec(ob, off, fx.Vector.from_elements([vv.to(fx.BFloat16)], fx.BFloat16), fx.BFloat16)
                 diff = carry[12] - carry[11][e]
                 gate = hw_exp2((diff <= 0).select(diff, float("-inf")) * 1.4426950408889634)
                 vals.append((vv * gate).to(fx.BFloat16))
@@ -262,7 +270,7 @@ def build(
                 factor2 = fx.Vector.from_elements(scale2, fx.Float32)
             result = yield [fx.fma(a1, factor1, updates[0]), fx.fma(a2, factor2, updates[1])] + carry[13:] + next_data
         if const_expr(has_state):
-            if slot >= 0:
+            if (slot >= 0) & (col < VALUE_TILE):
                 store_vec(ss, sb + kr, result[0].to(fx.BFloat16), fx.BFloat16)
                 store_vec(ss, sb + kr + 64, result[1].to(fx.BFloat16), fx.BFloat16)
 
@@ -279,7 +287,7 @@ def build(
         vn: fx.Tensor,
         stream: fx.Stream = fx.Stream(None),
     ):
-        kernel(k, w, u, g, gk, state, indices, h, vn).launch(grid=(H, V // 16), block=(256,), stream=stream)
+        kernel(k, w, u, g, gk, state, indices, h, vn).launch(grid=(H, V // VALUE_TILE), block=(256,), stream=stream)
 
     return launch
 
@@ -329,9 +337,11 @@ def build_varlen(
         lane = tid % 64
         wave = tid // 64
         head = fx.Int64(fx.block_idx.x)
-        vb = fx.Int64(fx.block_idx.y) * 16
+        vb = fx.Int64(fx.block_idx.y) * VALUE_TILE
         seq = fx.Int64(fx.block_idx.z)
-        # MFMA C owns K/T rows group*4+[0:4], and V column lane%16.
+        # MFMA keeps 16 physical columns; only VALUE_TILE columns own values.
+        # The remaining columns have zero state/input and never write globally.
+        # Keep all lanes active for MFMA, LDS staging and workgroup barriers.
         col = lane % 16
         group = lane // 16
         kr = wave * 16 + group * 4
@@ -374,7 +384,7 @@ def build_varlen(
         tc = fx.make_tiled_copy_A(cp, tiled).get_slice(fx.Int32(tid))
 
         if const_expr(has_state):
-            if slot >= 0:
+            if (slot >= 0) & (col < VALUE_TILE):
                 h1 = load_vec(ss, sb + kr, 4, fx.BFloat16).to(fx.Float32)
                 h2 = load_vec(ss, sb + kr + 64, 4, fx.BFloat16).to(fx.Float32)
 
@@ -405,7 +415,10 @@ def build_varlen(
             gv = []
             for e in range_constexpr(4):
                 off = ((base + kr + e) * H + head) * V + vb + col
-                uv.append(load_vec(ub, off, 1, fx.BFloat16)[0].to(fx.Float32))
+                uv_value = fx.Float32(0.0)
+                if col < VALUE_TILE:
+                    uv_value = load_vec(ub, off, 1, fx.BFloat16)[0].to(fx.Float32)
+                uv.append(uv_value)
                 gv_value = fx.Float32(0.0)
                 if const_expr(has_g):
                     gv_value = load_vec(gb, (base + kr + e) * H + head, 1, fx.Float32)[0]
@@ -429,8 +442,9 @@ def build_varlen(
             kp = kp_base + (it % 2) * 8192
             next_data = prefetch(clamp_chunk(it + depth))
             outbase = (((boh + it) * H + head) * V + vb + col) * 128 + kr
-            store_vec(hb, outbase, a1.to(fx.BFloat16), fx.BFloat16)
-            store_vec(hb, outbase + 64, a2.to(fx.BFloat16), fx.BFloat16)
+            if col < VALUE_TILE:
+                store_vec(hb, outbase, a1.to(fx.BFloat16), fx.BFloat16)
+                store_vec(hb, outbase + 64, a2.to(fx.BFloat16), fx.BFloat16)
             lds_store(hp, col * 128 + (kr ^ ((col % 8) * 8)), a1.to(fx.BFloat16))
             lds_store(hp, col * 128 + ((kr + 64) ^ ((col % 8) * 8)), a2.to(fx.BFloat16))
             for j in range_constexpr(4):
@@ -457,7 +471,8 @@ def build_varlen(
                 uv = carry[10][e]
                 vv = uv - predicted[e]
                 if const_expr(save):
-                    store_vec(ob, off, fx.Vector.from_elements([vv.to(fx.BFloat16)], fx.BFloat16), fx.BFloat16)
+                    if col < VALUE_TILE:
+                        store_vec(ob, off, fx.Vector.from_elements([vv.to(fx.BFloat16)], fx.BFloat16), fx.BFloat16)
                 diff = carry[12] - carry[11][e]
                 gate = hw_exp2((diff <= 0).select(diff, float("-inf")) * 1.4426950408889634)
                 vals.append((vv * gate).to(fx.BFloat16))
@@ -502,7 +517,7 @@ def build_varlen(
                 factor2 = fx.Vector.from_elements(scale2, fx.Float32)
             result = yield [fx.fma(a1, factor1, updates[0]), fx.fma(a2, factor2, updates[1])] + carry[13:] + next_data
         if const_expr(has_state):
-            if slot >= 0:
+            if (slot >= 0) & (col < VALUE_TILE):
                 store_vec(ss, sb + kr, result[0].to(fx.BFloat16), fx.BFloat16)
                 store_vec(ss, sb + kr + 64, result[1].to(fx.BFloat16), fx.BFloat16)
 
@@ -523,7 +538,7 @@ def build_varlen(
         stream: fx.Stream = fx.Stream(None),
     ):
         kernel(k, w, u, g, gk, state, indices, h, vn, cu, coff).launch(
-            grid=(H, V // 16, n), block=(256,), stream=stream
+            grid=(H, V // VALUE_TILE, n), block=(256,), stream=stream
         )
 
     return launch

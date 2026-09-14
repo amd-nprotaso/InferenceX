@@ -1,1 +1,7 @@
 prefix_rule(pattern=["cat", "docs/index.md"], decision="allow")
+prefix_rule(pattern=["cat", "kernel_tuning/conv/check_conv.py", "kernel_tuning/conv/README.md", "kernel_tuning/conv/README_zh.md", "kernel_tuning/conv/run_server.sh"], decision="allow")
+prefix_rule(pattern=["python3", "kernel_tuning/conv/check_conv.py", "--output", "/tmp/conv_cache_validation.json"], decision="allow")
+prefix_rule(pattern=["rg", "-n", "output_throughput|median_ttft_ms|mean_ttft_ms|json.dump|output_file|completed|total_input_tokens|total_output_tokens", "/sgl-workspace/sglang/python/sglang/benchmark/serving.py"], decision="allow")
+prefix_rule(pattern=["cat", "kernel_tuning/serving_both_comparison_20260911/summary.json"], decision="allow")
+prefix_rule(pattern=["ps", "-p", "220478,220476", "-o", "pid,ppid,lstart,args"], decision="allow")
+prefix_rule(pattern=["python3", "kernel_tuning/serving_four_way_20260911_clean/status.py"], decision="allow")

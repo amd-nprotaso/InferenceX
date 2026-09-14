@@ -1,0 +1,76 @@
+=== profile target : http://127.0.0.1:8888
+=== model          : amd/Qwen3.5-397B-A17B-MXFP4
+=== module         : sglang.benchmark.serving
+=== shape          : ISL=32768 OSL=1024 range-ratio=0.8
+=== concurrency    : 4
+=== activities     : GPU  by-stage=0
+=== traces         : /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile
+
+=== conc=4 prompts=4 warmups=4 -> /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4
+[aiter] import [module_aiter_core] under /sgl-workspace/aiter/aiter/jit/module_aiter_core.so
+[aiter] merge tuned file under model_configs/ and configs/ /sgl-workspace/aiter/aiter/configs/bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/glm5_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/flux2_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/gptoss_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/llama70B_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/glm53_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/minimax_m3_eagle_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/qwen3_5_397b_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/kimi_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/qwen3_8b_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/dsv3_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/qwen32B_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/q3vl_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/kimik2_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/glm47_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/kimik3_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/dsv4_bf16_tuned_gemm.csv:/sgl-workspace/aiter/aiter/configs/model_configs/llama405B_bf16_tuned_gemm.csv
+benchmark_args=Namespace(backend='sglang', base_url=None, host='127.0.0.1', port=8888, ready_check_timeout_sec=60, dataset_name='random', dataset_path='', dataset_offset=0, agentic_max_turns=None, speed_bench_category=None, speed_bench_output_len=512, model='amd/Qwen3.5-397B-A17B-MXFP4', served_model_name=None, tokenizer='amd/Qwen3.5-397B-A17B-MXFP4', num_prompts=4, sharegpt_output_len=None, sharegpt_context_len=None, random_input_len=32768, random_output_len=1024, random_range_ratio=0.8, image_count=1, image_resolution='1080p', random_image_count=False, image_format='jpeg', image_content='random', request_rate=inf, use_trace_timestamps=False, max_concurrency=4, output_file=None, output_details=False, print_requests=False, disable_tqdm=False, disable_stream=False, return_logprob=False, top_logprobs_num=0, token_ids_logprob=None, logprob_start_len=-1, return_routed_experts=False, cache_report=False, seed=42, disable_ignore_eos=False, temperature=0.0, top_p=1.0, extra_request_body=None, apply_chat_template=False, profile=True, plot_throughput=False, profile_activities=['GPU'], profile_start_step=None, profile_steps=None, profile_num_steps=12, profile_by_stage=False, profile_stages=None, profile_output_dir='/var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4', profile_prefix=None, lora_name=None, lora_request_distribution='uniform', lora_zipf_alpha=1.5, prompt_suffix='', pd_separated=False, profile_prefill_url=None, profile_decode_url=None, flush_cache=True, flush_cache_timeout=60.0, warmup_requests=4, tokenize_prompt=False, gsp_num_groups=64, gsp_prompts_per_group=16, gsp_system_prompt_len=2048, gsp_question_len=128, gsp_output_len=256, gsp_range_ratio=1.0, gsp_fast_prepare=False, gsp_send_routing_key=False, gsp_num_turns=1, gsp_ordered=False, gsp_group_distribution='uniform', gsp_zipf_alpha=None, mooncake_slowdown_factor=1.0, mooncake_num_rounds=1, mooncake_workload='conversation', fake_prefill=False, tag=None, header=None)
+Waiting up to 60s for http://127.0.0.1:8888/v1/models to become ready...
+Server ready in 0.0s.
+Namespace(backend='sglang', base_url=None, host='127.0.0.1', port=8888, ready_check_timeout_sec=60, dataset_name='random', dataset_path='', dataset_offset=0, agentic_max_turns=None, speed_bench_category=None, speed_bench_output_len=512, model='amd/Qwen3.5-397B-A17B-MXFP4', served_model_name=None, tokenizer='amd/Qwen3.5-397B-A17B-MXFP4', num_prompts=4, sharegpt_output_len=None, sharegpt_context_len=None, random_input_len=32768, random_output_len=1024, random_range_ratio=0.8, image_count=1, image_resolution='1080p', random_image_count=False, image_format='jpeg', image_content='random', request_rate=inf, use_trace_timestamps=False, max_concurrency=4, output_file=None, output_details=False, print_requests=False, disable_tqdm=False, disable_stream=False, return_logprob=False, top_logprobs_num=0, token_ids_logprob=None, logprob_start_len=-1, return_routed_experts=False, cache_report=False, seed=42, disable_ignore_eos=False, temperature=0.0, top_p=1.0, extra_request_body=None, apply_chat_template=False, profile=True, plot_throughput=False, profile_activities=['GPU'], profile_start_step=None, profile_steps=None, profile_num_steps=12, profile_by_stage=False, profile_stages=None, profile_output_dir='/var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4', profile_prefix=None, lora_name=None, lora_request_distribution='uniform', lora_zipf_alpha=1.5, prompt_suffix='', pd_separated=False, profile_prefill_url=None, profile_decode_url=None, flush_cache=True, flush_cache_timeout=60.0, warmup_requests=4, tokenize_prompt=False, gsp_num_groups=64, gsp_prompts_per_group=16, gsp_system_prompt_len=2048, gsp_question_len=128, gsp_output_len=256, gsp_range_ratio=1.0, gsp_fast_prepare=False, gsp_send_routing_key=False, gsp_num_turns=1, gsp_ordered=False, gsp_group_distribution='uniform', gsp_zipf_alpha=None, mooncake_slowdown_factor=1.0, mooncake_num_rounds=1, mooncake_workload='conversation', fake_prefill=False, tag=None, header=None)
+
+#Input tokens: 121523
+#Output tokens: 3707
+Starting warmup with 4 sequences...
+Warmup completed with 4 sequences. Starting main benchmark run...
+Starting profiler...
+async_request_profile api_url='http://127.0.0.1:8888/start_profile' body={'activities': ['GPU'], 'num_steps': 12, 'profile_by_stage': False, 'profile_stages': None, 'output_dir': '/var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354', 'profile_prefix': None}
+Profiler started
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:07<00:21,  7.13s/it] 50%|█████     | 2/4 [00:07<00:06,  3.10s/it]100%|██████████| 4/4 [00:07<00:00,  1.24s/it]100%|██████████| 4/4 [00:07<00:00,  1.92s/it]
+
+============ Serving Benchmark Result ============
+Backend:                                 sglang    
+Traffic request rate:                    inf       
+Max request concurrency:                 4         
+Successful requests:                     4         
+Benchmark duration (s):                  7.70      
+Total input tokens:                      121523    
+Total input text tokens:                 121523    
+Total generated tokens:                  3707      
+Total generated tokens (retokenized):    3680      
+Request throughput (req/s):              0.52      
+Input token throughput (tok/s):          15772.42  
+Output token throughput (tok/s):         481.13    
+Peak output token throughput (tok/s):    1107.00   
+Peak concurrent requests:                4         
+Total token throughput (tok/s):          16253.55  
+Concurrency:                             3.86      
+Accept length:                           3.42      
+----------------End-to-End Latency----------------
+Mean E2E Latency (ms):                   7429.79   
+Median E2E Latency (ms):                 7450.83   
+P90 E2E Latency (ms):                    7629.09   
+P95 E2E Latency (ms):                    7658.86   
+P99 E2E Latency (ms):                    7682.67   
+---------------Time to First Token----------------
+Mean TTFT (ms):                          2328.50   
+Median TTFT (ms):                        2519.58   
+P90 TTFT (ms):                           2861.15   
+P95 TTFT (ms):                           2862.76   
+P99 TTFT (ms):                           2864.04   
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          5.48      
+Median TPOT (ms):                        5.38      
+P90 TPOT (ms):                           6.06      
+P95 TPOT (ms):                           6.15      
+P99 TPOT (ms):                           6.22      
+---------------Inter-Token Latency----------------
+Mean ITL (ms):                           5.51      
+Median ITL (ms):                         3.72      
+P90 ITL (ms):                            15.51     
+P95 ITL (ms):                            22.29     
+P99 ITL (ms):                            30.06     
+Max ITL (ms):                            30.06     
+==================================================
+
+=== traces collected:
+        2.0M  /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-0.trace.json.gz
+        2.0M  /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-1.trace.json.gz
+        2.0M  /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-2.trace.json.gz
+        2.0M  /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_four_way_20260911_clean/round_2/gdn/profile/isl32768_osl1024_c4/1789123538.5817354/1789123538.5835443-TP-3.trace.json.gz
+=== view with chrome://tracing, https://ui.perfetto.dev, or tensorboard

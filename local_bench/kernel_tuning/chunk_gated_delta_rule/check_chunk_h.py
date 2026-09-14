@@ -156,7 +156,14 @@ def main():
         ref = reference(inp, strided, inp.initial_state_indices, inp.g, None, True, False)
         expected = envelope.clone()
         envelope.copy_(before)
-        args = (inp.k, inp.w, inp.u, inp.g, None, strided, inp.initial_state_indices)
+        # Supply GPU sequence metadata before capture, as serving does. Creating
+        # cu_seqlens from a Python list inside a graph is not capture-safe.
+        from sglang.kernels.ops.attention.fla.index import prepare_chunk_indices
+
+        cu = torch.tensor([0, shape.T], device=inp.k.device, dtype=torch.int32)
+        chunk_indices = prepare_chunk_indices(cu, 64)
+        args = (inp.k, inp.w, inp.u, inp.g, None, strided,
+                inp.initial_state_indices, True, cu, chunk_indices)
         got = chunk_gated_delta_rule_fwd_h(*args)
         assert all(torch.equal(x, y) for x, y in zip(ref, got))
         assert torch.equal(expected, envelope)

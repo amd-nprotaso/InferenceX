@@ -1,0 +1,102 @@
+experiment: /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/serving_all_kernels_20260911
+  baseline : 6 trials over rounds [1, 2, 3]
+  all      : 6 trials over rounds [1, 2, 3]
+
+== per-trial ==
+
+ round 1 trial 1
+ metric                baseline           all
+ output tok/s           574.454       579.454
+ total tok/s          19109.951     19276.284
+ duration s              63.916        63.365
+ TPOT ms                  5.328         5.242
+ median ITL ms            3.750         3.604
+ TTFT ms               1384.992      1421.256
+ E2E ms                6280.594      6239.571
+ accept len               3.396         3.393
+
+ round 1 trial 2
+ metric                baseline           all
+ output tok/s           576.652       581.990
+ total tok/s          19183.086     19360.644
+ duration s              63.673        63.089
+ TPOT ms                  5.257         5.242
+ median ITL ms            3.746         3.592
+ TTFT ms               1465.868      1406.564
+ E2E ms                6291.129      6223.508
+ accept len               3.384         3.386
+
+ round 2 trial 1
+ metric                baseline           all
+ output tok/s           580.403       582.977
+ total tok/s          19307.868     19393.488
+ duration s              63.261        62.982
+ TPOT ms                  5.260         5.171
+ median ITL ms            3.709         3.561
+ TTFT ms               1405.604      1466.461
+ E2E ms                6238.906      6218.925
+ accept len               3.395         3.400
+
+ round 2 trial 2
+ metric                baseline           all
+ output tok/s           577.767       580.179
+ total tok/s          19220.166     19300.410
+ duration s              63.550        63.286
+ TPOT ms                  5.301         5.364
+ median ITL ms            3.782         3.587
+ TTFT ms               1367.182      1318.330
+ E2E ms                6237.687      6243.653
+ accept len               3.390         3.382
+
+ round 3 trial 1
+ metric                baseline           all
+ output tok/s           575.812       584.638
+ total tok/s          19155.153     19448.763
+ duration s              63.766        62.803
+ TPOT ms                  5.249         5.040
+ median ITL ms            3.730         3.561
+ TTFT ms               1457.931      1568.083
+ E2E ms                6278.683      6205.427
+ accept len               3.389         3.400
+
+ round 3 trial 2
+ metric                baseline           all
+ output tok/s           578.223       580.989
+ total tok/s          19235.334     19327.364
+ duration s              63.500        63.197
+ TPOT ms                  5.122         5.217
+ median ITL ms            3.728         3.605
+ TTFT ms               1574.018      1446.994
+ E2E ms                6275.547      6242.174
+ accept len               3.401         3.387
+
+== pooled (all trials) ==
+metric                baseline           all       delta        %
+output tok/s           577.218       581.704       4.486    0.78%  better
+total tok/s          19201.926     19351.159     149.232    0.78%  better
+duration s              63.611        63.120      -0.491   -0.77%  better
+TPOT ms                  5.253         5.213      -0.040   -0.76%  better
+median ITL ms            3.741         3.585      -0.156   -4.17%  better
+TTFT ms               1442.599      1437.948      -4.651   -0.32%
+E2E ms                6267.091      6228.876     -38.215   -0.61%  better
+accept len               3.393         3.391      -0.001   -0.04%
+
+== spread (stdev / mean, pooled) ==
+output tok/s    baseline= 0.36%  all= 0.33%
+total tok/s     baseline= 0.36%  all= 0.33%
+duration s      baseline= 0.36%  all= 0.33%
+TPOT ms         baseline= 1.35%  all= 2.03%
+median ITL ms   baseline= 0.67%  all= 0.56%
+TTFT ms         baseline= 5.23%  all= 5.68%
+E2E ms          baseline= 0.37%  all= 0.25%
+accept len      baseline= 0.18%  all= 0.22%
+
+== paired by round (robust to drift across the run) ==
+metric                 round 1       round 2       round 3        mean
+output tok/s             0.90%         0.43%         1.00%       0.78%
+total tok/s              0.90%         0.43%         1.00%       0.78%
+duration s              -0.89%        -0.43%        -0.99%      -0.77%
+TPOT ms                 -0.95%        -0.24%        -1.09%      -0.76%
+median ITL ms           -4.01%        -4.59%        -3.91%      -4.17%
+TTFT ms                 -0.81%         0.43%        -0.56%      -0.31%
+E2E ms                  -0.86%        -0.11%        -0.85%      -0.61%

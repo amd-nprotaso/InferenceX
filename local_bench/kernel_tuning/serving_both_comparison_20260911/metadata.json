@@ -1,0 +1,35 @@
+{
+  "model": "amd/Qwen3.5-397B-A17B-MXFP4",
+  "tp": 4,
+  "concurrency": 4,
+  "input_length": 32768,
+  "output_length": 1024,
+  "random_range_ratio": 0.8,
+  "seed": 42,
+  "requests_per_trial": 40,
+  "warmups_per_trial": 8,
+  "trials_per_backend": 3,
+  "simulated_acceptance_length": 3.39,
+  "backends": [
+    "baseline",
+    "both"
+  ],
+  "source_hashes": {
+    "qwen3.5_fp4_sglang_server.sh": "ae8a549d0145482e90a5fa9139efe745dfff3ffcab02c0fba2f35c17873edd98",
+    "qwen3.5_fp4_sglang_bench.sh": "14cef7823ca079f11bbe0fcd45c836537e42c6d6cf4471e4499a8de429b697ba",
+    "kernel_tuning/run_server_both.sh": "4762e615fc3619ebfba07e145805b3e372f835ab1db68fcf3e1f0d96ae0f5f56",
+    "kernel_tuning/bootstrap_both/sitecustomize.py": "80ff080e83a24fb5cd00dadbde49adfe12c3b6a59b5bc80a607b9297bda7c54a",
+    "kernel_tuning/conv/causal_conv1d_flydsl.py": "29458b1fd3549f4d6b839c44e9f406a0018d5dcd3f85ff52de0bd8be77a1ab43",
+    "kernel_tuning/conv/bootstrap/sitecustomize.py": "1720440a0a38bc4fd6c0facf7421979988016ba671e4e1a142c75516988faf28",
+    "kernel_tuning/chunk_gated_delta_rule/chunk_delta_h_flydsl.py": "a3314ce366b528c9cafa8dab7b992adb1d75a3b2f82c54ce88dffcdef54206ce",
+    "kernel_tuning/chunk_gated_delta_rule/bootstrap/sitecustomize.py": "a404445240df25837ed00282dcd76dd5544d9cca97d528d3a07f7b329a7bd0a1",
+    "kernel_tuning/serving_both_comparison_20260911/run.sh": "9719dcf57a6ad91bff49054b84153b182f3718f1698e5ae512f4bfafb46196ce"
+  },
+  "versions": {
+    "torch": "2.9.1+rocm7.2.0.lw.git7e1940d4",
+    "sglang": "0.5.19.dev20260908+g554f817948",
+    "flydsl": "0.3.2",
+    "triton": "3.7.0+amd.rocm7.2.0.git89002410"
+  },
+  "git_head": "c94369e2f4c44977c1ab49cf1e20d1ea642f3f1b"
+}

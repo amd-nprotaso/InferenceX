@@ -18,8 +18,8 @@ from flydsl.expr import const_expr, range_constexpr
 def _build(dim: int, width: int, xs: tuple, ws: tuple, ss: tuple,
            os: tuple, has_bias: bool, has_cache: bool, has_indices: bool,
            has_initial: bool, silu: bool, pad_slot: Optional[int],
-           batch: int, max_len: int, block: int, tokens: int, dtype: torch.dtype,
-           spans: tuple, prefetch: int, lanes: int):
+           block: int, tokens: int, dtype: torch.dtype,
+           prefetch: int, lanes: int):
     element = {torch.bfloat16: fx.BFloat16, torch.float16: fx.Float16,
                torch.float32: fx.Float32}[dtype]
     @flyc.jit
@@ -29,13 +29,14 @@ def _build(dim: int, width: int, xs: tuple, ws: tuple, ss: tuple,
     @flyc.kernel(known_block_size=[block, 1, 1])
     def kernel(x: fx.Tensor, w: fx.Tensor, bias: fx.Tensor, state: fx.Tensor,
                starts: fx.Tensor, indices: fx.Tensor, initial: fx.Tensor,
-               out: fx.Tensor):
+               out: fx.Tensor, x_span: fx.Int64, w_span: fx.Int64,
+               state_span: fx.Int64, out_span: fx.Int64):
         # Explicit physical offsets below already include the original strides.
         # Rebase to unit-stride views so Tensor indexing does not apply them twice.
-        x = fx.Tensor(fx.make_view(fx.get_iter(x), fx.make_layout(spans[0], 1)))
-        w = fx.Tensor(fx.make_view(fx.get_iter(w), fx.make_layout(spans[1], 1)))
-        state = fx.Tensor(fx.make_view(fx.get_iter(state), fx.make_layout(spans[2], 1)))
-        out = fx.Tensor(fx.make_view(fx.get_iter(out), fx.make_layout(spans[3], 1)))
+        x = fx.Tensor(fx.make_view(fx.get_iter(x), fx.make_layout(x_span, 1)))
+        w = fx.Tensor(fx.make_view(fx.get_iter(w), fx.make_layout(w_span, 1)))
+        state = fx.Tensor(fx.make_view(fx.get_iter(state), fx.make_layout(state_span, 1)))
+        out = fx.Tensor(fx.make_view(fx.get_iter(out), fx.make_layout(out_span, 1)))
         seq = fx.block_idx.y
         chunk = fx.block_idx.x
         c = (fx.block_idx.z * block + fx.thread_idx.x) * lanes
@@ -113,8 +114,11 @@ def _build(dim: int, width: int, xs: tuple, ws: tuple, ss: tuple,
     @flyc.jit
     def launch(x: fx.Tensor, w: fx.Tensor, bias: fx.Tensor, state: fx.Tensor,
                starts: fx.Tensor, indices: fx.Tensor, initial: fx.Tensor,
-               out: fx.Tensor, stream: fx.Stream = fx.Stream(None)):
-        kernel(x, w, bias, state, starts, indices, initial, out).launch(
+               out: fx.Tensor, batch: fx.Int64, max_len: fx.Int64,
+               x_span: fx.Int64, w_span: fx.Int64, state_span: fx.Int64,
+               out_span: fx.Int64, stream: fx.Stream = fx.Stream(None)):
+        kernel(x, w, bias, state, starts, indices, initial, out,
+               x_span, w_span, state_span, out_span).launch(
             grid=((max_len + tokens - 1) // tokens, batch, (dim + block * lanes - 1) // (block * lanes)),
             block=(block, 1, 1), stream=stream,
         )
@@ -213,23 +217,23 @@ def causal_conv1d_fn(
     launch = _build(dim, width, x.stride(), weight.stride(), ss, out.stride(),
                     bias is not None, conv_states is not None, cache_indices is not None,
                     has_initial_state is not None, activation in (True, "silu", "swish"),
-                    pad_slot_id, batch, max_len, block, tokens, x.dtype,
-                    tuple(span(t) for t in (x, weight, conv_states, out)), prefetch, lanes)
+                    pad_slot_id, block, tokens, x.dtype, prefetch, lanes)
     # Absent optional pointers are never dereferenced by the specialized kernel.
     args = (x, weight, bias if bias is not None else x,
             conv_states if conv_states is not None else x, query_start_loc,
             cache_indices if cache_indices is not None else query_start_loc,
             has_initial_state if has_initial_state is not None else query_start_loc, out)
+    runtime = (batch, max_len, *(span(t) for t in (x, weight, conv_states, out)))
     with torch.cuda.device(x.device):
         stream = torch.cuda.current_stream(x.device)
         compiled = getattr(launch, "_compiled", None)
-        # Signature includes dtype/strides in FlyDSL; retain one fast path per
-        # concrete tensor signature and device, not merely per logical shape.
-        key = (x.device.index, tuple((t.dtype, tuple(t.shape), t.stride()) for t in args))
+        # FlyDSL specializes dtype, rank, and the first unit-stride axis.
+        # Sizes are dynamic; physical indexing strides remain in _build's key.
+        key = (x.device.index, tuple((t.dtype, t.ndim, t.stride().index(1)) for t in args))
         if compiled is None:
             launch._compiled = {}
         if key not in launch._compiled:
-            launch._compiled[key] = flyc.compile(launch, *args, fx.Stream(stream))
+            launch._compiled[key] = flyc.compile(launch, *args, *runtime, fx.Stream(stream))
         else:
-            launch._compiled[key](*args, fx.Stream(stream))
+            launch._compiled[key](*args, *runtime, fx.Stream(stream))
     return out

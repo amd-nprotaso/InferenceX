@@ -1,0 +1,127 @@
+{
+  "sessions": {
+    "round_1/baseline": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.29,
+        225.29,
+        225.26,
+        225.38
+      ]
+    },
+    "round_1/both": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.29,
+        225.38,
+        225.29,
+        225.26
+      ]
+    },
+    "round_1/conv": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.29,
+        225.38,
+        225.29,
+        225.26
+      ]
+    },
+    "round_1/gdn": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.38,
+        225.26,
+        225.29,
+        225.29
+      ]
+    },
+    "round_2/baseline": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.38,
+        225.29,
+        225.26,
+        225.29
+      ]
+    },
+    "round_2/both": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.29,
+        225.26,
+        225.29,
+        225.38
+      ]
+    },
+    "round_2/conv": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.29,
+        225.29,
+        225.38,
+        225.26
+      ]
+    },
+    "round_2/gdn": {
+      "measured_compile_calls": [
+        0,
+        0
+      ],
+      "available_gb_after_draft_load": [
+        225.29,
+        225.26,
+        225.38,
+        225.29
+      ]
+    }
+  },
+  "matched_tokens_per_trial": [
+    1184722,
+    36717
+  ],
+  "completed_throughput_requests": 640,
+  "kernel_profile_calls_per_rank": {
+    "conv": 180,
+    "gdn": 180
+  },
+  "profile_median_us": {
+    "baseline": {
+      "conv": 240.4905,
+      "gdn": 849.73525
+    },
+    "conv": {
+      "conv": 102.97975,
+      "gdn": 859.0455
+    },
+    "gdn": {
+      "conv": 240.63049999999998,
+      "gdn": 777.8335
+    },
+    "both": {
+      "conv": 103.119,
+      "gdn": 783.2337500000001
+    }
+  }
+}

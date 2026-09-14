@@ -29,6 +29,15 @@
       }
     },
     {
+      "name": "adaptive-ai-model",
+      "source": {
+        "source": "local",
+        "path": "./plugins/adaptive-ai-model"
+      },
+      "category": "skill",
+      "version": "1.1.1"
+    },
+    {
       "name": "add-new-project",
       "source": {
         "source": "local",
@@ -275,9 +284,9 @@
         "path": "./plugins/agent-head-transplant"
       },
       "category": "skill",
-      "version": "0.1.2",
+      "version": "0.2.0",
       "interface": {
-        "shortDescription": "Move a live coding-agent session between Claude Code and Codex by converting"
+        "shortDescription": "Move a live coding-agent session between Claude Code, Codex and Claude"
       }
     },
     {
@@ -431,7 +440,7 @@
         "path": "./plugins/aibf-triage"
       },
       "category": "skill",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "interface": {
         "shortDescription": "Triage software test failures with AI BlameFinder (AIBF) 2.0. Submits a JIRA UE ticket or an XOAH history URL to the hosted AIBF triage service, wh..."
       }
@@ -617,7 +626,7 @@
         "path": "./plugins/analyze-xoah-result"
       },
       "category": "skill",
-      "version": "2.3.4",
+      "version": "3.7.0",
       "interface": {
         "shortDescription": "Primary analysis skill for test/regression results from XOAH automation runs. Performs initial assessment and routes to specialized playbooks based..."
       }
@@ -953,6 +962,18 @@
       }
     },
     {
+      "name": "bms-selleros-commercial-fae-account-level",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bms-selleros-commercial-fae-account-level"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "For AMD commercial FAEs (field application engineers) - read an account or deal through a technical lens using the SellerOS MCP. Triggers on \"FAE n..."
+      }
+    },
+    {
       "name": "bms-selleros-commercial-seller-account-level",
       "source": {
         "source": "local",
@@ -962,6 +983,18 @@
       "version": "1.0.0",
       "interface": {
         "shortDescription": "Runs any of 19 sales plays at the account or opportunity level for AMD commercial sellers using the SellerOS MCP. Use this skill when you need acco..."
+      }
+    },
+    {
+      "name": "bms-selleros-toolkit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bms-selleros-toolkit"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "Small, generic SellerOS MCP helper capabilities that don't belong to any one account-level persona skill - currently HTML publishing (upload a self..."
       }
     },
     {
@@ -2240,6 +2273,18 @@
       }
     },
     {
+      "name": "dataiku-dss-sync",
+      "source": {
+        "source": "local",
+        "path": "./plugins/dataiku-dss-sync"
+      },
+      "category": "skill",
+      "version": "0.1.3",
+      "interface": {
+        "shortDescription": "Guarded programmatic push of Code Studio files to Dataiku DSS. The native \"Sync\" button has no public API; this skill writes project LIBRARY files ..."
+      }
+    },
+    {
       "name": "dazhang-skill",
       "source": {
         "source": "local",
@@ -3398,6 +3443,18 @@
       }
     },
     {
+      "name": "fpga-salesforce-mcp-setup",
+      "source": {
+        "source": "local",
+        "path": "./plugins/fpga-salesforce-mcp-setup"
+      },
+      "category": "skill",
+      "version": "1.0.6",
+      "interface": {
+        "shortDescription": "Scope: AMD AECG FPGA only - connects to the Xilinx Salesforce org"
+      }
+    },
+    {
       "name": "fpga-trace",
       "source": {
         "source": "local",
@@ -3452,7 +3509,7 @@
         "path": "./plugins/gap-ticket-automation"
       },
       "category": "skill",
-      "version": "1.21.0",
+      "version": "1.25.0",
       "interface": {
         "shortDescription": "Automate GAP JIRA ticket test selection. Fetches failed tests from a ticket, XOAH URL, Jira filter, or JQL URL; scores by pass rate and runtime; an..."
       }
@@ -4052,7 +4109,7 @@
         "path": "./plugins/grimlock-zstate-verif"
       },
       "category": "skill",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "interface": {
         "shortDescription": "Load the authoritative Grimlock PCIe Z-State (Z8/Z8R/Z11/S0i3) verification"
       }
@@ -4463,7 +4520,7 @@
         "path": "./plugins/intentify"
       },
       "category": "skill",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "interface": {
         "shortDescription": "Turns a vague request into a precise, target-tuned prompt for another"
       }
@@ -4724,7 +4781,7 @@
         "path": "./plugins/jira-to-bonfire-csv"
       },
       "category": "skill",
-      "version": "1.0.13",
+      "version": "1.0.14",
       "interface": {
         "shortDescription": "Export a Jira saved filter's issues into the bonfire burnup chart's _work.csv"
       }
@@ -4823,6 +4880,18 @@
       "version": "1.0.2",
       "interface": {
         "shortDescription": "Use when user asks to record, read, search, compare, or extract the history of file/folder/repo operations performed by an LLM session — \"what did ..."
+      }
+    },
+    {
+      "name": "library-read",
+      "source": {
+        "source": "local",
+        "path": "./plugins/library-read"
+      },
+      "category": "skill",
+      "version": "1.2.0",
+      "interface": {
+        "shortDescription": "This skill analyzes material from an internal AMD library and solves a vast variety of engineering problems. The library contains peer-reviewed pub..."
       }
     },
     {
@@ -5480,7 +5549,7 @@
         "path": "./plugins/mi-fw-lead-reg-read"
       },
       "category": "skill",
-      "version": "1.0.1",
+      "version": "1.1.1",
       "interface": {
         "shortDescription": "Read GPU and CPU hardware registers from a live AMD Instinct system (MI450/MI455,"
       }
@@ -5945,7 +6014,7 @@
         "path": "./plugins/nocgen-ai"
       },
       "category": "skill",
-      "version": "0.1.5",
+      "version": "0.1.7",
       "interface": {
         "shortDescription": "AMD internal source-grounded assistant for Arteris FlexNoC/FlexGen NoC"
       }
@@ -6542,6 +6611,18 @@
       "version": "1.3.3",
       "interface": {
         "shortDescription": "Assist PD engineers with CAC delta debug between two TileBuilder run"
+      }
+    },
+    {
+      "name": "pdf-create-report",
+      "source": {
+        "source": "local",
+        "path": "./plugins/pdf-create-report"
+      },
+      "category": "skill",
+      "version": "1.2.4",
+      "interface": {
+        "shortDescription": "Generate PDF reports and documents using WeasyPrint. Use when creating"
       }
     },
     {
@@ -7544,7 +7625,7 @@
         "path": "./plugins/qtest"
       },
       "category": "skill",
-      "version": "2.0.5",
+      "version": "2.0.6",
       "interface": {
         "shortDescription": "Look up, create, update, export, and execute Tricentis qTest Manager"
       }
@@ -8153,7 +8234,7 @@
         "path": "./plugins/rtl-bug-hunter"
       },
       "category": "skill",
-      "version": "1.0.6",
+      "version": "1.1.1",
       "interface": {
         "shortDescription": "Audit Verilog and SystemVerilog RTL for evidence-backed functional bugs"
       }
@@ -8693,6 +8774,15 @@
       }
     },
     {
+      "name": "shadersplainer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/shadersplainer"
+      },
+      "category": "skill",
+      "version": "1.0.0"
+    },
+    {
       "name": "shaohyan-skill",
       "source": {
         "source": "local",
@@ -9122,7 +9212,7 @@
         "path": "./plugins/smart-cdc"
       },
       "category": "skill",
-      "version": "1.4.17",
+      "version": "1.4.18",
       "interface": {
         "shortDescription": "AMD-internal assistant for CDC/RDC flow setup, clock and reset understanding,"
       }
@@ -9446,7 +9536,7 @@
         "path": "./plugins/sn-current"
       },
       "category": "skill",
-      "version": "1.0.10",
+      "version": "1.0.11",
       "interface": {
         "shortDescription": "Pull Jira issues for a named, saved JQL query and write a flattened JSON"
       }
@@ -9710,7 +9800,7 @@
         "path": "./plugins/sn-jama-dash"
       },
       "category": "skill",
-      "version": "1.4.2",
+      "version": "1.4.4",
       "interface": {
         "shortDescription": "Fetch live SimNow requirements from Jama, classify them by state, and"
       }
@@ -9818,7 +9908,7 @@
         "path": "./plugins/sn-pm-ppt"
       },
       "category": "skill",
-      "version": "1.1.7",
+      "version": "1.2.1",
       "interface": {
         "shortDescription": "Build a PM execution-status PowerPoint by filling a fixed corporate template"
       }
@@ -10679,6 +10769,18 @@
       }
     },
     {
+      "name": "ssadeh-general-skill",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ssadeh-general-skill"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "A general-purpose skill for automating tasks and providing intelligent assistance. Use this skill when you need a flexible, reusable agent capabili..."
+      }
+    },
+    {
       "name": "ssl-cert",
       "source": {
         "source": "local",
@@ -10910,6 +11012,18 @@
       "version": "1.0.3",
       "interface": {
         "shortDescription": "Use when writing or reviewing SystemVerilog Assertions (SVA) in RTL,"
+      }
+    },
+    {
+      "name": "swarm-cl-review",
+      "source": {
+        "source": "local",
+        "path": "./plugins/swarm-cl-review"
+      },
+      "category": "skill",
+      "version": "1.0.2",
+      "interface": {
+        "shortDescription": "Fetch and post comments on AMD Perforce Swarm code reviews (swarm.xilinx.com/1666)"
       }
     },
     {
@@ -11468,7 +11582,7 @@
         "path": "./plugins/tile-port-placement"
       },
       "category": "skill",
-      "version": "1.0.18",
+      "version": "1.1.2",
       "interface": {
         "shortDescription": "Generate connectivity-verified, catch-wrapped port_placement.tcl scripts"
       }
@@ -11537,7 +11651,7 @@
         "path": "./plugins/timing-analysis-synth-constraints"
       },
       "category": "skill",
-      "version": "1.5.1",
+      "version": "1.5.4",
       "interface": {
         "shortDescription": "Use when analyzing timing violations across TileBuilder NOC runs for"
       }
@@ -11633,9 +11747,9 @@
         "path": "./plugins/token-efficiency-analyzer"
       },
       "category": "skill",
-      "version": "1.14.3",
+      "version": "1.15.2",
       "interface": {
-        "shortDescription": "Forensic token-waste analysis of Claude Code and Codex session transcripts."
+        "shortDescription": "Find out where your agent''s tokens actually went. Reads raw Claude"
       }
     },
     {
@@ -11798,6 +11912,18 @@
       "version": "0.1.1",
       "interface": {
         "shortDescription": "Access AMD Learning Udemy Business through the AMD Okta SSO session."
+      }
+    },
+    {
+      "name": "ue-test-selection",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ue-test-selection"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "Pick the best representative test in a JIRA UE (Unique Error) ticket for AI triage — AIBF culprit-CL ranking plus Smart BlameFinder physical valida..."
       }
     },
     {
@@ -12614,7 +12740,7 @@
         "path": "./plugins/ws-vs-pkg-scan-init-tdr-compare"
       },
       "category": "skill",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "interface": {
         "shortDescription": "Verify that a scan-init (or any setup) function programs the same TDRs the same way at Wafer-Sort (WS) and Package (PKG), at both the C++ source an..."
       }

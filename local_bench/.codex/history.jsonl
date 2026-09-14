@@ -6,3 +6,12 @@
 {"session_id":"01a08643-3681-7ba2-b7d1-d55543187e2b","ts":1788963862,"text":"yes, I stopped server, write to me how to run it with new kernel"}
 {"session_id":"01a086ef-795b-76c2-b64d-252b3f6c6e72","ts":1788970274,"text":"How to run sglang server with both changes: /var/home/InferenceX/local_bench/kernel_tuning/chunk_gated_delta_rule and /var/home/InferenceX/local_bench/kernel_tuning/conv ?"}
 {"session_id":"01a086ef-795b-76c2-b64d-252b3f6c6e72","ts":1788970481,"text":"create this shell script"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789114021,"text":"I had create FlyDSL convolution kerne: /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/conv/causal_conv1d_flydsl.py and want to use it with: TP=4 CONC=4 /var/home/my_InferenceX/InferenceX/local_bench/qwen3.5_fp4_sglang_server.sh and /var/home/my_InferenceX/InferenceX/local_bench/qwen3.5_fp4_sglang_bench.sh, but the whole sglang is slower with my kernel, Fix _build's cache key (drop batch/max_len/spans) and the _compiled key (dtype + rank +\n  unit-stride axis instead of exact shapes), and it becomes measurable for the first time. It\n  could well turn out faster than the Triton baseline — that's exactly what happened with the\n  gdn kernel, which went from unusable to +0.57% once the same bug was removed."}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789115263,"text":"ok, compare perfromance with my kernel and without"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789116857,"text":"ok now compare default version and version with 2 my kernels: /var/home/my_InferenceX/InferenceX/local_bench/kernel_tuning/run_server_both.sh"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789118409,"text":"what are the reason of slow down?"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789118712,"text":"Ok, run experiment with:  ISL=32768 OSL=1024"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789121347,"text":"release gpu, rerun please"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789131696,"text":"write to me bash command how to run server with both kernels"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789134934,"text":"based on new traces: /var/home/sglang_profiling4 can you tell to me, why new chunk_gated_delta_rule kernel is not effective?"}
+{"session_id":"01a08f7f-5fca-7860-8a4d-ee2afd41e747","ts":1789135906,"text":"reduce the value tile from 16 to 8"}

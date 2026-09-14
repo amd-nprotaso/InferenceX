@@ -1,0 +1,24 @@
+/opt/venv/lib/python3.10/site-packages/triton/language/core.py:2623: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+/opt/venv/lib/python3.10/site-packages/triton/language/core.py:2623: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+device=AMD Instinct MI355X arch=gfx950 tol rtol=0.016 atol=0.016
+
+[PASS] aligned single seq                           T=4096   n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] aligned single seq 32k                       T=32768  n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] ragged single seq                            T=29618  n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] ragged single seq (T%64==1)                  T=4097   n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] ragged single seq (T%64==63)                 T=4159   n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] sub-chunk seq                                T=17     n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] exactly one chunk                            T=64     n=1  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] 2 seqs aligned                               T=6144   n=2  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] 2 seqs ragged                                T=29618  n=2  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] 3 seqs ragged                                T=20145  n=3  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] 4 seqs mixed                                 T=9507   n=4  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] production-like 3 seqs                       T=32768  n=3  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] no save_new_value                            T=8000   n=2  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] state slot -1 on seq 0                       T=5096   n=2  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] all slots -1                                 T=5000   n=2  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+[PASS] gk path                                      T=5596   n=2  h maxerr=0.000e+00  v_new maxerr=0.000e+00  state maxerr=0.000e+00
+
+16/16 passed

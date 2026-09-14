@@ -9,6 +9,31 @@ difference is inside the measurement spread. The 0.65 ms and 0.50 ms targets
 were not reached. The historical 0.850 ms bar is exceeded, but comparing only
 against that older number would overstate the result.
 
+## BV8 implementation update (2026-09-11)
+
+The current kernel uses `VALUE_TILE=8` in both `build` and `build_varlen`.
+For TP4 (`H=16`, `V=128`), the varlen grid is `(16, 16, n_seq)`, giving
+256 workgroups per sequence instead of 128. Restart the server launched by
+`../run_server_both.sh` to load the change; no additional flag is required.
+
+The `MFMA(16,16,32)` instruction and its physical 16-column LDS layouts remain.
+Columns 8–15 carry zero state/input and cannot read or write global value/state
+tensors. All lanes still participate in MFMA and barriers. This avoids overlapping
+writes between adjacent logical BV8 tiles. The public V-divisible-by-16 contract
+is unchanged. More workgroups also duplicate K/W loads and matrix work; this is
+an experiment, not a demonstrated serving speedup. The measurements below are
+historical BV16 results, not measurements of this BV8 implementation.
+
+Validation commands (without the serving bootstrap):
+
+```bash
+python3 check_varlen.py
+python3 check_chunk_h.py --output /tmp/gdn_bv8_generic.json
+SGLANG_FLYDSL_GDN_STATIC=1 python3 check_chunk_h.py --output /tmp/gdn_bv8_static.json
+```
+
+Graph tests prepare GPU sequence metadata before capture, matching serving.
+
 ## Repeated device measurements
 
 TP4: B=1, T=32768, Hg=4, H=16, K=V=128, BT=64. Each cell is the median of

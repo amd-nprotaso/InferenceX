@@ -112,6 +112,16 @@ timings separate from end-to-end throughput and quality conclusions.
 
 ## Interface and constraints
 
+Batch size, maximum sequence length, and storage spans are runtime arguments,
+so varying these values reuses the builder and compiled kernel. The compiled
+dispatch key includes device and each tensor's dtype, rank, and first unit-stride
+axis. Physical strides and tuning choices remain builder specializations;
+changing those can still compile a new kernel. Restart the server to load this fix.
+Run `python3 kernel_tuning/conv/check_conv.py --cache-only` to check reuse across
+growing/shrinking packed requests against PyTorch and Triton, including graph replay.
+This removes request-size compilation overhead; serving speedup still requires
+a paired baseline/FlyDSL run with the same workload.
+
 `causal_conv1d_flydsl.causal_conv1d_fn` accepts the inspected SGLang prefill API:
 
 - Input `[channels, total_tokens]`; weights `[channels, width]`.

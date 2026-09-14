@@ -12,8 +12,10 @@ source directories still have to be on PYTHONPATH, because each hook does a
 bare `from <kernel>_flydsl import ...` when its target module is first imported.
 
 Each hook stays gated by its own env flag (SGLANG_FLYDSL_CAUSAL_CONV /
-SGLANG_FLYDSL_GDN_CHUNK_H), so this file activates nothing on its own. That
-makes one launcher able to serve all four arms of a kernel A/B.
+SGLANG_FLYDSL_GDN_CHUNK_H / SGLANG_FLYDSL_MOE_DECODE), so this file activates
+nothing on its own. That makes one launcher able to serve every arm of a
+kernel A/B, and it is why adding a kernel means adding an entry to _HOOKS
+rather than a third file named `sitecustomize.py`.
 
 SGLANG_FLYDSL_COUNT_COMPILES=1 wraps flydsl.compiler.compile and logs one line
 per JIT compile. Counting lines in the server log across a benchmark window is
@@ -31,6 +33,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _HOOKS = (
     ("_flydsl_hook_conv", os.path.join(_ROOT, "conv", "bootstrap", "sitecustomize.py")),
     ("_flydsl_hook_gdn", os.path.join(_ROOT, "chunk_gated_delta_rule", "bootstrap", "sitecustomize.py")),
+    ("_flydsl_hook_moe_decode", os.path.join(_ROOT, "moe_decode", "bootstrap", "sitecustomize.py")),
 )
 
 

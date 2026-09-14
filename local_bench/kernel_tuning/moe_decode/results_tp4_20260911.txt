@@ -1,0 +1,203 @@
+
+====================================================================================================
+Qwen3.5-397B-A17B MXFP4 TP=4  |  tokens=4  rows=40  model_dim=4096 inter_dim=256 E=512 topk=10
+====================================================================================================
+
+  -- sglang  (40.11 us, 6.0 launches)
+        11.15 +-0.06 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+         9.07 +-0.28 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         7.01 +-0.15 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_
+         4.85 +-0.01 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.55 +-0.02 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.49 +-0.02 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+
+  -- sglang+atomic  (40.21 us, 6.0 launches)
+        11.02 +-0.18 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+         9.06 +-0.25 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         6.89 +-0.23 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_
+         4.94 +-0.08 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.83 +-0.09 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.46 +-0.02 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+
+  -- flydsl  (33.69 us, 4.0 launches)
+        11.05 +-0.02 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+        10.29 +-0.02 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         6.96 +-0.01 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_
+         5.39 +-0.15 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+
+  -- flydsl+atomic  (33.11 us, 4.0 launches)
+        11.01 +-0.01 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+        10.20 +-0.03 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         6.83 +-0.02 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_
+         5.08 +-0.04 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+
+  stage roll-up (us per layer per rank)
+     stage                   sglang  sglang+atomic         flydsl  flydsl+atomic
+     router                    9.07           9.06              -              -
+     route+sort                   -              -          10.29          10.20
+     sort                      8.04           8.29              -              -
+     quant+scatter             4.85           4.94           5.39           5.08
+     stage1                   11.15          11.02          11.05          11.01
+     stage2                    7.01           6.89           6.96           6.83
+     FRONT-END                21.96          22.29          15.68          15.27
+       vs base                   --          +0.33          -6.27          -6.68
+     TOTAL                    40.11          40.21          33.69          33.11
+     launches                   6.0            6.0            4.0            4.0
+     vs sglang                   --          +0.10          -6.41          -7.00
+
+====================================================================================================
+Qwen3.5-397B-A17B MXFP4 TP=4  |  tokens=8  rows=80  model_dim=4096 inter_dim=256 E=512 topk=10
+====================================================================================================
+
+  -- sglang  (50.90 us, 7.0 launches)
+        15.92 +-0.07 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+         9.19 +-0.07 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         9.14 +-0.03 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bh
+         5.11 +-0.02 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.73 +-0.05 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.67 +-0.01 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.14 +-0.02 us  x 1.0  [reduce       ] moe_reduction_kernel_0
+
+  -- sglang+atomic  (50.85 us, 7.0 launches)
+        16.21 +-0.01 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+         9.39 +-0.17 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bh
+         8.98 +-0.04 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         5.13 +-0.04 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.55 +-0.03 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.68 +-0.04 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         2.91 +-0.12 us  x 1.0  [reduce       ] moe_reduction_kernel_0
+
+  -- flydsl  (43.93 us, 5.0 launches)
+        16.08 +-0.15 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+        10.66 +-0.04 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         9.28 +-0.09 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bh
+         5.02 +-0.05 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         2.89 +-0.12 us  x 1.0  [reduce       ] moe_reduction_kernel_0
+
+  -- flydsl+atomic  (43.79 us, 5.0 launches)
+        16.08 +-0.10 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_
+        10.60 +-0.01 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         9.21 +-0.22 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bh
+         4.97 +-0.01 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         2.93 +-0.16 us  x 1.0  [reduce       ] moe_reduction_kernel_0
+
+  stage roll-up (us per layer per rank)
+     stage                   sglang  sglang+atomic         flydsl  flydsl+atomic
+     router                    9.19           8.98              -              -
+     route+sort                   -              -          10.66          10.60
+     sort                      8.40           8.23              -              -
+     quant+scatter             5.11           5.13           5.02           4.97
+     stage1                   15.92          16.21          16.08          16.08
+     stage2                    9.14           9.39           9.28           9.21
+     reduce                    3.14           2.91           2.89           2.93
+     FRONT-END                25.85          25.25          18.56          18.51
+       vs base                   --          -0.60          -7.29          -7.34
+     TOTAL                    50.90          50.85          43.93          43.79
+     launches                   7.0            7.0            5.0            5.0
+     vs sglang                   --          -0.05          -6.98          -7.11
+
+====================================================================================================
+Qwen3.5-397B-A17B MXFP4 TP=4  |  tokens=16  rows=160  model_dim=4096 inter_dim=256 E=512 topk=10
+====================================================================================================
+
+  -- sglang  (72.68 us, 7.0 launches)
+        33.22 +-0.06 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_
+        13.52 +-0.04 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_nt_reduce_tk10
+         9.30 +-0.29 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         5.58 +-0.02 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.46 +-0.04 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.62 +-0.03 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.00 +-0.00 us  x 1.0  [reduce       ] moe_reduction_kernel_0
+
+  -- sglang+atomic  (71.54 us, 6.0 launches)
+        34.30 +-0.39 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_
+        13.38 +-0.03 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_
+         9.64 +-0.03 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         5.71 +-0.05 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.98 +-0.51 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.54 +-0.03 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+
+  -- flydsl  (67.13 us, 5.0 launches)
+        32.62 +-0.13 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_
+        13.53 +-0.09 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_nt_reduce_tk10
+        12.59 +-0.06 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         5.69 +-0.00 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         2.70 +-0.01 us  x 1.0  [reduce       ] moe_reduction_kernel_0
+
+  -- flydsl+atomic  (65.52 us, 4.0 launches)
+        34.16 +-0.24 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_
+        13.32 +-0.11 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_
+        12.50 +-0.01 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         5.54 +-0.07 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+
+  stage roll-up (us per layer per rank)
+     stage                   sglang  sglang+atomic         flydsl  flydsl+atomic
+     router                    9.30           9.64              -              -
+     route+sort                   -              -          12.59          12.50
+     sort                      8.08           8.52              -              -
+     quant+scatter             5.58           5.71           5.69           5.54
+     stage1                   33.22          34.30          32.62          34.16
+     stage2                   13.52          13.38          13.53          13.32
+     reduce                    3.00              -           2.70              -
+     FRONT-END                25.95          23.86          20.98          18.04
+       vs base                   --          -2.09          -4.97          -7.90
+     TOTAL                    72.68          71.54          67.13          65.52
+     launches                   7.0            6.0            5.0            4.0
+     vs sglang                   --          -1.14          -5.55          -7.17
+
+====================================================================================================
+Qwen3.5-397B-A17B MXFP4 TP=4  |  tokens=32  rows=320  model_dim=4096 inter_dim=256 E=512 topk=10
+====================================================================================================
+
+  -- sglang  (105.38 us, 6.0 launches)
+        56.61 +-0.12 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async
+        24.68 +-0.04 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_pers
+         9.30 +-0.05 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         6.57 +-0.04 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.72 +-0.08 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.51 +-0.01 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+
+  -- sglang+atomic  (104.84 us, 6.0 launches)
+        56.25 +-0.14 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async
+        24.15 +-0.36 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_pers
+         9.42 +-0.03 us  x 1.0  [router       ] _ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0
+         6.58 +-0.00 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+         4.86 +-0.09 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+         3.57 +-0.01 us  x 1.0  [sort         ] void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKe
+
+  -- flydsl  (103.37 us, 4.0 launches)
+        56.34 +-0.09 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async
+        23.78 +-0.04 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_pers
+        16.72 +-0.01 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         6.53 +-0.01 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+
+  -- flydsl+atomic  (103.45 us, 4.0 launches)
+        56.08 +-0.30 us  x 1.0  [stage1       ] mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async
+        24.09 +-0.06 us  x 1.0  [stage2       ] gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_pers
+        16.69 +-0.06 us  x 1.0  [route+sort   ] moe_sorting_oneshot_fused_kernel_0
+         6.60 +-0.05 us  x 1.0  [quant+scatter] _ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi25
+
+  stage roll-up (us per layer per rank)
+     stage                   sglang  sglang+atomic         flydsl  flydsl+atomic
+     router                    9.30           9.42              -              -
+     route+sort                   -              -          16.72          16.69
+     sort                      8.23           8.43              -              -
+     quant+scatter             6.57           6.58           6.53           6.60
+     stage1                   56.61          56.25          56.34          56.08
+     stage2                   24.68          24.15          23.78          24.09
+     FRONT-END                24.09          24.44          23.25          23.28
+       vs base                   --          +0.35          -0.84          -0.81
+     TOTAL                   105.38         104.84         103.37         103.45
+     launches                   6.0            6.0            4.0            4.0
+     vs sglang                   --          -0.54          -2.02          -1.93
+
+====================================================================================================
+projection over 60 layers (one rank, one decode/verify step)
+====================================================================================================
+  tokens             sglang  sglang+atomic         flydsl  flydsl+atomic
+  4                2.406 ms       2.412 ms       2.022 ms       1.987 ms
+  8                3.054 ms       3.051 ms       2.636 ms       2.628 ms
+  16               4.361 ms       4.293 ms       4.028 ms       3.931 ms
+  32               6.323 ms       6.290 ms       6.202 ms       6.207 ms
+
+raw results -> /tmp/compare_tp4.json

@@ -102,6 +102,15 @@ ISL=32768 OSL=1024 CONC_LIST="4" bash qwen3.5_fp4_sglang_bench.sh
 
 ## 接口与约束
 
+批大小、最大序列长度和存储跨度作为运行时参数传入，改变这些值会复用 builder
+及已编译内核。编译调用缓存键包含设备，以及各张量的 dtype、维数和第一个步长为 1
+的轴。物理步长及调优参数仍属于 builder 特化条件，改变它们仍可能触发新编译。
+重启服务器后修复才会生效。运行
+`python3 kernel_tuning/conv/check_conv.py --cache-only`，可针对增长及缩短的打包请求
+验证缓存复用，并与 PyTorch、Triton 对照，包含图重放检查。
+此修复消除由请求大小变化引起的编译开销；服务加速比仍需使用相同负载进行
+基线与 FlyDSL 配对测量。
+
 `causal_conv1d_flydsl.causal_conv1d_fn` 接受当前 SGLang prefill 接口：
 
 - 输入为 `[channels, total_tokens]`，权重为 `[channels, width]`。

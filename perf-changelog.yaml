@@ -7070,3 +7070,27 @@
     - "优化可选的 local_bench/kernel_tuning/conv FlyDSL 因果 prefill 卷积：分组预取 token、将尾部读取地址钳制在有效范围内、提前读取权重，并打包相邻通道。"
     - "MI350X TP=4 内核交替测试中，32K、4K 和打包 4x8K 输入相较原始 FlyDSL 实现分别加速 1.54x、1.10x、1.53x；尚未测量服务吞吐量。"
   pr-link: XXX
+
+- config-keys:
+    - qwen3.5-fp4-mi355x-sglang
+    - qwen3.5-fp4-mi355x-sglang-mtp
+  scenario-type:
+    - fixed-seq-len
+  description:
+    - "Fix opt-in local_bench FlyDSL causal prefill convolution cache reuse: pass batch size, maximum sequence length, and storage spans at runtime; key compiled dispatch by device and tensor dtype, rank, and unit-stride axis instead of exact shapes."
+    - "Retain physical-stride and tuning specialization. Validate variable-shape reuse, numerical output, state updates, and GPU graph replay; end-to-end serving speedup is not yet measured."
+    - "修复可选 local_bench FlyDSL 因果 prefill 卷积的缓存复用：批大小、最大序列长度及存储跨度改为运行时参数；编译调用缓存键使用设备及张量类型、维数和单位步长轴，不再包含精确形状。"
+    - "保留物理步长及调优参数特化，验证变长输入的缓存复用、数值输出、状态更新及 GPU 图重放；尚未测量端到端服务加速比。"
+  pr-link: XXX
+
+- config-keys:
+    - qwen3.5-fp4-mi355x-sglang
+    - qwen3.5-fp4-mi355x-sglang-mtp
+  scenario-type:
+    - fixed-seq-len
+  description:
+    - "Reduce the opt-in local_bench FlyDSL GDN h logical value tile from 16 to 8 in static and variable-length kernels, doubling TP4 workgroups per sequence to 256."
+    - "Keep physical 16-column MFMA/LDS layouts and mask unused global value/state accesses; serving performance has not been measured for this change."
+    - "将可选 local_bench FlyDSL GDN h 静态及变长内核的逻辑 value tile 从 16 改为 8，使 TP4 每序列 workgroup 数翻倍至 256。"
+    - "保留物理 16 列 MFMA/LDS 布局并屏蔽未使用列的全局 value/state 访问；尚未测量本次修改的服务性能。"
+  pr-link: XXX

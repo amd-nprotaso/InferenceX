@@ -1,0 +1,770 @@
+{
+  "sglang|4": {
+    "tokens": 4,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_kw2_v2out_v33",
+        "us": 11.145716666666722,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.12010000000010201
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.066433333333352,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.5613333333334083
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 7.005699999999999,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.3040000000000216
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 4.850366666666668,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.014666666666689032
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.551066666666653,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.03740000000008248
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.4876833333333397,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.03870000000002438
+      }
+    ]
+  },
+  "sglang+atomic|4": {
+    "tokens": 4,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_kw2_v2out_v33",
+        "us": 11.021766666666661,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.36540000000005257
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.058416666666671,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.49476666666666347
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 6.893766666666689,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.4533333333333269
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 4.944399999999959,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.1546000000000456
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.827016666666639,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.18136666666664247
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.459683333333345,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.043966666666581666
+      }
+    ]
+  },
+  "flydsl|4": {
+    "tokens": 4,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_kw2_v2out_v33",
+        "us": 11.051749999999995,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.04390000000011618
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 10.288399999999982,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.04539999999998834
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 6.958366666666666,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.025333333333355412
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.394350000000045,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.3027000000000104
+      }
+    ]
+  },
+  "flydsl+atomic|4": {
+    "tokens": 4,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_kw2_v2out_v33",
+        "us": 11.008433333333377,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.010733333333270423
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 10.198449999999987,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.06263333333345145
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 6.825749999999978,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.032099999999956275
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.075716666666693,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.0866333333332916
+      }
+    ]
+  },
+  "sglang|8": {
+    "tokens": 8,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_v2out_v33",
+        "us": 15.920449999999995,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.14409999999998924
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.19173333333329,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.14799999999988245
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 9.137033333333296,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.05740000000015577
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.109033333333291,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.046733333333204286
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.72768333333332,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.09463333333338753
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.6743833333332545,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.020033333333348224
+      },
+      {
+        "name": "moe_reduction_kernel_0",
+        "us": 3.144366666666658,
+        "launches": 0.9999999999999999,
+        "stage": "reduce",
+        "samples": 2,
+        "spread": 0.04533333333333456
+      }
+    ]
+  },
+  "sglang+atomic|8": {
+    "tokens": 8,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_v2out_v33",
+        "us": 16.21110000000005,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.024000000000032884
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 9.391699999999998,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.33200000000010377
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 8.978399999999949,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.08400000000006003
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.1316666666666535,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.07599999999989837
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.548333333333341,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.06933333333340475
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.684383333333342,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.0853666666666042
+      },
+      {
+        "name": "moe_reduction_kernel_0",
+        "us": 2.9077000000000215,
+        "launches": 0.9999999999999999,
+        "stage": "reduce",
+        "samples": 2,
+        "spread": 0.23599999999995092
+      }
+    ]
+  },
+  "flydsl|8": {
+    "tokens": 8,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_v2out_v33",
+        "us": 16.081783333333295,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.29070000000000285
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 10.657099999999982,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.07606666666664985
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 9.28235000000003,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.1746333333333574
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.016349999999968,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.09329999999988026
+      },
+      {
+        "name": "moe_reduction_kernel_0",
+        "us": 2.887683333333314,
+        "launches": 0.9999999999999999,
+        "stage": "reduce",
+        "samples": 2,
+        "spread": 0.24136666666665452
+      }
+    ]
+  },
+  "flydsl+atomic|8": {
+    "tokens": 8,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x32x256_pm1_fp4q_sort_async_v2out_v33",
+        "us": 16.083100000000073,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.19740000000004798
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 10.601766666666688,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.02400000000002578
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_reduce_tk10_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 9.205049999999996,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.4494333333334062
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 4.972383333333341,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.010633333333331052
+      },
+      {
+        "name": "moe_reduction_kernel_0",
+        "us": 2.9323666666666535,
+        "launches": 0.9999999999999999,
+        "stage": "reduce",
+        "samples": 2,
+        "spread": 0.31200000000001005
+      }
+    ]
+  },
+  "sglang|16": {
+    "tokens": 16,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 33.21796666666664,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.11446666666666516
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_nt_reduce_tk10_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 13.517083333333398,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.08916666666664597
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.295733333333313,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.5772666666665653
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.576416666666686,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.032033333333326475
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.45634999999999,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.08536666666654291
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.623016666666668,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.06930000000002945
+      },
+      {
+        "name": "moe_reduction_kernel_0",
+        "us": 2.9970333333333334,
+        "launches": 0.9999999999999999,
+        "stage": "reduce",
+        "samples": 2,
+        "spread": 0.009266666666594592
+      }
+    ]
+  },
+  "sglang+atomic|16": {
+    "tokens": 16,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 34.295899999999946,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.7881333333332847
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 13.383766666666657,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.06526666666658087
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.637083333333266,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.057366666666615274
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.707033333333351,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.1040000000000072
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.984383333333308,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 1.0212333333334396
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.5350166666667024,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.058699999999965335
+      }
+    ]
+  },
+  "flydsl|16": {
+    "tokens": 16,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 32.62453333333338,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.26399999999993895
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_nt_reduce_tk10_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 13.529766666666685,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.17333333333341194
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 12.593716666666666,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.11210000000008513
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.689733333333351,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.002666666666621076
+      },
+      {
+        "name": "moe_reduction_kernel_0",
+        "us": 2.6957166666666903,
+        "launches": 0.9999999999999999,
+        "stage": "reduce",
+        "samples": 2,
+        "spread": 0.022633333333332395
+      }
+    ]
+  },
+  "flydsl+atomic|16": {
+    "tokens": 16,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x64x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 34.1565833333333,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.4878999999999536
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk256_atomic_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 13.316466666666631,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.22133333333330185
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 12.502416666666615,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.019966666666674016
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 5.5416666666666305,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.14133333333339948
+      }
+    ]
+  },
+  "sglang|32": {
+    "tokens": 32,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 56.610733333333336,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.24133333333334406
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_persist_cu256_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 24.678483333333336,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.08663333333333867
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.296433333333345,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.10399999999997434
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 6.5703833333333375,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.08403333333337049
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.719033333333311,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.1520666666665642
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.506366666666632,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.02800000000007552
+      }
+    ]
+  },
+  "sglang+atomic|32": {
+    "tokens": 32,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 56.24671666666669,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.2867000000000246
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_persist_cu256_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 24.149199999999993,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.7187999999999448
+      },
+      {
+        "name": "_ZN4vllm3moe17topkGatingSoftmaxIDF16bLi32ELi512ELi2ELi64ELb1ELi0ELNS0_23SharedExpertScoringFuncE0EEEvPKT_PKbPfiPiS9_iiiiii",
+        "us": 9.423733333333356,
+        "launches": 0.9999999999999999,
+        "stage": "router",
+        "samples": 2,
+        "spread": 0.06533333333331193
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 6.583033333333287,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.0027333333333201537
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P0_v2<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 4.863033333333324,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.17593333333323002
+      },
+      {
+        "name": "void aiter::opus_moe_sorting_entry<aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >, aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs>(aiter::MoeSortingMultiPhaseKernel_P23<aiter::MoeSortingProblemMp<int, float, int, 1, false, false, true> >::Kargs)",
+        "us": 3.5710333333333946,
+        "launches": 0.9999999999999999,
+        "stage": "sort",
+        "samples": 2,
+        "spread": 0.013333333333408692
+      }
+    ]
+  },
+  "flydsl|32": {
+    "tokens": 32,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 56.33534999999998,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.17063333333334896
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_persist_cu256_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 23.782566666666654,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.07866666666675215
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 16.71513333333331,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.01600000000002666
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 6.532333333333304,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.013333333333316766
+      }
+    ]
+  },
+  "flydsl+atomic|32": {
+    "tokens": 32,
+    "kernels": [
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_fp4_t32x128x256_pm1_fp4q_sort_async_xcd4_v2out_v33",
+        "us": 56.075366666666696,
+        "launches": 0.9999999999999999,
+        "stage": "stage1",
+        "samples": 2,
+        "spread": 0.5972666666666768
+      },
+      {
+        "name": "gemm2_a4w4_port_hmax8192_imax256_bm32_bn128_bk128_nt_atomic_persist_cu256_bhoist_apf_spart4x2_bf16lds_kst_v2_biasabi6",
+        "us": 24.08853333333333,
+        "launches": 0.9999999999999999,
+        "stage": "stage2",
+        "samples": 2,
+        "spread": 0.11199999999995569
+      },
+      {
+        "name": "moe_sorting_oneshot_fused_kernel_0",
+        "us": 16.68780000000006,
+        "launches": 0.9999999999999999,
+        "stage": "route+sort",
+        "samples": 2,
+        "spread": 0.12406666666662858
+      },
+      {
+        "name": "_ZN5aiter30fused_mx_quant_moe_sort_kernelIDF16bN4opus5fp4_tELi256ELi16EEEvPT0_PhPKT_PKiSA_PKfiiiiiiiii",
+        "us": 6.595700000000017,
+        "launches": 0.9999999999999999,
+        "stage": "quant+scatter",
+        "samples": 2,
+        "spread": 0.10800000000011423
+      }
+    ]
+  }
+}
