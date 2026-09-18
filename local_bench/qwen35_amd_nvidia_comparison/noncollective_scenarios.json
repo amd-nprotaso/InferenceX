@@ -1,0 +1,22 @@
+[
+  {
+    "scenario": "Non-collective fusion package",
+    "prefill_saved_ms": 13.562525749999999,
+    "verify_saved_ms": 0.6792612741935515,
+    "new_prefill_ms": 688.76042346875,
+    "new_verify_ms": 10.629800406754029,
+    "new_cycle_ms": 13.640790646379365,
+    "cycle_latency_reduction_pct": 4.743427453762861,
+    "captured_window_reduction_pct": 2.2204897914965884
+  },
+  {
+    "scenario": "Above + decode MoE/attention tuning",
+    "prefill_saved_ms": 13.562525749999999,
+    "verify_saved_ms": 1.7643289435483915,
+    "new_prefill_ms": 688.76042346875,
+    "new_verify_ms": 9.544732737399189,
+    "new_cycle_ms": 12.555722977024525,
+    "cycle_latency_reduction_pct": 12.32068817441693,
+    "captured_window_reduction_pct": 3.2123050454153335
+  }
+]

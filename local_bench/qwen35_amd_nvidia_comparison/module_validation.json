@@ -1,0 +1,56 @@
+{
+  "module_kernel_rows": 6972,
+  "kernel_calls_preserved": 97329,
+  "flat_inventory_entries_preserved": 6195,
+  "layer_panels": 120,
+  "attribution_counts": [
+    {
+      "vendor": "AMD",
+      "phase": "Prefill",
+      "attribution": "recorded CPU module + launch correlation",
+      "calls": 10300
+    },
+    {
+      "vendor": "AMD",
+      "phase": "Decode (TARGET_VERIFY)",
+      "attribution": "inferred from AMD prefill module and decode kernel role; IDs are prefill references",
+      "calls": 33945
+    },
+    {
+      "vendor": "NVIDIA",
+      "phase": "Prefill",
+      "attribution": "inferred from AMD module structure and kernel role",
+      "calls": 6944
+    },
+    {
+      "vendor": "NVIDIA",
+      "phase": "Prefill",
+      "attribution": "inferred from AMD module structure and kernel role; leaf module unresolved",
+      "calls": 720
+    },
+    {
+      "vendor": "NVIDIA",
+      "phase": "Prefill",
+      "attribution": "inferred from AMD module structure and kernel role; spans or changes module boundaries",
+      "calls": 780
+    },
+    {
+      "vendor": "NVIDIA",
+      "phase": "Decode (TARGET_VERIFY)",
+      "attribution": "inferred from AMD module structure and kernel role",
+      "calls": 31155
+    },
+    {
+      "vendor": "NVIDIA",
+      "phase": "Decode (TARGET_VERIFY)",
+      "attribution": "inferred from AMD module structure and kernel role; spans or changes module boundaries",
+      "calls": 4185
+    },
+    {
+      "vendor": "NVIDIA",
+      "phase": "Decode (TARGET_VERIFY)",
+      "attribution": "inferred from AMD module structure and kernel role; leaf module unresolved",
+      "calls": 9300
+    }
+  ]
+}

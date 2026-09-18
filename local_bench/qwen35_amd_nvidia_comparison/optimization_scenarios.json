@@ -1,0 +1,61 @@
+[
+  {
+    "title": "Practical fusion prototypes",
+    "assumptions": {
+      "F01": 0.5,
+      "F07": 0.5,
+      "F04": 0.5,
+      "F05": 0.5,
+      "F11": 0.5,
+      "F16": 0.5,
+      "F20": 0.5
+    },
+    "prefill_saved_ms": 24.412864000000027,
+    "decode_saved_ms": 0.7946586451612976,
+    "new_prefill_ms": 677.9100852187499,
+    "new_decode_ms": 10.514403035786284,
+    "new_cycle_ms": 13.52539327541162,
+    "new_captured_window_ms": 3269.1822060781246
+  },
+  {
+    "title": "Fusion + focused compute tuning",
+    "assumptions": {
+      "F01": 0.5,
+      "F07": 0.5,
+      "F04": 0.5,
+      "F05": 0.5,
+      "F11": 0.5,
+      "F16": 0.5,
+      "F20": 0.5,
+      "T02": 0.25,
+      "T03": 0.25
+    },
+    "prefill_saved_ms": 24.412864000000027,
+    "decode_saved_ms": 1.8797263145161018,
+    "new_prefill_ms": 677.9100852187499,
+    "new_decode_ms": 9.429335366431479,
+    "new_cycle_ms": 12.440325606056815,
+    "new_captured_window_ms": 3235.5451083281255
+  },
+  {
+    "title": "Above + 25% collective reduction",
+    "assumptions": {
+      "F01": 0.5,
+      "F07": 0.5,
+      "F04": 0.5,
+      "F05": 0.5,
+      "F11": 0.5,
+      "F16": 0.5,
+      "F20": 0.5,
+      "T02": 0.25,
+      "T03": 0.25,
+      "T01": 0.25
+    },
+    "prefill_saved_ms": 101.83568212499996,
+    "decode_saved_ms": 2.149986959677396,
+    "new_prefill_ms": 600.48726709375,
+    "new_decode_ms": 9.159074721270185,
+    "new_cycle_ms": 12.170064960895521,
+    "new_captured_window_ms": 2917.475755828126
+  }
+]

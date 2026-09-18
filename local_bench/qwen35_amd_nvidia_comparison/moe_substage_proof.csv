@@ -1,0 +1,34 @@
+vendor,phase,substage,calls_per_layer,gpu_ms_per_forward
+AMD,Prefill,Expert GEMM 1,1.0,28.925768500000007
+AMD,Prefill,Expert GEMM 2,1.0,43.0284665
+AMD,Prefill,Expert reduction / finalize,1.0,33.59119950000001
+AMD,Prefill,Permutation,2.0,3.3532305000000036
+AMD,Prefill,Quantization,2.0,6.000011499999998
+AMD,Prefill,Routing / TopK,1.0,2.198426999999999
+AMD,Prefill,Shared-expert activation,1.0,0.9729630000000004
+AMD,Prefill,Shared/routed combination,1.0,10.840389
+AMD,Prefill,Shared/router GEMMs and split-K reductions,3.0,20.116306500000004
+AMD,Prefill,Sorting / workspace,4.0,3.8448280000000015
+AMD,Decode,Fused expert pipeline,1.0,3.12290796774194
+AMD,Decode,Routing / TopK,1.0,0.5868822903225803
+AMD,Decode,Shared-expert activation,1.0,0.2723326129032313
+AMD,Decode,Shared/routed combination,1.0,0.2838670967741951
+AMD,Decode,Shared/router GEMMs and split-K reductions,3.0,0.8699225806451637
+NVIDIA,Prefill,Copy helper,1.0,10.175414499999993
+NVIDIA,Prefill,Expert GEMM 1,1.0,28.022374499999994
+NVIDIA,Prefill,Expert GEMM 2,1.0,36.12587050000001
+NVIDIA,Prefill,Expert reduction / finalize,1.0,33.5628865
+NVIDIA,Prefill,Quantization,1.0,3.3994989999999996
+NVIDIA,Prefill,Routing / TopK,3.0,8.030150999999998
+NVIDIA,Prefill,Shared-expert activation,1.0,0.9878080000000001
+NVIDIA,Prefill,Shared/routed combination,1.0,8.749654499999997
+NVIDIA,Prefill,Shared/router GEMMs and split-K reductions,3.0,15.678602000000003
+NVIDIA,Decode,Copy helper,1.0,0.08988793548387158
+NVIDIA,Decode,Expert GEMM 1,1.0,1.5599490322580645
+NVIDIA,Decode,Expert GEMM 2,1.0,1.0934129032258053
+NVIDIA,Decode,Expert reduction / finalize,1.0,0.26500248387096675
+NVIDIA,Decode,Quantization,1.0,0.14862045161290247
+NVIDIA,Decode,Routing / TopK,1.0,0.46729706451613134
+NVIDIA,Decode,Shared-expert activation,1.0,0.1914327741935486
+NVIDIA,Decode,Shared/routed combination,1.0,0.14319887096774103
+NVIDIA,Decode,Shared/router GEMMs and split-K reductions,5.0,1.1882988709677438

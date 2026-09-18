@@ -1,4 +1,4 @@
-"""MI355X BF16 K128/BV8 chunk-state recurrence with explicit MFMA fragments.
+"""MI355X BF16 K128/BV16 chunk-state recurrence with explicit MFMA fragments.
 
 Two kernels share the same math:
 
@@ -26,7 +26,11 @@ from flydsl.expr.typing import T
 
 PREFETCH_DEPTH = 2
 CHUNK_SIZE = 64
-VALUE_TILE = 8
+# Must match the MFMA's 16 physical columns. At 8 the `col < VALUE_TILE` guards
+# retire half of every MFMA's output, so the grid doubles (V // VALUE_TILE) while
+# each workgroup keeps the same LDS footprint and does the same MFMA work --
+# 2.06x slower on qwen35-397b-tp4 for bit-identical results.
+VALUE_TILE = 16
 
 
 @flyc.jit

@@ -1,0 +1,11913 @@
+# Qwen3.5: per-layer PyTorch module sublists
+
+Module sublists: AMD prefill uses recorded nn.Module ranges linked to CPU kernel launches. AMD decode uses AMD prefill module references and kernel-role inference because graph replay hides the module stack. NVIDIA groups are inferred from AMD structure and kernel roles; they are not observed NVIDIA module IDs. Fused operations spanning modules and ambiguous shared-expert/router projections are labeled explicitly. Kernels launched directly by a parent module appear under “Direct kernels” rather than an invented child module. Counts and times cover the same forwards as the flat inventory. Each kernel invocation is counted once. Module grouping reorders the display by hierarchy; the existing execution sequence preserves GPU start order.
+
+[Interactive report](comparison.html) · [Exact module/kernel CSV](kernels_by_module.csv) · [Sequence with module attribution](module_sequences.csv)
+
+
+## Prefill: linear_attention
+
+
+### Layer 0
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_0**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2668.065 µs/fwd
+  - **GemmaRMSNorm_0**
+    - `_gemma_rmsnorm_kernel` — 1 calls/fwd; 140.680 µs/fwd
+  - **Qwen3_5GatedDeltaNet_0**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.700 µs/fwd
+    - **MergedColumnParallelLinear_0**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1082.072 µs/fwd
+    - **MergedColumnParallelLinear_1**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.690 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.630 µs/fwd
+    - **RadixLinearAttention_0**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.579 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.508 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.358 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 118.879 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.489 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.849 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.448 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 1 calls/fwd; 4.389 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 4 calls/fwd; 17.876 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 9.308 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.929 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 31.588 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 148.580 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.869 µs/fwd
+      - `at::native::(anonymous namespace)::CatArrayBatchedCopy_contig` — 1 calls/fwd; 3.619 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 1.25 calls/fwd; 7.429 µs/fwd
+      - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 6.019 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 914.521 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 198.909 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.179 µs/fwd
+    - **RMSNorm_0**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.109 µs/fwd
+    - **RowParallelLinear_0**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.821 µs/fwd
+  - **GemmaRMSNorm_1**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.159 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_0**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.600 µs/fwd
+    - **Qwen2MoeMLP_0**
+      - **MergedColumnParallelLinear_2**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.400 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.810 µs/fwd
+      - **SiluAndMul_0**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 17.329 µs/fwd
+      - **RowParallelLinear_1**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 99.759 µs/fwd
+    - **ReplicatedLinear_0**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.450 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.640 µs/fwd
+    - **TopK_0**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.659 µs/fwd
+    - **FusedMoE_0**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.649 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.969 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 60.419 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.739 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.009 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 462.010 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.569 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 723.061 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 556.230 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 1042.077 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsrmsnormRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign16o40961_tensorptrbf1...` — 1 calls/fwd; 79.944 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 127.240 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 805.638 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 51.360 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.744 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.136 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.024 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.320 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.184 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.712 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.872 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 1 calls/fwd; 2.056 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 4 calls/fwd; 8.127 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 4.472 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.200 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.736 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.455 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.056 µs/fwd
+      - `at::native::(anonymous namespace)::CatArrayBatchedCopy_alignedK_contig` — 1 calls/fwd; 1.904 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 1.5 calls/fwd; 3.576 µs/fwd
+      - `at_cuda_detail::cub::detail::scan::DeviceScanInitKernel` — 1 calls/fwd; 1.320 µs/fwd
+      - `at_cuda_detail::cub::detail::scan::DeviceScanKernel` — 1 calls/fwd; 2.088 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1038.877 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.279 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.047 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.351 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.856 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 443.631 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 583.990 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.631 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.543 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.256 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.624 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.079 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.960 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.184 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.336 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.544 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 70.192 µs/fwd
+
+### Layer 1
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_1**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.245 µs/fwd
+  - **GemmaRMSNorm_2**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.849 µs/fwd
+  - **Qwen3_5GatedDeltaNet_1**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 136.549 µs/fwd
+    - **MergedColumnParallelLinear_3**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1055.572 µs/fwd
+    - **MergedColumnParallelLinear_4**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.809 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.700 µs/fwd
+    - **RadixLinearAttention_1**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.479 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 9.188 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.228 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 116.120 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 65.189 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.829 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.448 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.299 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 31.568 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 147.249 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.100 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 963.191 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 208.980 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.240 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.380 µs/fwd
+    - **RMSNorm_1**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.839 µs/fwd
+    - **RowParallelLinear_2**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 451.220 µs/fwd
+  - **GemmaRMSNorm_3**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.710 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_1**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 184.999 µs/fwd
+    - **Qwen2MoeMLP_1**
+      - **MergedColumnParallelLinear_5**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.459 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.740 µs/fwd
+      - **SiluAndMul_1**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.169 µs/fwd
+      - **RowParallelLinear_3**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 100.609 µs/fwd
+    - **ReplicatedLinear_1**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.670 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.530 µs/fwd
+    - **TopK_1**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.639 µs/fwd
+    - **FusedMoE_1**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.799 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.429 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.839 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 43.349 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.858 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.589 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 462.780 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.399 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 729.781 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 559.231 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 795.230 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.503 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.896 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 800.038 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.952 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.000 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.936 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.096 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.111 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.400 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.728 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.896 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.528 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.448 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.495 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.792 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.757 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.320 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.328 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.744 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.024 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.295 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.688 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 447.167 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 592.414 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 146.055 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.384 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.856 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.176 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.847 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.959 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.160 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.944 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.256 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 64.432 µs/fwd
+
+### Layer 2
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_2**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2570.906 µs/fwd
+  - **GemmaRMSNorm_4**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.860 µs/fwd
+  - **Qwen3_5GatedDeltaNet_2**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.449 µs/fwd
+    - **MergedColumnParallelLinear_6**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1075.522 µs/fwd
+    - **MergedColumnParallelLinear_7**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.109 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.380 µs/fwd
+    - **RadixLinearAttention_2**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.199 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.489 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.688 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 108.439 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.509 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.119 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.548 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.809 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.338 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 140.389 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.009 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 953.261 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.380 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.140 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.170 µs/fwd
+    - **RMSNorm_2**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.679 µs/fwd
+    - **RowParallelLinear_4**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 453.550 µs/fwd
+  - **GemmaRMSNorm_5**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.729 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_2**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 183.280 µs/fwd
+    - **Qwen2MoeMLP_2**
+      - **MergedColumnParallelLinear_8**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.130 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.700 µs/fwd
+      - **SiluAndMul_2**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.079 µs/fwd
+      - **RowParallelLinear_5**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 100.340 µs/fwd
+    - **ReplicatedLinear_2**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.029 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.460 µs/fwd
+    - **TopK_2**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.499 µs/fwd
+    - **FusedMoE_2**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.719 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.459 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.849 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.519 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 101.208 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.339 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 470.090 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.439 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 741.321 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 566.810 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 768.374 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.360 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.527 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 798.238 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 53.400 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.328 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.904 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.120 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.255 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.208 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.680 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.728 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.528 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.392 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.928 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.503 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.749 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.151 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.296 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.736 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.152 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.056 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.024 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 453.567 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 597.102 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.855 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.688 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.904 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.880 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 561.174 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.055 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.072 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.816 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.584 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.528 µs/fwd
+
+### Layer 4
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_3**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2578.405 µs/fwd
+  - **GemmaRMSNorm_8**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.409 µs/fwd
+  - **Qwen3_5GatedDeltaNet_3**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 131.939 µs/fwd
+    - **MergedColumnParallelLinear_10**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.612 µs/fwd
+    - **MergedColumnParallelLinear_11**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.160 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 12.080 µs/fwd
+    - **RadixLinearAttention_3**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.299 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.378 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.698 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 108.469 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.419 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.989 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.128 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.119 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.448 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 134.389 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.279 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 952.761 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 202.700 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.060 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.139 µs/fwd
+    - **RMSNorm_3**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.329 µs/fwd
+    - **RowParallelLinear_8**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 466.630 µs/fwd
+  - **GemmaRMSNorm_9**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.290 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_4**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.620 µs/fwd
+    - **Qwen2MoeMLP_4**
+      - **MergedColumnParallelLinear_12**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.160 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.270 µs/fwd
+      - **SiluAndMul_4**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.229 µs/fwd
+      - **RowParallelLinear_9**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.389 µs/fwd
+    - **ReplicatedLinear_4**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.540 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.920 µs/fwd
+    - **TopK_4**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.579 µs/fwd
+    - **FusedMoE_4**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.669 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.459 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.979 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.209 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.768 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.419 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 478.500 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.439 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 732.111 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 566.431 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 750.262 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.840 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.728 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 800.814 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 55.016 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.224 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.904 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.863 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.248 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 36.016 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.760 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.584 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.888 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.400 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.223 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.197 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 238.144 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.256 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.712 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 138.199 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.560 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.120 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 452.063 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 592.534 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.487 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.600 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.512 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.768 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.367 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.784 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.272 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.848 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.832 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.616 µs/fwd
+
+### Layer 5
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_4**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2571.955 µs/fwd
+  - **GemmaRMSNorm_10**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.909 µs/fwd
+  - **Qwen3_5GatedDeltaNet_4**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.419 µs/fwd
+    - **MergedColumnParallelLinear_13**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.142 µs/fwd
+    - **MergedColumnParallelLinear_14**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.779 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.880 µs/fwd
+    - **RadixLinearAttention_4**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.329 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.768 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.968 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.239 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 65.129 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.119 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.908 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.849 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.618 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 143.540 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.729 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 964.601 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 207.650 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.180 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.159 µs/fwd
+    - **RMSNorm_4**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.309 µs/fwd
+    - **RowParallelLinear_10**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 463.230 µs/fwd
+  - **GemmaRMSNorm_11**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.849 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_5**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.399 µs/fwd
+    - **Qwen2MoeMLP_5**
+      - **MergedColumnParallelLinear_15**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.620 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.790 µs/fwd
+      - **SiluAndMul_5**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.159 µs/fwd
+      - **RowParallelLinear_11**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.019 µs/fwd
+    - **ReplicatedLinear_5**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.210 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.220 µs/fwd
+    - **TopK_5**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.459 µs/fwd
+    - **FusedMoE_5**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.699 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.399 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.969 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 39.499 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.998 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.019 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 476.690 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.519 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 741.021 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.250 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 727.486 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.736 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.711 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 799.598 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.816 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.296 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.032 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.088 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.496 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.288 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.888 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.920 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.584 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.768 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.960 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.936 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.197 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.439 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.664 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.832 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.127 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.983 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 452.679 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 593.054 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.848 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.943 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.568 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.184 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.399 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.072 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.280 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.176 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.888 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.144 µs/fwd
+
+### Layer 6
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_5**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2573.845 µs/fwd
+  - **GemmaRMSNorm_12**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.679 µs/fwd
+  - **Qwen3_5GatedDeltaNet_5**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.959 µs/fwd
+    - **MergedColumnParallelLinear_16**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.882 µs/fwd
+    - **MergedColumnParallelLinear_17**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.029 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.800 µs/fwd
+    - **RadixLinearAttention_5**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.219 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.369 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.638 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 110.020 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.679 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.429 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.358 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.679 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.468 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 138.639 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.380 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 952.341 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 202.899 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.060 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.130 µs/fwd
+    - **RMSNorm_5**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.619 µs/fwd
+    - **RowParallelLinear_12**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.180 µs/fwd
+  - **GemmaRMSNorm_13**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.690 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_6**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.950 µs/fwd
+    - **Qwen2MoeMLP_6**
+      - **MergedColumnParallelLinear_18**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.610 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.989 µs/fwd
+      - **SiluAndMul_6**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.249 µs/fwd
+      - **RowParallelLinear_13**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.049 µs/fwd
+    - **ReplicatedLinear_6**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.900 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.900 µs/fwd
+    - **TopK_6**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.529 µs/fwd
+    - **FusedMoE_6**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.819 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.369 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 7.019 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 39.689 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.638 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.469 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 479.210 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.549 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 741.960 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 563.400 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 727.158 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.967 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.888 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.974 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.680 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.040 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.104 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.399 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 56.984 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.840 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.792 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.544 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.736 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.919 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.008 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.997 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.504 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.728 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.776 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.639 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.968 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.463 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.103 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.600 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.064 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.311 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.416 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.390 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.416 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.120 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.872 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.760 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 64.344 µs/fwd
+
+### Layer 8
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_6**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2569.715 µs/fwd
+  - **GemmaRMSNorm_16**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.470 µs/fwd
+  - **Qwen3_5GatedDeltaNet_6**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.819 µs/fwd
+    - **MergedColumnParallelLinear_20**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.072 µs/fwd
+    - **MergedColumnParallelLinear_21**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.300 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.440 µs/fwd
+    - **RadixLinearAttention_6**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.139 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.489 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.398 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 107.289 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.199 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.749 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.668 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 14.999 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.059 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 133.459 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.509 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 947.261 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 201.279 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.070 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.130 µs/fwd
+    - **RMSNorm_6**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.019 µs/fwd
+    - **RowParallelLinear_16**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.840 µs/fwd
+  - **GemmaRMSNorm_17**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.769 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_8**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 184.739 µs/fwd
+    - **Qwen2MoeMLP_8**
+      - **MergedColumnParallelLinear_22**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.350 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.690 µs/fwd
+      - **SiluAndMul_8**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.259 µs/fwd
+      - **RowParallelLinear_17**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.829 µs/fwd
+    - **ReplicatedLinear_8**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.680 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.270 µs/fwd
+    - **TopK_8**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.439 µs/fwd
+    - **FusedMoE_8**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.719 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.419 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.989 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 39.759 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.738 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.509 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 480.320 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.709 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 746.900 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 559.201 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 713.230 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.424 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.520 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 801.005 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 55.112 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.040 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.040 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.464 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.032 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.736 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.792 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.624 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.456 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.952 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.911 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.621 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.760 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.440 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.720 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.351 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 303.079 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.079 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.839 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.590 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.928 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.983 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.464 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.255 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.174 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.767 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.168 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.944 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.880 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.872 µs/fwd
+
+### Layer 9
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_7**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2568.825 µs/fwd
+  - **GemmaRMSNorm_18**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.729 µs/fwd
+  - **Qwen3_5GatedDeltaNet_7**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.379 µs/fwd
+    - **MergedColumnParallelLinear_23**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1078.762 µs/fwd
+    - **MergedColumnParallelLinear_24**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.910 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.700 µs/fwd
+    - **RadixLinearAttention_7**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.409 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.669 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.938 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 116.769 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.929 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.849 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.028 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.679 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.558 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 139.849 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.169 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 950.481 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 208.270 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.110 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.159 µs/fwd
+    - **RMSNorm_7**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.599 µs/fwd
+    - **RowParallelLinear_18**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 466.630 µs/fwd
+  - **GemmaRMSNorm_19**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.570 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_9**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.359 µs/fwd
+    - **Qwen2MoeMLP_9**
+      - **MergedColumnParallelLinear_25**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.719 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.380 µs/fwd
+      - **SiluAndMul_9**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.049 µs/fwd
+      - **RowParallelLinear_19**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.169 µs/fwd
+    - **ReplicatedLinear_9**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.180 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.690 µs/fwd
+    - **TopK_9**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.659 µs/fwd
+    - **FusedMoE_9**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.369 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.809 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.459 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.498 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.659 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 482.950 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.909 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 733.171 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 560.751 µs/fwd
+- **Qwen3_5LinearDecoderLayer_35**
+  - **Qwen2MoeSparseMoeBlock_46**
+    - **FusedMoE_46**
+      - `aiter::mxfp4_moe_sort_kernel` — 0.25 calls/fwd; 160316.866 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 724.590 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.296 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.832 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 797.526 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.344 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.048 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.928 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.040 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.056 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.176 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.768 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.792 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.592 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.360 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.560 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.832 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.501 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.615 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.424 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.688 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.064 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.471 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.879 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 453.143 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.086 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.695 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.567 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.871 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.024 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.838 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.880 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.256 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.000 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.432 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.952 µs/fwd
+
+### Layer 10
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_8**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2577.875 µs/fwd
+  - **GemmaRMSNorm_20**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.870 µs/fwd
+  - **Qwen3_5GatedDeltaNet_8**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.359 µs/fwd
+    - **MergedColumnParallelLinear_26**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1068.141 µs/fwd
+    - **MergedColumnParallelLinear_27**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.499 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.480 µs/fwd
+    - **RadixLinearAttention_8**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.259 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.388 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.868 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 109.329 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.399 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.229 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.928 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.349 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.738 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 145.089 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.099 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 957.851 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 203.090 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.060 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.149 µs/fwd
+    - **RMSNorm_8**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.969 µs/fwd
+    - **RowParallelLinear_20**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 463.860 µs/fwd
+  - **GemmaRMSNorm_21**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.930 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_10**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.819 µs/fwd
+    - **Qwen2MoeMLP_10**
+      - **MergedColumnParallelLinear_28**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.330 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.019 µs/fwd
+      - **SiluAndMul_10**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.169 µs/fwd
+      - **RowParallelLinear_21**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.149 µs/fwd
+    - **ReplicatedLinear_10**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.370 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.550 µs/fwd
+    - **TopK_10**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.479 µs/fwd
+    - **FusedMoE_10**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.729 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.409 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.889 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.449 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.819 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.119 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 480.170 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.659 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 736.620 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.991 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 734.766 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.695 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.495 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.877 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.440 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.240 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.240 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.952 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 145.832 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.536 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.672 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.848 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.504 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.376 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.784 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.688 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.429 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.263 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.504 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.712 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.032 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.343 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.152 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 455.599 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 593.279 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.496 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.071 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.815 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.808 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.086 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.032 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.128 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.832 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.656 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.912 µs/fwd
+
+### Layer 12
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_9**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2576.225 µs/fwd
+  - **GemmaRMSNorm_24**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.439 µs/fwd
+  - **Qwen3_5GatedDeltaNet_9**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.599 µs/fwd
+    - **MergedColumnParallelLinear_30**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1063.372 µs/fwd
+    - **MergedColumnParallelLinear_31**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.859 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.290 µs/fwd
+    - **RadixLinearAttention_9**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.289 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.758 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.848 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 112.829 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.470 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.149 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.798 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.349 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.358 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 135.929 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.130 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 948.682 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 203.019 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.110 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.149 µs/fwd
+    - **RMSNorm_9**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.379 µs/fwd
+    - **RowParallelLinear_24**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.180 µs/fwd
+  - **GemmaRMSNorm_25**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.869 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_12**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 183.710 µs/fwd
+    - **Qwen2MoeMLP_12**
+      - **MergedColumnParallelLinear_32**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.200 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.930 µs/fwd
+      - **SiluAndMul_12**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.259 µs/fwd
+      - **RowParallelLinear_25**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.829 µs/fwd
+    - **ReplicatedLinear_12**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.590 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.650 µs/fwd
+    - **TopK_12**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.699 µs/fwd
+    - **FusedMoE_12**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.699 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.329 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.969 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.489 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.949 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.419 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 486.870 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.629 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 736.271 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.890 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 737.654 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.079 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.840 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 801.358 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 55.064 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.312 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.320 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.888 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.023 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.432 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.648 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.792 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.488 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.568 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.976 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.536 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.797 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.583 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.448 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.720 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.320 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.871 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.672 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.623 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.391 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.624 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 194.008 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.928 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.104 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.870 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.032 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.336 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.152 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.440 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 71.904 µs/fwd
+
+### Layer 13
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_10**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2569.475 µs/fwd
+  - **GemmaRMSNorm_26**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.039 µs/fwd
+  - **Qwen3_5GatedDeltaNet_10**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 135.120 µs/fwd
+    - **MergedColumnParallelLinear_33**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1078.582 µs/fwd
+    - **MergedColumnParallelLinear_34**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.629 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.450 µs/fwd
+    - **RadixLinearAttention_10**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.339 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.629 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.128 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 115.839 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 66.049 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.269 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.038 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.409 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 31.338 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 146.130 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.039 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 976.741 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 210.240 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.160 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.200 µs/fwd
+    - **RMSNorm_10**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 78.459 µs/fwd
+    - **RowParallelLinear_26**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.240 µs/fwd
+  - **GemmaRMSNorm_27**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.170 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_13**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 178.399 µs/fwd
+    - **Qwen2MoeMLP_13**
+      - **MergedColumnParallelLinear_35**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.209 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.790 µs/fwd
+      - **SiluAndMul_13**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.239 µs/fwd
+      - **RowParallelLinear_27**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 100.089 µs/fwd
+    - **ReplicatedLinear_13**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.980 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.340 µs/fwd
+    - **TopK_13**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_13**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.759 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.399 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.869 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 39.689 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.048 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.349 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 481.640 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.419 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 732.521 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.890 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 734.662 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.239 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.696 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 797.390 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.736 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.112 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.184 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.920 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.368 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.272 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.720 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.536 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.640 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.584 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.816 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.680 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.133 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.632 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.336 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.712 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.440 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 303.623 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.040 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.383 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.430 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.904 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.943 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.688 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.616 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.510 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.271 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.120 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.776 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.464 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.856 µs/fwd
+
+### Layer 14
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_11**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.955 µs/fwd
+  - **GemmaRMSNorm_28**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.260 µs/fwd
+  - **Qwen3_5GatedDeltaNet_11**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.690 µs/fwd
+    - **MergedColumnParallelLinear_36**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.861 µs/fwd
+    - **MergedColumnParallelLinear_37**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.720 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.290 µs/fwd
+    - **RadixLinearAttention_11**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.289 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.418 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.668 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 109.849 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.209 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.299 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.158 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.369 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.268 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 138.589 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.899 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 954.362 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.880 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.070 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.189 µs/fwd
+    - **RMSNorm_11**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 76.009 µs/fwd
+    - **RowParallelLinear_28**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 465.520 µs/fwd
+  - **GemmaRMSNorm_29**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.209 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_14**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.340 µs/fwd
+    - **Qwen2MoeMLP_14**
+      - **MergedColumnParallelLinear_38**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.110 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.740 µs/fwd
+      - **SiluAndMul_14**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.189 µs/fwd
+      - **RowParallelLinear_29**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.959 µs/fwd
+    - **ReplicatedLinear_14**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.040 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.570 µs/fwd
+    - **TopK_14**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_14**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.429 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 7.049 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.469 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 101.438 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.279 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 481.220 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.639 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 740.561 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.890 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 736.910 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.160 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.736 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 796.190 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.456 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.000 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.840 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.880 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.760 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.192 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.680 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.713 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.552 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.528 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.680 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.904 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.181 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.327 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.352 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.448 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.063 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.679 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 457.319 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.798 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.847 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 194.559 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.496 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.336 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.751 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.743 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.184 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.856 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.600 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 64.048 µs/fwd
+
+### Layer 16
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_12**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2572.445 µs/fwd
+  - **GemmaRMSNorm_32**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.029 µs/fwd
+  - **Qwen3_5GatedDeltaNet_12**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.480 µs/fwd
+    - **MergedColumnParallelLinear_40**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1077.062 µs/fwd
+    - **MergedColumnParallelLinear_41**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.529 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.490 µs/fwd
+    - **RadixLinearAttention_12**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.129 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.468 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.388 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 107.739 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.499 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.829 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.728 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 14.919 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 29.988 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 132.489 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.859 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 954.851 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 200.360 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.080 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.079 µs/fwd
+    - **RMSNorm_12**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.849 µs/fwd
+    - **RowParallelLinear_32**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 461.030 µs/fwd
+  - **GemmaRMSNorm_33**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.790 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_16**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.779 µs/fwd
+    - **Qwen2MoeMLP_16**
+      - **MergedColumnParallelLinear_42**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.290 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.269 µs/fwd
+      - **SiluAndMul_16**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.309 µs/fwd
+      - **RowParallelLinear_33**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.079 µs/fwd
+    - **ReplicatedLinear_16**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.109 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.480 µs/fwd
+    - **TopK_16**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.569 µs/fwd
+    - **FusedMoE_16**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.329 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.959 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 39.889 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.528 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.059 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 486.190 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.569 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 750.081 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.690 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 754.790 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.224 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.512 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 796.886 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.752 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.992 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.280 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.912 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.272 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 56.752 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.640 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.608 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.520 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.456 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.008 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.344 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.405 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.567 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.352 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.024 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.335 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.808 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.087 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.102 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.823 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.759 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.856 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.888 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.159 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.519 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.360 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.840 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.272 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 71.720 µs/fwd
+
+### Layer 17
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_13**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2568.895 µs/fwd
+  - **GemmaRMSNorm_34**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.249 µs/fwd
+  - **Qwen3_5GatedDeltaNet_13**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.229 µs/fwd
+    - **MergedColumnParallelLinear_43**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.112 µs/fwd
+    - **MergedColumnParallelLinear_44**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.619 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.380 µs/fwd
+    - **RadixLinearAttention_13**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.309 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 9.209 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.908 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 116.829 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.400 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.119 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.858 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.139 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.548 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 142.869 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.789 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 965.882 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 209.499 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.190 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.170 µs/fwd
+    - **RMSNorm_13**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.640 µs/fwd
+    - **RowParallelLinear_34**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 469.180 µs/fwd
+  - **GemmaRMSNorm_35**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.299 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_17**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.250 µs/fwd
+    - **Qwen2MoeMLP_17**
+      - **MergedColumnParallelLinear_45**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.299 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.810 µs/fwd
+      - **SiluAndMul_17**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.179 µs/fwd
+      - **RowParallelLinear_35**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.599 µs/fwd
+    - **ReplicatedLinear_17**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.370 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.809 µs/fwd
+    - **TopK_17**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.629 µs/fwd
+    - **FusedMoE_17**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.299 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.869 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.170 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.218 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.259 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 483.630 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.479 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 732.731 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 563.090 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 753.694 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.079 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.592 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 791.118 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.552 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.024 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.080 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.960 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.296 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.392 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.616 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.736 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.552 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.369 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.984 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.904 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.629 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.479 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.312 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.720 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.952 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 303.119 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.120 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 459.343 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.902 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.943 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.512 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.088 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.128 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.327 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.208 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.152 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.968 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.584 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.112 µs/fwd
+
+### Layer 18
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_14**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2570.905 µs/fwd
+  - **GemmaRMSNorm_36**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.989 µs/fwd
+  - **Qwen3_5GatedDeltaNet_14**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.040 µs/fwd
+    - **MergedColumnParallelLinear_46**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.332 µs/fwd
+    - **MergedColumnParallelLinear_47**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.679 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.470 µs/fwd
+    - **RadixLinearAttention_14**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.199 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.559 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.748 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 110.629 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.239 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.189 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.318 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.199 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.498 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 137.770 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.269 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 948.171 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.060 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.060 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.139 µs/fwd
+    - **RMSNorm_14**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.339 µs/fwd
+    - **RowParallelLinear_36**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 462.820 µs/fwd
+  - **GemmaRMSNorm_37**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.950 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_18**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.530 µs/fwd
+    - **Qwen2MoeMLP_18**
+      - **MergedColumnParallelLinear_48**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.999 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.600 µs/fwd
+      - **SiluAndMul_18**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.709 µs/fwd
+      - **RowParallelLinear_37**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.199 µs/fwd
+    - **ReplicatedLinear_18**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.130 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.670 µs/fwd
+    - **TopK_18**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.619 µs/fwd
+    - **FusedMoE_18**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.759 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.309 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.929 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.669 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.648 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.989 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 488.670 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.649 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 746.341 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 560.410 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 743.638 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.600 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.696 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.046 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.328 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.264 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.104 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.016 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.024 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.160 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.672 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.768 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.544 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.432 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.719 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.968 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.885 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.464 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.272 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.744 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.128 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.319 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.199 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 461.375 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.230 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.744 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.759 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.208 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.864 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.287 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.503 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.152 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.903 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.400 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.895 µs/fwd
+
+### Layer 20
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_15**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.706 µs/fwd
+  - **GemmaRMSNorm_40**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.689 µs/fwd
+  - **Qwen3_5GatedDeltaNet_15**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 131.709 µs/fwd
+    - **MergedColumnParallelLinear_50**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1078.352 µs/fwd
+    - **MergedColumnParallelLinear_51**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.080 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.490 µs/fwd
+    - **RadixLinearAttention_15**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.199 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.258 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.638 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 108.219 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.179 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.829 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.888 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.119 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.108 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 133.419 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.699 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 949.861 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 202.260 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.090 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.109 µs/fwd
+    - **RMSNorm_15**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.809 µs/fwd
+    - **RowParallelLinear_40**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 462.400 µs/fwd
+  - **GemmaRMSNorm_41**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.419 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_20**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.340 µs/fwd
+    - **Qwen2MoeMLP_20**
+      - **MergedColumnParallelLinear_52**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.779 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.689 µs/fwd
+      - **SiluAndMul_20**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.069 µs/fwd
+      - **RowParallelLinear_41**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.090 µs/fwd
+    - **ReplicatedLinear_20**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.069 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.480 µs/fwd
+    - **TopK_20**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.629 µs/fwd
+    - **FusedMoE_20**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.229 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.879 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.869 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.488 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.819 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 491.180 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.989 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 742.221 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 566.260 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 754.254 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.496 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.680 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 793.670 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.288 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.224 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.880 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.880 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.024 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.096 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.696 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.736 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.512 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.255 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.488 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.584 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.829 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.320 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.240 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.760 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.719 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.088 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.504 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.967 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.446 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.808 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.367 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.416 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.776 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.071 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.311 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.296 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.048 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.440 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.216 µs/fwd
+
+### Layer 21
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_16**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.105 µs/fwd
+  - **GemmaRMSNorm_42**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.259 µs/fwd
+  - **Qwen3_5GatedDeltaNet_16**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 135.989 µs/fwd
+    - **MergedColumnParallelLinear_53**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.882 µs/fwd
+    - **MergedColumnParallelLinear_54**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.759 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.780 µs/fwd
+    - **RadixLinearAttention_16**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.309 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.708 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.088 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.500 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.760 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.459 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.088 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.569 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.868 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 137.929 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.620 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 949.241 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 206.730 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.010 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.179 µs/fwd
+    - **RMSNorm_16**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.189 µs/fwd
+    - **RowParallelLinear_42**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.810 µs/fwd
+  - **GemmaRMSNorm_43**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.320 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_21**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.670 µs/fwd
+    - **Qwen2MoeMLP_21**
+      - **MergedColumnParallelLinear_55**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.080 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.590 µs/fwd
+      - **SiluAndMul_21**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.239 µs/fwd
+      - **RowParallelLinear_43**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.549 µs/fwd
+    - **ReplicatedLinear_21**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.139 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.010 µs/fwd
+    - **TopK_21**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.529 µs/fwd
+    - **FusedMoE_21**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.699 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.279 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.789 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.199 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 101.438 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.259 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 487.290 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.449 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 735.381 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.820 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 737.462 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.456 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.632 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.718 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.624 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.328 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.112 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.928 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.112 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.087 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.688 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.712 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.512 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.359 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.712 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.615 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1038.709 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.192 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.695 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.120 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.591 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 457.255 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 597.606 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.792 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.568 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.264 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.856 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.191 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.040 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.240 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.120 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.344 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.712 µs/fwd
+
+### Layer 22
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_17**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.795 µs/fwd
+  - **GemmaRMSNorm_44**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.289 µs/fwd
+  - **Qwen3_5GatedDeltaNet_17**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.299 µs/fwd
+    - **MergedColumnParallelLinear_56**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.452 µs/fwd
+    - **MergedColumnParallelLinear_57**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.809 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.220 µs/fwd
+    - **RadixLinearAttention_17**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.379 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.678 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.218 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 112.709 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.939 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.749 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.718 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.599 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.818 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 148.649 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 132.310 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 977.211 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 208.430 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.180 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.210 µs/fwd
+    - **RMSNorm_17**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 78.439 µs/fwd
+    - **RowParallelLinear_44**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.920 µs/fwd
+  - **GemmaRMSNorm_45**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.600 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_22**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.379 µs/fwd
+    - **Qwen2MoeMLP_22**
+      - **MergedColumnParallelLinear_58**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.429 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.570 µs/fwd
+      - **SiluAndMul_22**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.259 µs/fwd
+      - **RowParallelLinear_45**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.549 µs/fwd
+    - **ReplicatedLinear_22**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.420 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.450 µs/fwd
+    - **TopK_22**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.549 µs/fwd
+    - **FusedMoE_22**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.189 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.789 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 43.879 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.568 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.169 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 490.460 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.569 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 729.111 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 556.541 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 726.790 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.960 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.383 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.198 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.704 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.800 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.104 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.335 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.344 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.560 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.984 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.608 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.280 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.120 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.880 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.093 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.703 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.416 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.672 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.744 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.447 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.232 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 453.655 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.743 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.696 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 194.183 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.583 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.440 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.310 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.888 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.232 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.568 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.368 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.136 µs/fwd
+
+### Layer 24
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_18**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2570.725 µs/fwd
+  - **GemmaRMSNorm_48**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.219 µs/fwd
+  - **Qwen3_5GatedDeltaNet_18**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.359 µs/fwd
+    - **MergedColumnParallelLinear_60**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.622 µs/fwd
+    - **MergedColumnParallelLinear_61**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.499 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.290 µs/fwd
+    - **RadixLinearAttention_18**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.229 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.799 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.808 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.790 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.889 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.559 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.738 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.709 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.638 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 138.070 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.900 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 964.641 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 206.300 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.120 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.250 µs/fwd
+    - **RMSNorm_18**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 76.009 µs/fwd
+    - **RowParallelLinear_48**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 465.510 µs/fwd
+  - **GemmaRMSNorm_49**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.610 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_24**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.579 µs/fwd
+    - **Qwen2MoeMLP_24**
+      - **MergedColumnParallelLinear_62**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.209 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.669 µs/fwd
+      - **SiluAndMul_24**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.369 µs/fwd
+      - **RowParallelLinear_49**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.449 µs/fwd
+    - **ReplicatedLinear_24**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.110 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.550 µs/fwd
+    - **TopK_24**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.549 µs/fwd
+    - **FusedMoE_24**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.299 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.929 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 42.319 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 98.528 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.649 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 495.190 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.509 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 731.271 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 559.491 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 735.310 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.743 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.480 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 793.790 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.960 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.960 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.696 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.111 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.416 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.608 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.664 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.472 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.272 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.639 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.648 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.805 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.392 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.680 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.736 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.303 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.160 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 458.863 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 593.471 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.728 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.383 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.471 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.504 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.918 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.080 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.128 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.856 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.352 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.688 µs/fwd
+
+### Layer 25
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_19**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2569.595 µs/fwd
+  - **GemmaRMSNorm_50**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.550 µs/fwd
+  - **Qwen3_5GatedDeltaNet_19**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.320 µs/fwd
+    - **MergedColumnParallelLinear_63**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.011 µs/fwd
+    - **MergedColumnParallelLinear_64**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.479 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.470 µs/fwd
+    - **RadixLinearAttention_19**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.349 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 9.098 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.148 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.269 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.839 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.459 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.938 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.779 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.598 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 148.859 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.479 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 969.702 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 209.329 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.100 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.210 µs/fwd
+    - **RMSNorm_19**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 79.089 µs/fwd
+    - **RowParallelLinear_50**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 461.070 µs/fwd
+  - **GemmaRMSNorm_51**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.530 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_25**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.919 µs/fwd
+    - **Qwen2MoeMLP_25**
+      - **MergedColumnParallelLinear_65**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.350 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.790 µs/fwd
+      - **SiluAndMul_25**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.569 µs/fwd
+      - **RowParallelLinear_51**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.319 µs/fwd
+    - **ReplicatedLinear_25**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.250 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.090 µs/fwd
+    - **TopK_25**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.519 µs/fwd
+    - **FusedMoE_25**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.759 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.129 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.839 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.459 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.008 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.519 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 492.970 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.489 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 731.280 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.821 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 735.326 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.375 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.776 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 791.126 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.247 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.048 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.912 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.128 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 145.968 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.600 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.664 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.728 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.504 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.288 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.936 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.824 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1036.989 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.488 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.416 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.895 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.807 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.871 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 457.695 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.910 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.983 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.552 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.560 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.768 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.622 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.232 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.064 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.864 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 15.928 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.712 µs/fwd
+
+### Layer 26
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_20**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2575.785 µs/fwd
+  - **GemmaRMSNorm_52**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.489 µs/fwd
+  - **Qwen3_5GatedDeltaNet_20**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.799 µs/fwd
+    - **MergedColumnParallelLinear_66**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1070.691 µs/fwd
+    - **MergedColumnParallelLinear_67**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.919 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.390 µs/fwd
+    - **RadixLinearAttention_20**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.149 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.688 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.838 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 108.389 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.119 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.439 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.898 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.119 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.308 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 134.280 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.679 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 949.571 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 201.590 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.160 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.130 µs/fwd
+    - **RMSNorm_20**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.799 µs/fwd
+    - **RowParallelLinear_52**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 457.810 µs/fwd
+  - **GemmaRMSNorm_53**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.160 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_26**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.909 µs/fwd
+    - **Qwen2MoeMLP_26**
+      - **MergedColumnParallelLinear_68**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.150 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.590 µs/fwd
+      - **SiluAndMul_26**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.129 µs/fwd
+      - **RowParallelLinear_53**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.230 µs/fwd
+    - **ReplicatedLinear_26**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.470 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.020 µs/fwd
+    - **TopK_26**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.589 µs/fwd
+    - **FusedMoE_26**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.689 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.139 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.929 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 42.609 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.838 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.089 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 496.250 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.459 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 744.860 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.241 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 759.774 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 161.103 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.480 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 791.270 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.784 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.224 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.152 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.808 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 145.712 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.304 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.592 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.656 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.488 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.328 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.311 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.600 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.685 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.488 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.488 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.760 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.216 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.359 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 456.671 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 592.782 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.663 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.920 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.016 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.112 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.030 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.823 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.304 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.328 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.584 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.792 µs/fwd
+
+### Layer 28
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_21**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2570.445 µs/fwd
+  - **GemmaRMSNorm_56**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.369 µs/fwd
+  - **Qwen3_5GatedDeltaNet_21**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.579 µs/fwd
+    - **MergedColumnParallelLinear_70**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.671 µs/fwd
+    - **MergedColumnParallelLinear_71**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.789 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.530 µs/fwd
+    - **RadixLinearAttention_21**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.209 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.549 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.828 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 111.689 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 65.349 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.509 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.068 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.579 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.398 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 138.559 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.139 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 950.361 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.380 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.050 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.179 µs/fwd
+    - **RMSNorm_21**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.389 µs/fwd
+    - **RowParallelLinear_56**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.030 µs/fwd
+  - **GemmaRMSNorm_57**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.209 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_28**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.480 µs/fwd
+    - **Qwen2MoeMLP_28**
+      - **MergedColumnParallelLinear_72**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.239 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.330 µs/fwd
+      - **SiluAndMul_28**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.279 µs/fwd
+      - **RowParallelLinear_57**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.529 µs/fwd
+    - **ReplicatedLinear_28**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.190 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.100 µs/fwd
+    - **TopK_28**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.469 µs/fwd
+    - **FusedMoE_28**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.959 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.979 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 43.759 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.108 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.689 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 498.180 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.469 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 730.571 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 560.510 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 736.590 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.280 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.608 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.837 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.736 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.240 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.936 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.872 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.175 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 56.983 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.576 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.976 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.552 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.312 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.736 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.847 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.429 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.295 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.504 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.728 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.655 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.303 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.583 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 459.583 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.278 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.831 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.792 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.344 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.416 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.487 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.624 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.304 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.048 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.392 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 71.488 µs/fwd
+
+### Layer 29
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_22**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2575.246 µs/fwd
+  - **GemmaRMSNorm_58**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.820 µs/fwd
+  - **Qwen3_5GatedDeltaNet_22**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.999 µs/fwd
+    - **MergedColumnParallelLinear_73**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.282 µs/fwd
+    - **MergedColumnParallelLinear_74**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.859 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.790 µs/fwd
+    - **RadixLinearAttention_22**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.219 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.939 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.958 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.219 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.219 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.299 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.928 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.209 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 31.079 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 146.990 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.059 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 972.221 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 209.219 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.070 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.200 µs/fwd
+    - **RMSNorm_22**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.099 µs/fwd
+    - **RowParallelLinear_58**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 456.530 µs/fwd
+  - **GemmaRMSNorm_59**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.279 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_29**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.569 µs/fwd
+    - **Qwen2MoeMLP_29**
+      - **MergedColumnParallelLinear_75**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.769 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.489 µs/fwd
+      - **SiluAndMul_29**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.169 µs/fwd
+      - **RowParallelLinear_59**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.929 µs/fwd
+    - **ReplicatedLinear_29**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.099 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.330 µs/fwd
+    - **TopK_29**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.669 µs/fwd
+    - **FusedMoE_29**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.709 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.999 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 7.009 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 44.139 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.808 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.889 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 498.400 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.549 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 744.740 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 565.091 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 748.854 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.752 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.480 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.014 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.368 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.136 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.088 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.040 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.384 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.215 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.592 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.760 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.520 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.288 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.456 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.040 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.541 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.279 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.712 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 298.863 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.039 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 459.743 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 593.734 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.927 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.767 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.312 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.832 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.135 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.303 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.184 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.104 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.384 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.999 µs/fwd
+
+### Layer 30
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_23**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2571.216 µs/fwd
+  - **GemmaRMSNorm_60**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.519 µs/fwd
+  - **Qwen3_5GatedDeltaNet_23**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 132.319 µs/fwd
+    - **MergedColumnParallelLinear_76**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.052 µs/fwd
+    - **MergedColumnParallelLinear_77**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.509 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.840 µs/fwd
+    - **RadixLinearAttention_23**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.159 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.588 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.768 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 109.030 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.499 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.729 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.428 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.109 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.498 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 135.959 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.630 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 959.412 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 202.429 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.050 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.099 µs/fwd
+    - **RMSNorm_23**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.779 µs/fwd
+    - **RowParallelLinear_60**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 462.880 µs/fwd
+  - **GemmaRMSNorm_61**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.419 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_30**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.620 µs/fwd
+    - **Qwen2MoeMLP_30**
+      - **MergedColumnParallelLinear_78**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.689 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.850 µs/fwd
+      - **SiluAndMul_30**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.090 µs/fwd
+      - **RowParallelLinear_61**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.369 µs/fwd
+    - **ReplicatedLinear_30**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.129 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.160 µs/fwd
+    - **TopK_30**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.699 µs/fwd
+    - **FusedMoE_30**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.729 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.949 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.709 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 42.169 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.278 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.709 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 503.120 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.679 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 734.531 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 565.651 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 741.766 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.159 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.648 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 795.070 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.000 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.048 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.832 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.111 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.072 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.032 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.552 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.664 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.536 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.360 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.607 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.680 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1038.413 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.175 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.352 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.608 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.591 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.224 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 457.567 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 593.638 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.664 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.639 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.999 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 55.896 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.910 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.072 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.232 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.952 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 15.992 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 65.816 µs/fwd
+
+### Layer 32
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_24**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.275 µs/fwd
+  - **GemmaRMSNorm_64**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.419 µs/fwd
+  - **Qwen3_5GatedDeltaNet_24**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 132.779 µs/fwd
+    - **MergedColumnParallelLinear_80**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.922 µs/fwd
+    - **MergedColumnParallelLinear_81**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.029 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.320 µs/fwd
+    - **RadixLinearAttention_24**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.229 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.648 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.908 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 111.329 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.349 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.539 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.488 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.059 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.518 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 140.319 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.580 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 961.571 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 205.760 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.080 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.159 µs/fwd
+    - **RMSNorm_24**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.959 µs/fwd
+    - **RowParallelLinear_64**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.610 µs/fwd
+  - **GemmaRMSNorm_65**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.400 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_32**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 185.430 µs/fwd
+    - **Qwen2MoeMLP_32**
+      - **MergedColumnParallelLinear_82**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.849 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.190 µs/fwd
+      - **SiluAndMul_32**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.059 µs/fwd
+      - **RowParallelLinear_65**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.499 µs/fwd
+    - **ReplicatedLinear_32**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.410 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.160 µs/fwd
+    - **TopK_32**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.629 µs/fwd
+    - **FusedMoE_32**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.099 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 43.509 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.518 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.629 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 504.030 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.509 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 747.991 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.610 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 737.310 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.296 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.871 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 795.246 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.664 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.032 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.880 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.311 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.040 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.600 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.680 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.560 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.328 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.975 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.872 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.589 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.351 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.376 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.703 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.951 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.352 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 458.927 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.399 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.440 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 194.392 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.880 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.896 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.855 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.079 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.152 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.760 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.520 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 65.896 µs/fwd
+
+### Layer 33
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_25**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2568.936 µs/fwd
+  - **GemmaRMSNorm_66**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.060 µs/fwd
+  - **Qwen3_5GatedDeltaNet_25**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.309 µs/fwd
+    - **MergedColumnParallelLinear_83**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.281 µs/fwd
+    - **MergedColumnParallelLinear_84**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.889 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.500 µs/fwd
+    - **RadixLinearAttention_25**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.269 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.569 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.758 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 112.729 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.489 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.809 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.018 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.609 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.488 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 139.919 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.429 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 952.051 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 205.930 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.100 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.179 µs/fwd
+    - **RMSNorm_25**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.759 µs/fwd
+    - **RowParallelLinear_66**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 462.410 µs/fwd
+  - **GemmaRMSNorm_67**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.839 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_33**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.519 µs/fwd
+    - **Qwen2MoeMLP_33**
+      - **MergedColumnParallelLinear_85**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.230 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.639 µs/fwd
+      - **SiluAndMul_33**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.319 µs/fwd
+      - **RowParallelLinear_67**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.669 µs/fwd
+    - **ReplicatedLinear_33**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.010 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.650 µs/fwd
+    - **TopK_33**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.429 µs/fwd
+    - **FusedMoE_33**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.769 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.079 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.709 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 42.519 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 101.578 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.589 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 499.721 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.429 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 734.261 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 563.041 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 735.150 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.856 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.408 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.558 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.752 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.992 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.144 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.856 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.048 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.336 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.576 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.768 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.504 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.336 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.520 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.927 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1038.854 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.344 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.352 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.744 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.799 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.159 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.463 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 459.535 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 598.447 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.856 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.920 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.856 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.072 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.694 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.864 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.376 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.512 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.488 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.656 µs/fwd
+
+### Layer 34
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_26**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2573.935 µs/fwd
+  - **GemmaRMSNorm_68**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.810 µs/fwd
+  - **Qwen3_5GatedDeltaNet_26**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.820 µs/fwd
+    - **MergedColumnParallelLinear_86**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.881 µs/fwd
+    - **MergedColumnParallelLinear_87**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.329 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.590 µs/fwd
+    - **RadixLinearAttention_26**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.259 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.729 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.768 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 113.199 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 66.209 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.409 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.998 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.159 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.818 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 144.720 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 131.109 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 962.902 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 206.360 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.140 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 1.990 µs/fwd
+    - **RMSNorm_26**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.319 µs/fwd
+    - **RowParallelLinear_68**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.050 µs/fwd
+  - **GemmaRMSNorm_69**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.489 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_34**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.819 µs/fwd
+    - **Qwen2MoeMLP_34**
+      - **MergedColumnParallelLinear_88**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.219 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.290 µs/fwd
+      - **SiluAndMul_34**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.159 µs/fwd
+      - **RowParallelLinear_69**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.399 µs/fwd
+    - **ReplicatedLinear_34**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.099 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.550 µs/fwd
+    - **TopK_34**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_34**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.729 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.019 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.679 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 44.669 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.028 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.909 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 501.750 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.959 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 744.721 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.770 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 752.702 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.895 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.400 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.670 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.656 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.208 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.088 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.824 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 145.712 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.248 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.576 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.744 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.544 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.280 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.751 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.664 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.573 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.544 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.328 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.744 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.000 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.431 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.255 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 462.375 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 599.814 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.815 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.024 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.727 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.648 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.719 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.872 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.288 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.040 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.336 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 65.584 µs/fwd
+
+### Layer 36
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_27**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2571.975 µs/fwd
+  - **GemmaRMSNorm_72**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.909 µs/fwd
+  - **Qwen3_5GatedDeltaNet_27**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.820 µs/fwd
+    - **MergedColumnParallelLinear_90**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1078.782 µs/fwd
+    - **MergedColumnParallelLinear_91**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.009 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.510 µs/fwd
+    - **RadixLinearAttention_27**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.279 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.788 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.798 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 113.919 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.239 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.309 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.448 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.529 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.378 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 136.589 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.799 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 951.041 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 205.510 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.160 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.229 µs/fwd
+    - **RMSNorm_27**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 76.289 µs/fwd
+    - **RowParallelLinear_72**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 465.540 µs/fwd
+  - **GemmaRMSNorm_73**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.819 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_36**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.569 µs/fwd
+    - **Qwen2MoeMLP_36**
+      - **MergedColumnParallelLinear_92**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.049 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.040 µs/fwd
+      - **SiluAndMul_36**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.079 µs/fwd
+      - **RowParallelLinear_73**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.570 µs/fwd
+    - **ReplicatedLinear_36**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.710 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.370 µs/fwd
+    - **TopK_36**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_36**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.829 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.869 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.899 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.899 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 98.568 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.529 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 495.081 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.459 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 740.171 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.341 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 751.702 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.983 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.448 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.165 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.592 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.200 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.864 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.968 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 145.968 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.504 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.640 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.896 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.528 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.328 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.639 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.639 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.389 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.248 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.288 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.688 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.760 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.863 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.664 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 464.719 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 600.814 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.712 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.320 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.735 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 55.936 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.975 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.696 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.256 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.808 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.624 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.088 µs/fwd
+
+### Layer 37
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_28**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2573.625 µs/fwd
+  - **GemmaRMSNorm_74**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.269 µs/fwd
+  - **Qwen3_5GatedDeltaNet_28**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 132.809 µs/fwd
+    - **MergedColumnParallelLinear_93**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.372 µs/fwd
+    - **MergedColumnParallelLinear_94**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.599 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.360 µs/fwd
+    - **RadixLinearAttention_28**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.289 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.998 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.238 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 113.299 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.859 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 20.449 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.828 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.739 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 31.218 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.689 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 131.820 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 976.721 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 210.109 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.100 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.210 µs/fwd
+    - **RMSNorm_28**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 79.109 µs/fwd
+    - **RowParallelLinear_74**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 457.760 µs/fwd
+  - **GemmaRMSNorm_75**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.389 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_37**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 184.539 µs/fwd
+    - **Qwen2MoeMLP_37**
+      - **MergedColumnParallelLinear_95**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.070 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.989 µs/fwd
+      - **SiluAndMul_37**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.059 µs/fwd
+      - **RowParallelLinear_75**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.709 µs/fwd
+    - **ReplicatedLinear_37**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.489 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.330 µs/fwd
+    - **TopK_37**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.649 µs/fwd
+    - **FusedMoE_37**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.769 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.929 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.659 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.879 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.808 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.339 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 503.100 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.599 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 746.361 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 560.750 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 753.054 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.560 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.623 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 795.158 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.304 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.320 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.008 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.896 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.040 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.528 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.664 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.704 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.488 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.303 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.696 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.720 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.542 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.407 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.376 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.784 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.880 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 161.103 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 466.887 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 601.158 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.928 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 194.704 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.864 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.016 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.287 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.032 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.288 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.880 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.360 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.832 µs/fwd
+
+### Layer 38
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_29**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2572.945 µs/fwd
+  - **GemmaRMSNorm_76**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.510 µs/fwd
+  - **Qwen3_5GatedDeltaNet_29**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 135.269 µs/fwd
+    - **MergedColumnParallelLinear_96**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1077.681 µs/fwd
+    - **MergedColumnParallelLinear_97**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.939 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.810 µs/fwd
+    - **RadixLinearAttention_29**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.219 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.338 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.648 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 107.429 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.249 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.249 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.318 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.459 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.438 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 133.400 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.309 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 950.441 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 202.490 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.160 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.149 µs/fwd
+    - **RMSNorm_29**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.899 µs/fwd
+    - **RowParallelLinear_76**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 458.530 µs/fwd
+  - **GemmaRMSNorm_77**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.069 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_38**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.379 µs/fwd
+    - **Qwen2MoeMLP_38**
+      - **MergedColumnParallelLinear_98**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.160 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.260 µs/fwd
+      - **SiluAndMul_38**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.079 µs/fwd
+      - **RowParallelLinear_77**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.600 µs/fwd
+    - **ReplicatedLinear_38**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.290 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.930 µs/fwd
+    - **TopK_38**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.689 µs/fwd
+    - **FusedMoE_38**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.709 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.029 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.809 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 43.769 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.448 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.679 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 503.760 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.479 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 765.931 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 559.080 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 755.134 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.176 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.320 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 791.302 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.360 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.048 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.936 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.832 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.088 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.464 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.544 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.840 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.488 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.336 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.688 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.776 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.317 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.175 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.336 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.768 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.399 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.983 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 464.375 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 603.198 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.752 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.144 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.016 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.536 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.942 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.000 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.304 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.912 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.296 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.103 µs/fwd
+
+### Layer 40
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_30**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.095 µs/fwd
+  - **GemmaRMSNorm_80**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.159 µs/fwd
+  - **Qwen3_5GatedDeltaNet_30**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.679 µs/fwd
+    - **MergedColumnParallelLinear_100**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.522 µs/fwd
+    - **MergedColumnParallelLinear_101**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.579 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.460 µs/fwd
+    - **RadixLinearAttention_30**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.199 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.489 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.588 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 111.499 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.279 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.049 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.858 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.969 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.518 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 141.299 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.079 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 951.781 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.100 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.150 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.109 µs/fwd
+    - **RMSNorm_30**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.659 µs/fwd
+    - **RowParallelLinear_80**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 462.630 µs/fwd
+  - **GemmaRMSNorm_81**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.540 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_40**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.199 µs/fwd
+    - **Qwen2MoeMLP_40**
+      - **MergedColumnParallelLinear_102**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.940 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.630 µs/fwd
+      - **SiluAndMul_40**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.169 µs/fwd
+      - **RowParallelLinear_81**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.859 µs/fwd
+    - **ReplicatedLinear_40**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.570 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.630 µs/fwd
+    - **TopK_40**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.499 µs/fwd
+    - **FusedMoE_40**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.729 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.959 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.969 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.069 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.038 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.559 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 503.960 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.569 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 762.831 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.781 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 754.182 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.783 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.495 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 796.166 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.632 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.983 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.024 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.056 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 145.832 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.280 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.528 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.680 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.456 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.328 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.447 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.696 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.437 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.215 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.720 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.696 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.863 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.623 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 467.599 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 603.374 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.720 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.327 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.959 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.352 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.310 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.664 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.136 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.896 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.032 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.528 µs/fwd
+
+### Layer 41
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_31**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2576.475 µs/fwd
+  - **GemmaRMSNorm_82**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.010 µs/fwd
+  - **Qwen3_5GatedDeltaNet_31**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.849 µs/fwd
+    - **MergedColumnParallelLinear_103**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.401 µs/fwd
+    - **MergedColumnParallelLinear_104**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.640 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.400 µs/fwd
+    - **RadixLinearAttention_31**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.359 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.758 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.988 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.959 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.949 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.769 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.478 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.659 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.728 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 143.739 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.859 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 974.912 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 207.859 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.050 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.189 µs/fwd
+    - **RMSNorm_31**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 78.350 µs/fwd
+    - **RowParallelLinear_82**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 465.710 µs/fwd
+  - **GemmaRMSNorm_83**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.820 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_41**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.470 µs/fwd
+    - **Qwen2MoeMLP_41**
+      - **MergedColumnParallelLinear_105**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.099 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.180 µs/fwd
+      - **SiluAndMul_41**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.039 µs/fwd
+      - **RowParallelLinear_83**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.599 µs/fwd
+    - **ReplicatedLinear_41**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.739 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.189 µs/fwd
+    - **TopK_41**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 37.109 µs/fwd
+    - **FusedMoE_41**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.769 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.959 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.789 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.469 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.318 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.569 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 501.920 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.589 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 753.701 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.810 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 741.694 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.023 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.608 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 793.110 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.512 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.008 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.096 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.953 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.096 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.136 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.528 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.808 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.496 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.456 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.615 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.879 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.781 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.783 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.352 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.680 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.767 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.055 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.224 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 466.102 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 603.430 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.535 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.639 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.727 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.528 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.062 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.128 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.104 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.784 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.656 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.279 µs/fwd
+
+### Layer 42
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_32**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2573.785 µs/fwd
+  - **GemmaRMSNorm_84**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.000 µs/fwd
+  - **Qwen3_5GatedDeltaNet_32**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.690 µs/fwd
+    - **MergedColumnParallelLinear_106**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1078.591 µs/fwd
+    - **MergedColumnParallelLinear_107**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.869 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.360 µs/fwd
+    - **RadixLinearAttention_32**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.219 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.868 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.538 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 111.139 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.469 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.899 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.698 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.409 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.508 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 140.790 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.249 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 958.331 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 203.500 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.120 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.119 µs/fwd
+    - **RMSNorm_32**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.809 µs/fwd
+    - **RowParallelLinear_84**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 462.880 µs/fwd
+  - **GemmaRMSNorm_85**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.500 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_42**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 183.659 µs/fwd
+    - **Qwen2MoeMLP_42**
+      - **MergedColumnParallelLinear_108**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.840 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.840 µs/fwd
+      - **SiluAndMul_42**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.049 µs/fwd
+      - **RowParallelLinear_85**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.599 µs/fwd
+    - **ReplicatedLinear_42**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.180 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.180 µs/fwd
+    - **TopK_42**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.569 µs/fwd
+    - **FusedMoE_42**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.979 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.619 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 44.619 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.498 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.179 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 500.410 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.939 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 754.130 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 554.511 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 748.558 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.031 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.344 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.302 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.032 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.192 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.976 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.936 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.400 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.248 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.616 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.864 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.464 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.280 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.759 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.584 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.701 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.680 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.464 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.752 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.887 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.383 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.560 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 469.807 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 605.574 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.543 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.480 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.360 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.648 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.814 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.232 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.232 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.976 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.376 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 70.032 µs/fwd
+
+### Layer 44
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_33**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2572.905 µs/fwd
+  - **GemmaRMSNorm_88**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.629 µs/fwd
+  - **Qwen3_5GatedDeltaNet_33**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.370 µs/fwd
+    - **MergedColumnParallelLinear_110**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1077.922 µs/fwd
+    - **MergedColumnParallelLinear_111**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.279 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.260 µs/fwd
+    - **RadixLinearAttention_33**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.199 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.348 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.878 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 107.569 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.799 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.399 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.288 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 14.909 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.108 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 130.909 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.339 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 949.121 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 199.020 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.090 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.109 µs/fwd
+    - **RMSNorm_33**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.859 µs/fwd
+    - **RowParallelLinear_88**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 467.540 µs/fwd
+  - **GemmaRMSNorm_89**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.560 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_44**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.159 µs/fwd
+    - **Qwen2MoeMLP_44**
+      - **MergedColumnParallelLinear_112**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.060 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.010 µs/fwd
+      - **SiluAndMul_44**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.289 µs/fwd
+      - **RowParallelLinear_89**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.189 µs/fwd
+    - **ReplicatedLinear_44**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.640 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.420 µs/fwd
+    - **TopK_44**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.729 µs/fwd
+    - **FusedMoE_44**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.959 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.709 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 47.189 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 98.818 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.419 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 505.560 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.459 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 753.701 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 557.251 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 730.926 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.967 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.976 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 796.838 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.536 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.704 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.008 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.032 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.136 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.568 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.600 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.888 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.536 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.384 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.927 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.752 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.605 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.448 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.408 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.744 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.688 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.255 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.312 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 472.711 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 610.703 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.599 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.384 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.504 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.048 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.255 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.792 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.520 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.696 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.448 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 71.960 µs/fwd
+
+### Layer 45
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_34**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2572.666 µs/fwd
+  - **GemmaRMSNorm_90**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.990 µs/fwd
+  - **Qwen3_5GatedDeltaNet_34**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.539 µs/fwd
+    - **MergedColumnParallelLinear_113**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1081.031 µs/fwd
+    - **MergedColumnParallelLinear_114**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.540 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.510 µs/fwd
+    - **RadixLinearAttention_34**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.379 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.769 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 12.138 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 115.329 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.279 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.589 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.348 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.569 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.428 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 139.050 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.539 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 951.191 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 208.940 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.180 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.220 µs/fwd
+    - **RMSNorm_34**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.569 µs/fwd
+    - **RowParallelLinear_90**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.790 µs/fwd
+  - **GemmaRMSNorm_91**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.439 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_45**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.019 µs/fwd
+    - **Qwen2MoeMLP_45**
+      - **MergedColumnParallelLinear_115**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.010 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.040 µs/fwd
+      - **SiluAndMul_45**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.139 µs/fwd
+      - **RowParallelLinear_91**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.669 µs/fwd
+    - **ReplicatedLinear_45**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.450 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.300 µs/fwd
+    - **TopK_45**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.579 µs/fwd
+    - **FusedMoE_45**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.769 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.969 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.839 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 44.319 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.858 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.419 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 508.191 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.549 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 747.530 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.831 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 750.326 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.168 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 127.128 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.510 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.447 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.568 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.160 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.032 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.728 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.416 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.767 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.848 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.680 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.743 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.096 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.175 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.950 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.720 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.336 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.736 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.183 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.719 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 157.984 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 469.799 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 607.054 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 146.000 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.600 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.368 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.424 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.447 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.816 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.384 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.528 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.120 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 72.304 µs/fwd
+
+### Layer 46
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_35**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2575.835 µs/fwd
+  - **GemmaRMSNorm_92**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.109 µs/fwd
+  - **Qwen3_5GatedDeltaNet_35**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.619 µs/fwd
+    - **MergedColumnParallelLinear_116**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1079.502 µs/fwd
+    - **MergedColumnParallelLinear_117**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.999 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.520 µs/fwd
+    - **RadixLinearAttention_35**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.299 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.769 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.788 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 109.749 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.989 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 20.109 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.728 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.469 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.978 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 149.479 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.350 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 961.841 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.819 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.080 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.159 µs/fwd
+    - **RMSNorm_35**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.090 µs/fwd
+    - **RowParallelLinear_92**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 456.860 µs/fwd
+  - **GemmaRMSNorm_93**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 185.110 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_46**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.859 µs/fwd
+    - **Qwen2MoeMLP_46**
+      - **MergedColumnParallelLinear_118**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.499 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.940 µs/fwd
+      - **SiluAndMul_46**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.309 µs/fwd
+      - **RowParallelLinear_93**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.989 µs/fwd
+    - **ReplicatedLinear_46**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.859 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.359 µs/fwd
+    - **TopK_46**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.599 µs/fwd
+    - **FusedMoE_46**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.729 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.999 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.629 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 47.639 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 101.688 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.869 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 497.650 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 0.75 calls/fwd; 5.709 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 759.541 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 565.540 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 735.502 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.856 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.544 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 795.222 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 53.936 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.000 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.143 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.896 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 147.008 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.144 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.696 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.888 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.608 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.560 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.712 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.392 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1043.334 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 238.351 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.352 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.696 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.215 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.727 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.208 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 467.471 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 606.990 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.688 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.999 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.184 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.448 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 560.174 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.952 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.320 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.224 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.520 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.888 µs/fwd
+
+### Layer 48
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_36**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2571.235 µs/fwd
+  - **GemmaRMSNorm_96**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.499 µs/fwd
+  - **Qwen3_5GatedDeltaNet_36**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 135.069 µs/fwd
+    - **MergedColumnParallelLinear_120**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.962 µs/fwd
+    - **MergedColumnParallelLinear_121**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.199 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.400 µs/fwd
+    - **RadixLinearAttention_36**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.409 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.789 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.998 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 113.439 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.730 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.579 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.218 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.839 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.688 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 138.289 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.639 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 948.002 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 205.619 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.120 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.189 µs/fwd
+    - **RMSNorm_36**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 76.149 µs/fwd
+    - **RowParallelLinear_96**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 465.180 µs/fwd
+  - **GemmaRMSNorm_97**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 185.979 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_48**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.060 µs/fwd
+    - **Qwen2MoeMLP_48**
+      - **MergedColumnParallelLinear_122**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.240 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.040 µs/fwd
+      - **SiluAndMul_48**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.189 µs/fwd
+      - **RowParallelLinear_97**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.499 µs/fwd
+    - **ReplicatedLinear_48**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.489 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.590 µs/fwd
+    - **TopK_48**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.579 µs/fwd
+    - **FusedMoE_48**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.039 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.829 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 46.009 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.038 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.639 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 503.230 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.569 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 751.071 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 565.230 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 760.094 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.967 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.552 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 797.990 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.688 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.008 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 12.983 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.040 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.583 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.360 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.640 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.736 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.616 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.336 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.679 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.016 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.021 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.944 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.664 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.727 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.159 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.304 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 468.415 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 606.270 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.559 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.248 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.151 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.416 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.207 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.111 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.288 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.264 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.304 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.768 µs/fwd
+
+### Layer 49
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_37**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2571.695 µs/fwd
+  - **GemmaRMSNorm_98**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.269 µs/fwd
+  - **Qwen3_5GatedDeltaNet_37**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.890 µs/fwd
+    - **MergedColumnParallelLinear_123**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.681 µs/fwd
+    - **MergedColumnParallelLinear_124**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.999 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.300 µs/fwd
+    - **RadixLinearAttention_37**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.169 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.668 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.798 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 114.799 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.869 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.639 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.328 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.389 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.578 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 148.020 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.469 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 970.311 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 206.500 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.160 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.139 µs/fwd
+    - **RMSNorm_37**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.879 µs/fwd
+    - **RowParallelLinear_98**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.920 µs/fwd
+  - **GemmaRMSNorm_99**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.899 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_49**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.459 µs/fwd
+    - **Qwen2MoeMLP_49**
+      - **MergedColumnParallelLinear_125**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.370 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.269 µs/fwd
+      - **SiluAndMul_49**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.059 µs/fwd
+      - **RowParallelLinear_99**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.420 µs/fwd
+    - **ReplicatedLinear_49**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.960 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.430 µs/fwd
+    - **TopK_49**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.579 µs/fwd
+    - **FusedMoE_49**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.999 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.669 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.209 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.818 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.939 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 499.851 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.639 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 747.631 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 559.660 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 764.038 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.560 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.447 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.862 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 53.176 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.992 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.056 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.864 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.376 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 56.648 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.656 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.800 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.552 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.344 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.840 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.136 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.085 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.904 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.312 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.768 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.887 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.120 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.255 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 468.871 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 605.494 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.871 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.527 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.544 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.624 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.615 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.479 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.296 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.984 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.449 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 65.944 µs/fwd
+
+### Layer 50
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_38**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2576.585 µs/fwd
+  - **GemmaRMSNorm_100**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.409 µs/fwd
+  - **Qwen3_5GatedDeltaNet_38**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.209 µs/fwd
+    - **MergedColumnParallelLinear_126**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1080.572 µs/fwd
+    - **MergedColumnParallelLinear_127**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.799 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.310 µs/fwd
+    - **RadixLinearAttention_38**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.219 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.429 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.558 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 107.879 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.250 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.859 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.338 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.049 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.448 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 133.899 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.999 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 942.972 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 201.969 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.060 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.139 µs/fwd
+    - **RMSNorm_38**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 74.649 µs/fwd
+    - **RowParallelLinear_100**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.730 µs/fwd
+  - **GemmaRMSNorm_101**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.099 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_50**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.490 µs/fwd
+    - **Qwen2MoeMLP_50**
+      - **MergedColumnParallelLinear_128**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.180 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.220 µs/fwd
+      - **SiluAndMul_50**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.189 µs/fwd
+      - **RowParallelLinear_101**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.339 µs/fwd
+    - **ReplicatedLinear_50**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.849 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.590 µs/fwd
+    - **TopK_50**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.649 µs/fwd
+    - **FusedMoE_50**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.909 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.829 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 46.569 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.908 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.349 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 494.960 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.729 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 745.421 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 563.270 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 770.774 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.544 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.560 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.406 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.944 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.248 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.216 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.952 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.639 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.152 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.656 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.792 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.624 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.400 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.207 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.728 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1042.349 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.511 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.744 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.792 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 301.327 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.904 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 469.478 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 607.198 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.600 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.368 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.399 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.624 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.254 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.648 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.112 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.880 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.632 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.712 µs/fwd
+
+### Layer 52
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_39**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2575.535 µs/fwd
+  - **GemmaRMSNorm_104**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.290 µs/fwd
+  - **Qwen3_5GatedDeltaNet_39**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.839 µs/fwd
+    - **MergedColumnParallelLinear_130**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1084.061 µs/fwd
+    - **MergedColumnParallelLinear_131**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.760 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.450 µs/fwd
+    - **RadixLinearAttention_39**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.149 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.658 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.658 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 111.429 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.809 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 17.959 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.828 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.159 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.388 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 135.179 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 127.939 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 951.642 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 205.569 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.110 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.139 µs/fwd
+    - **RMSNorm_39**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.239 µs/fwd
+    - **RowParallelLinear_104**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 464.020 µs/fwd
+  - **GemmaRMSNorm_105**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.030 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_52**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.069 µs/fwd
+    - **Qwen2MoeMLP_52**
+      - **MergedColumnParallelLinear_132**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.209 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.460 µs/fwd
+      - **SiluAndMul_52**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.319 µs/fwd
+      - **RowParallelLinear_105**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.909 µs/fwd
+    - **ReplicatedLinear_52**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.680 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.200 µs/fwd
+    - **TopK_52**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.579 µs/fwd
+    - **FusedMoE_52**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.069 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.809 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 44.959 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 103.458 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.489 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 497.740 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.519 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 756.821 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.520 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 785.790 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.063 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 127.056 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 798.590 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.568 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.232 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.200 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.056 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.360 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.248 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.632 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.800 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.576 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.296 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.799 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.976 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1039.885 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.655 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.280 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.760 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.920 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.855 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.079 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 472.271 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 606.767 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.648 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.959 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.376 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.968 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.966 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.816 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.080 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.848 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.712 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.248 µs/fwd
+
+### Layer 53
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_40**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2574.565 µs/fwd
+  - **GemmaRMSNorm_106**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.759 µs/fwd
+  - **Qwen3_5GatedDeltaNet_40**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.559 µs/fwd
+    - **MergedColumnParallelLinear_133**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1076.692 µs/fwd
+    - **MergedColumnParallelLinear_134**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.199 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.500 µs/fwd
+    - **RadixLinearAttention_40**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.219 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.659 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.828 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 112.999 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 65.479 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 19.019 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 35.028 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 16.189 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.578 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 143.399 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.899 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 965.631 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 206.870 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.140 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.149 µs/fwd
+    - **RMSNorm_40**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.039 µs/fwd
+    - **RowParallelLinear_106**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 456.200 µs/fwd
+  - **GemmaRMSNorm_107**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.829 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_53**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.130 µs/fwd
+    - **Qwen2MoeMLP_53**
+      - **MergedColumnParallelLinear_135**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.900 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.859 µs/fwd
+      - **SiluAndMul_53**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.129 µs/fwd
+      - **RowParallelLinear_107**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.089 µs/fwd
+    - **ReplicatedLinear_53**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.419 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.270 µs/fwd
+    - **TopK_53**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.559 µs/fwd
+    - **FusedMoE_53**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.659 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.839 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.729 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 51.389 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.598 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.819 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 491.530 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.349 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 745.011 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 559.330 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 790.406 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.967 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.656 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 795.894 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.928 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.344 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.184 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.784 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.968 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.128 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.864 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.712 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.584 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.512 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.511 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.176 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.941 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 238.072 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.416 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.392 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.983 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.287 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 467.503 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 607.311 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.839 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.824 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.672 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.320 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 560.518 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.192 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.368 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.000 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.624 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.919 µs/fwd
+
+### Layer 54
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_41**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2568.365 µs/fwd
+  - **GemmaRMSNorm_108**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.170 µs/fwd
+  - **Qwen3_5GatedDeltaNet_41**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 134.839 µs/fwd
+    - **MergedColumnParallelLinear_136**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1075.372 µs/fwd
+    - **MergedColumnParallelLinear_137**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.839 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.340 µs/fwd
+    - **RadixLinearAttention_41**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.319 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.409 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.948 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 110.699 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.969 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.869 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.638 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.819 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.338 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 141.570 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 130.450 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 968.261 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 206.260 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.110 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.220 µs/fwd
+    - **RMSNorm_41**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 76.699 µs/fwd
+    - **RowParallelLinear_108**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 460.680 µs/fwd
+  - **GemmaRMSNorm_109**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.250 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_54**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.809 µs/fwd
+    - **Qwen2MoeMLP_54**
+      - **MergedColumnParallelLinear_138**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.160 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.770 µs/fwd
+      - **SiluAndMul_54**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.249 µs/fwd
+      - **RowParallelLinear_109**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.689 µs/fwd
+    - **ReplicatedLinear_54**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.360 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.300 µs/fwd
+    - **TopK_54**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.509 µs/fwd
+    - **FusedMoE_54**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.689 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.789 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 53.839 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.398 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.969 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 495.340 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.489 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 745.001 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 560.171 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 790.494 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.248 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.672 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 794.598 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.552 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.016 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.015 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 14.128 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 147.063 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 56.944 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.776 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.888 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.520 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.448 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.311 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.360 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.485 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 238.103 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.408 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.191 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.967 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.856 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 467.807 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 608.735 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.639 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.112 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.328 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.104 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 560.199 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.767 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.288 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.040 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.520 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.040 µs/fwd
+
+### Layer 56
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_42**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2571.305 µs/fwd
+  - **GemmaRMSNorm_112**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.359 µs/fwd
+  - **Qwen3_5GatedDeltaNet_42**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 133.719 µs/fwd
+    - **MergedColumnParallelLinear_140**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1076.012 µs/fwd
+    - **MergedColumnParallelLinear_141**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.039 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.530 µs/fwd
+    - **RadixLinearAttention_42**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.269 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.448 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.658 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 110.020 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 63.039 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.329 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 33.958 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.179 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.498 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 137.269 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.400 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 957.551 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.600 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.060 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.119 µs/fwd
+    - **RMSNorm_42**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 75.090 µs/fwd
+    - **RowParallelLinear_112**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 461.670 µs/fwd
+  - **GemmaRMSNorm_113**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.239 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_56**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.520 µs/fwd
+    - **Qwen2MoeMLP_56**
+      - **MergedColumnParallelLinear_142**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.180 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.900 µs/fwd
+      - **SiluAndMul_56**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.629 µs/fwd
+      - **RowParallelLinear_113**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.249 µs/fwd
+    - **ReplicatedLinear_56**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.599 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.620 µs/fwd
+    - **TopK_56**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.659 µs/fwd
+    - **FusedMoE_56**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.689 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.679 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.659 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 52.069 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.778 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.979 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 493.970 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.919 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 744.711 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 557.860 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 760.702 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.856 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.816 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 798.798 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.920 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 1.992 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.000 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.880 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.871 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 56.944 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.648 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.896 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.600 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.520 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 151.167 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 126.072 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.093 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 238.095 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.336 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.704 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 137.328 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.519 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.328 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 464.999 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 603.895 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.832 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.752 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.887 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.312 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.238 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.144 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.080 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.376 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.240 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.424 µs/fwd
+
+### Layer 57
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_43**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2572.166 µs/fwd
+  - **GemmaRMSNorm_114**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.180 µs/fwd
+  - **Qwen3_5GatedDeltaNet_43**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 132.810 µs/fwd
+    - **MergedColumnParallelLinear_143**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1075.421 µs/fwd
+    - **MergedColumnParallelLinear_144**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 33.379 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.360 µs/fwd
+    - **RadixLinearAttention_43**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.269 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.749 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.698 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 113.729 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.919 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.789 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.638 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.999 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.648 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 142.230 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 128.169 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 961.331 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 207.160 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.120 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.109 µs/fwd
+    - **RMSNorm_43**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 77.399 µs/fwd
+    - **RowParallelLinear_114**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 457.150 µs/fwd
+  - **GemmaRMSNorm_115**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.299 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_57**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 179.409 µs/fwd
+    - **Qwen2MoeMLP_57**
+      - **MergedColumnParallelLinear_145**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.090 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.329 µs/fwd
+      - **SiluAndMul_57**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.249 µs/fwd
+      - **RowParallelLinear_115**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.809 µs/fwd
+    - **ReplicatedLinear_57**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.130 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.960 µs/fwd
+    - **TopK_57**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.589 µs/fwd
+    - **FusedMoE_57**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.759 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.709 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.879 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 59.969 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.688 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.989 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 482.690 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.369 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 729.291 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.000 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 782.502 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.999 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.592 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 795.790 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 52.912 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.016 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.040 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.864 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.335 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.632 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.600 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 25.832 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.560 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.400 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.656 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.839 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1041.373 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.680 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.344 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.720 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.967 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.199 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.032 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 459.103 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 599.071 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.888 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.824 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.687 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.663 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.118 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.408 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.320 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.352 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.296 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.824 µs/fwd
+
+### Layer 58
+
+
+#### AMD — recorded
+
+- **Qwen3_5LinearDecoderLayer_44**
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2570.955 µs/fwd
+  - **GemmaRMSNorm_116**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.609 µs/fwd
+  - **Qwen3_5GatedDeltaNet_44**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 132.419 µs/fwd
+    - **MergedColumnParallelLinear_146**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 1074.282 µs/fwd
+    - **MergedColumnParallelLinear_147**
+      - `rocBLAS/Tensile MT32x192x128` — 0.75 calls/fwd; 32.679 µs/fwd
+      - `rocBLAS/Tensile MT32x224x128` — 0.25 calls/fwd; 11.410 µs/fwd
+    - **RadixLinearAttention_44**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.229 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.5 calls/fwd; 8.938 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 11.898 µs/fwd
+      - `kernel_0` — 1 calls/fwd; 109.789 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 64.120 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 18.759 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 34.398 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 15.649 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 30.668 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 140.659 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 129.599 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 970.932 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 204.619 µs/fwd
+      - `at::native::elementwise_kernel_manual_unroll` — 0.25 calls/fwd; 1.120 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.5 calls/fwd; 2.139 µs/fwd
+    - **RMSNorm_44**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 76.679 µs/fwd
+    - **RowParallelLinear_116**
+      - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 457.981 µs/fwd
+  - **GemmaRMSNorm_117**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.729 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_58**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.960 µs/fwd
+    - **Qwen2MoeMLP_58**
+      - **MergedColumnParallelLinear_148**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.460 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.620 µs/fwd
+      - **SiluAndMul_58**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.179 µs/fwd
+      - **RowParallelLinear_117**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.379 µs/fwd
+    - **ReplicatedLinear_58**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.010 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.849 µs/fwd
+    - **TopK_58**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.599 µs/fwd
+    - **FusedMoE_58**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.759 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.719 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 51.919 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.509 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.579 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 484.630 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.609 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 738.531 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.680 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 768.878 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.792 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 126.560 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 792.750 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_32x256_64x6_1x4_h_bz_TNN` — 1 calls/fwd; 54.648 µs/fwd
+    - **RadixLinearAttention**
+      - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 2.200 µs/fwd
+      - `at::native::index_elementwise_kernel` — 1.75 calls/fwd; 13.128 µs/fwd
+      - `at::native::index_elementwise_kernel` — 2 calls/fwd; 13.872 µs/fwd
+      - `_causal_conv1d_fwd_kernel` — 1 calls/fwd; 146.439 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 57.175 µs/fwd
+      - `fused_gdn_gating_kernel` — 1 calls/fwd; 35.640 µs/fwd
+      - `l2norm_fwd_kernel` — 2 calls/fwd; 26.032 µs/fwd
+      - `chunk_local_cumsum_scalar_kernel` — 1 calls/fwd; 11.568 µs/fwd
+      - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 53.344 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kkt_solve_kernel` — 1 calls/fwd; 150.992 µs/fwd
+      - `recompute_w_u_fwd_kernel` — 1 calls/fwd; 125.904 µs/fwd
+      - `chunk_gated_delta_rule_fwd_kernel_h_blockdim64` — 1 calls/fwd; 1040.598 µs/fwd
+      - `chunk_fwd_kernel_o` — 1 calls/fwd; 237.416 µs/fwd
+      - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 1.528 µs/fwd
+      - `at::native::vectorized_gather_kernel` — 0.25 calls/fwd; 0.768 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 136.807 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.935 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.832 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 463.047 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 599.150 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.832 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.975 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.672 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 57.104 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.750 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.399 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.152 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.048 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.864 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.728 µs/fwd
+
+## Prefill: full_attention
+
+
+### Layer 3
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_0**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 256.559 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.209 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2386.835 µs/fwd
+  - **GemmaRMSNorm_6**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.929 µs/fwd
+  - **QKVParallelLinear_0**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 964.042 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 110.840 µs/fwd
+  - **RadixAttention_0**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.679 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.940 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 41.668 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2114.744 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.220 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 9.228 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.519 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.250 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.979 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.490 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.139 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.419 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.540 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 2.100 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 8.479 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 3.700 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.610 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 7.428 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 6.249 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.510 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 12.479 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.280 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 12.399 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.869 µs/fwd
+  - **RowParallelLinear_6**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 379.020 µs/fwd
+  - **GemmaRMSNorm_7**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.880 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_3**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 183.399 µs/fwd
+    - **Qwen2MoeMLP_3**
+      - **MergedColumnParallelLinear_9**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.860 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.720 µs/fwd
+      - **SiluAndMul_3**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.139 µs/fwd
+      - **RowParallelLinear_7**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.189 µs/fwd
+    - **ReplicatedLinear_3**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.830 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.140 µs/fwd
+    - **TopK_3**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.469 µs/fwd
+    - **FusedMoE_3**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.409 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.889 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.819 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.338 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.339 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 467.910 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.489 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 727.941 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 565.820 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.664 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 800.982 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.167 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 713.566 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 311.415 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.304 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.736 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2124.634 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.816 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 297.351 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.808 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 454.007 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 589.726 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.880 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.847 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.055 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.552 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.838 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.320 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.456 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.088 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.920 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.736 µs/fwd
+
+### Layer 7
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_1**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 258.570 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.399 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2385.455 µs/fwd
+  - **GemmaRMSNorm_14**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.540 µs/fwd
+  - **QKVParallelLinear_1**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 971.481 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 115.239 µs/fwd
+  - **RadixAttention_1**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 25.159 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 6.010 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.848 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2126.234 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.280 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 9.959 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.649 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.220 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 3.029 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.520 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.269 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.729 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.580 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 3.240 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.430 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.499 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.250 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.338 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 6.379 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.880 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 15.429 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.370 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 13.629 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.840 µs/fwd
+  - **RowParallelLinear_14**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 384.480 µs/fwd
+  - **GemmaRMSNorm_15**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.769 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_7**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.129 µs/fwd
+    - **Qwen2MoeMLP_7**
+      - **MergedColumnParallelLinear_19**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.029 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.710 µs/fwd
+      - **SiluAndMul_7**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.219 µs/fwd
+      - **RowParallelLinear_15**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.059 µs/fwd
+    - **ReplicatedLinear_7**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.290 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.430 µs/fwd
+    - **TopK_7**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.609 µs/fwd
+    - **FusedMoE_7**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.769 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.459 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.889 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.319 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.468 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.779 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 476.430 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.639 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 737.371 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 560.301 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 58.000 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 739.966 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.264 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 717.590 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 311.479 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.792 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.624 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2118.610 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.000 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 295.039 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.584 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 460.087 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 593.031 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.928 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.655 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.879 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.432 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.806 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.280 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.472 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.056 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.664 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.344 µs/fwd
+
+### Layer 11
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_2**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 257.480 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.899 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2390.105 µs/fwd
+  - **GemmaRMSNorm_22**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.380 µs/fwd
+  - **QKVParallelLinear_2**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 966.711 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 111.299 µs/fwd
+  - **RadixAttention_2**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.749 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.729 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.008 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2110.985 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.240 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 8.878 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 6.369 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.149 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.830 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.399 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.269 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.419 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.139 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 3.050 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 8.639 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 5.110 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.399 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 5.689 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 6.059 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.809 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 13.989 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.389 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 12.709 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.980 µs/fwd
+  - **RowParallelLinear_22**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 383.410 µs/fwd
+  - **GemmaRMSNorm_23**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.070 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_11**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.119 µs/fwd
+    - **Qwen2MoeMLP_11**
+      - **MergedColumnParallelLinear_29**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.349 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.170 µs/fwd
+      - **SiluAndMul_11**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.229 µs/fwd
+      - **RowParallelLinear_23**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.889 µs/fwd
+    - **ReplicatedLinear_11**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.250 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.999 µs/fwd
+    - **TopK_11**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_11**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.769 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.329 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.899 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.069 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 101.118 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.849 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 483.960 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.529 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 734.651 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 566.460 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.664 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 755.878 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.367 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 715.126 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.687 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.112 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.504 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2108.699 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.832 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 300.408 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.351 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 461.183 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.566 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.839 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.215 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.832 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.704 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.023 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.015 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.544 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.000 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 17.024 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.776 µs/fwd
+
+### Layer 15
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_3**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 258.529 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.539 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2399.265 µs/fwd
+  - **GemmaRMSNorm_30**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.399 µs/fwd
+  - **QKVParallelLinear_3**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 970.062 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 113.040 µs/fwd
+  - **RadixAttention_3**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.839 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.779 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 44.798 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2045.574 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.260 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 9.438 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.839 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.159 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.929 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.399 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.009 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.149 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.990 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.820 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.029 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.200 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.349 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.659 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 6.969 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 5.290 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 16.289 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.149 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 12.629 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.909 µs/fwd
+  - **RowParallelLinear_30**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 382.110 µs/fwd
+  - **GemmaRMSNorm_31**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.450 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_15**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.679 µs/fwd
+    - **Qwen2MoeMLP_15**
+      - **MergedColumnParallelLinear_39**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 55.620 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.150 µs/fwd
+      - **SiluAndMul_15**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 15.949 µs/fwd
+      - **RowParallelLinear_31**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 100.849 µs/fwd
+    - **ReplicatedLinear_15**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.260 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.689 µs/fwd
+    - **TopK_15**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.569 µs/fwd
+    - **FusedMoE_15**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.699 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.329 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.909 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 40.899 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.428 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.229 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 486.430 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.549 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 741.381 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 563.370 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.672 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 768.038 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.848 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 717.694 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.671 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.808 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.560 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2113.715 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.984 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 297.096 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.872 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 463.231 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 597.414 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.847 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.584 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.472 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 55.959 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.407 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.272 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.328 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.736 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.064 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.192 µs/fwd
+
+### Layer 19
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_4**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 259.820 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 61.120 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2391.355 µs/fwd
+  - **GemmaRMSNorm_38**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.919 µs/fwd
+  - **QKVParallelLinear_4**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 967.582 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 115.919 µs/fwd
+  - **RadixAttention_4**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 24.349 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.729 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.978 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2119.694 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.300 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 11.269 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.729 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.240 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.950 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.599 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.399 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.679 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.330 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.890 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.880 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 5.399 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.700 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 7.399 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.019 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.780 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 16.399 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.420 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 14.769 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.950 µs/fwd
+  - **RowParallelLinear_38**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 379.300 µs/fwd
+  - **GemmaRMSNorm_39**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.169 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_19**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 177.329 µs/fwd
+    - **Qwen2MoeMLP_19**
+      - **MergedColumnParallelLinear_49**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.780 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.320 µs/fwd
+      - **SiluAndMul_19**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 15.989 µs/fwd
+      - **RowParallelLinear_39**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 100.939 µs/fwd
+    - **ReplicatedLinear_19**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.340 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.270 µs/fwd
+    - **TopK_19**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.559 µs/fwd
+    - **FusedMoE_19**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.789 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.159 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.819 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.319 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.508 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.679 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 486.180 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.429 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 736.911 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 564.760 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.639 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 790.262 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.535 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 717.182 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.815 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.264 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.304 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2111.322 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.872 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 294.991 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.568 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 462.111 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.503 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.776 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.864 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.088 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.208 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.895 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.056 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.296 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.904 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.400 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.440 µs/fwd
+
+### Layer 23
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_5**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 259.020 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.380 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2377.175 µs/fwd
+  - **GemmaRMSNorm_46**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.140 µs/fwd
+  - **QKVParallelLinear_5**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 966.411 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 112.089 µs/fwd
+  - **RadixAttention_5**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.599 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.819 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.608 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 1990.844 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.170 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 8.449 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.819 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.170 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 3.079 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.460 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.559 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 5.579 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.720 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.740 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.210 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.019 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.429 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 5.638 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 7.149 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.919 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 15.949 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.370 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 13.859 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.790 µs/fwd
+  - **RowParallelLinear_46**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 380.670 µs/fwd
+  - **GemmaRMSNorm_47**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.689 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_23**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.180 µs/fwd
+    - **Qwen2MoeMLP_23**
+      - **MergedColumnParallelLinear_59**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.260 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.440 µs/fwd
+      - **SiluAndMul_23**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.129 µs/fwd
+      - **RowParallelLinear_47**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.259 µs/fwd
+    - **ReplicatedLinear_23**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 56.750 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.469 µs/fwd
+    - **TopK_23**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.489 µs/fwd
+    - **FusedMoE_23**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.259 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.649 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 42.219 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.418 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.119 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 491.970 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.419 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 734.271 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.840 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.360 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 779.934 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.407 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 716.070 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.015 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.792 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.407 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2052.058 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.952 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 296.559 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.344 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 464.583 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 595.150 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 146.207 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.063 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.623 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.728 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.823 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.519 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.344 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.840 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.192 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.248 µs/fwd
+
+### Layer 27
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_6**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 257.960 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.899 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2381.595 µs/fwd
+  - **GemmaRMSNorm_54**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.630 µs/fwd
+  - **QKVParallelLinear_6**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 967.771 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 111.389 µs/fwd
+  - **RadixAttention_6**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.769 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.630 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 44.538 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2027.924 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.220 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 10.209 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.369 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.109 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.990 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.500 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.089 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 5.089 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.460 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.750 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 8.739 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.630 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.349 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.179 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.769 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.590 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 14.749 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.000 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 13.559 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.889 µs/fwd
+  - **RowParallelLinear_54**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 384.100 µs/fwd
+  - **GemmaRMSNorm_55**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 180.519 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_27**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.259 µs/fwd
+    - **Qwen2MoeMLP_27**
+      - **MergedColumnParallelLinear_69**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.910 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.840 µs/fwd
+      - **SiluAndMul_27**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.059 µs/fwd
+      - **RowParallelLinear_55**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.329 µs/fwd
+    - **ReplicatedLinear_27**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.150 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.690 µs/fwd
+    - **TopK_27**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.409 µs/fwd
+    - **FusedMoE_27**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.129 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.829 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 41.049 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.758 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.569 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 497.820 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.619 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 732.071 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 564.571 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.464 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 776.318 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.912 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 715.950 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.071 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.088 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.368 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2077.171 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.816 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 299.607 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.320 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 465.479 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.222 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.464 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.016 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.432 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.103 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.071 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.224 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.472 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.912 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.112 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.520 µs/fwd
+
+### Layer 31
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_7**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 258.320 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.739 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2392.005 µs/fwd
+  - **GemmaRMSNorm_62**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.350 µs/fwd
+  - **QKVParallelLinear_7**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 969.461 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 116.229 µs/fwd
+  - **RadixAttention_7**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 24.569 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 6.110 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.938 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2067.364 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.269 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 9.079 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 6.409 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.159 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 3.110 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.419 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 5.139 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 5.919 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.539 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.890 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.189 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 3.819 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.249 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.588 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 7.269 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.760 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 13.659 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.360 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 13.879 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.899 µs/fwd
+  - **RowParallelLinear_62**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 385.809 µs/fwd
+  - **GemmaRMSNorm_63**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.169 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_31**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.030 µs/fwd
+    - **Qwen2MoeMLP_31**
+      - **MergedColumnParallelLinear_79**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.079 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.170 µs/fwd
+      - **SiluAndMul_31**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.329 µs/fwd
+      - **RowParallelLinear_63**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.249 µs/fwd
+    - **ReplicatedLinear_31**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.210 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.629 µs/fwd
+    - **TopK_31**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.419 µs/fwd
+    - **FusedMoE_31**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.679 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.979 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.869 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 42.429 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.038 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.169 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 505.150 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.399 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 744.771 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 564.580 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.472 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 765.022 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.783 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 716.966 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.279 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.808 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.432 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2088.378 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.944 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 304.015 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.600 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 467.886 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 594.783 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.768 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.023 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.760 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.760 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.743 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.536 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.320 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.720 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.696 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.463 µs/fwd
+
+### Layer 35
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_8**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 256.680 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.589 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2385.945 µs/fwd
+  - **GemmaRMSNorm_70**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.239 µs/fwd
+  - **QKVParallelLinear_8**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 967.121 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 109.819 µs/fwd
+  - **RadixAttention_8**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.539 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.870 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 42.908 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2144.634 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.109 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 10.378 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.619 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.059 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.929 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.369 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.919 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 5.559 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.429 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.740 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.229 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.380 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.320 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.279 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.619 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.809 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 15.599 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.740 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 14.759 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.929 µs/fwd
+  - **RowParallelLinear_70**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 385.150 µs/fwd
+  - **GemmaRMSNorm_71**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.719 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_35**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.139 µs/fwd
+    - **Qwen2MoeMLP_35**
+      - **MergedColumnParallelLinear_89**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.829 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.989 µs/fwd
+      - **SiluAndMul_35**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.039 µs/fwd
+      - **RowParallelLinear_71**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.319 µs/fwd
+    - **ReplicatedLinear_35**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.230 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.359 µs/fwd
+    - **TopK_35**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.519 µs/fwd
+    - **FusedMoE_35**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.969 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.669 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.369 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.628 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.379 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 504.011 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.479 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 748.111 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.640 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 58.000 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 754.702 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.216 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 715.518 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.111 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.288 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.608 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2126.370 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.872 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 302.207 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.639 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 472.671 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 600.615 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.792 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.055 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.319 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.968 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.951 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 121.760 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.328 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.960 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.416 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.615 µs/fwd
+
+### Layer 39
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_9**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 258.030 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.349 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2384.215 µs/fwd
+  - **GemmaRMSNorm_78**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 179.899 µs/fwd
+  - **QKVParallelLinear_9**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 970.461 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 115.699 µs/fwd
+  - **RadixAttention_9**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 24.129 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.960 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.608 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2078.144 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.250 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 11.059 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.069 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.210 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 3.030 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.530 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.419 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.839 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.189 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.760 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.239 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 3.660 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.420 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.588 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.459 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.540 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 16.299 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.499 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 15.329 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 2.260 µs/fwd
+  - **RowParallelLinear_78**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 387.440 µs/fwd
+  - **GemmaRMSNorm_79**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 184.859 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_39**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 182.489 µs/fwd
+    - **Qwen2MoeMLP_39**
+      - **MergedColumnParallelLinear_99**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.770 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.560 µs/fwd
+      - **SiluAndMul_39**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.189 µs/fwd
+      - **RowParallelLinear_79**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.169 µs/fwd
+    - **ReplicatedLinear_39**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.579 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.870 µs/fwd
+    - **TopK_39**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_39**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.719 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.009 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.799 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 46.789 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 98.918 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.589 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 70085.306 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.629 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 752.841 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.530 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.832 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 818.510 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.392 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 715.766 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.343 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.792 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.224 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2096.314 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.952 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 303.775 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 158.184 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 473.327 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 605.190 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.904 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.231 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.120 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.040 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.975 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 122.784 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.480 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.040 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 15.848 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 69.688 µs/fwd
+
+### Layer 43
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_10**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 256.780 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.369 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2380.845 µs/fwd
+  - **GemmaRMSNorm_86**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.180 µs/fwd
+  - **QKVParallelLinear_10**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 970.981 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 112.429 µs/fwd
+  - **RadixAttention_10**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 24.139 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 6.059 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 44.428 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2090.614 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.250 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 10.209 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.109 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.170 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 3.029 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.399 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.519 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 6.669 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.630 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.850 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 8.919 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 3.649 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.159 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.869 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 7.759 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.599 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 14.909 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.080 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 14.139 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.780 µs/fwd
+  - **RowParallelLinear_86**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 386.610 µs/fwd
+  - **GemmaRMSNorm_87**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 182.029 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_43**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 181.850 µs/fwd
+    - **Qwen2MoeMLP_43**
+      - **MergedColumnParallelLinear_109**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.779 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.890 µs/fwd
+      - **SiluAndMul_43**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.089 µs/fwd
+      - **RowParallelLinear_87**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.869 µs/fwd
+    - **ReplicatedLinear_43**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.809 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.120 µs/fwd
+    - **TopK_43**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.649 µs/fwd
+    - **FusedMoE_43**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.789 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.839 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.639 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 48.949 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 100.158 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.509 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 502.620 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.499 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 742.051 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 555.220 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.880 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 783.774 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.744 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 714.550 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.183 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.128 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.560 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2094.218 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.832 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 303.175 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.576 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 474.606 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 607.255 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 146.080 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.416 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.519 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.432 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.670 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.000 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.591 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.888 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.304 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.272 µs/fwd
+
+### Layer 47
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_11**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 255.079 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 59.899 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2407.315 µs/fwd
+  - **GemmaRMSNorm_94**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.870 µs/fwd
+  - **QKVParallelLinear_11**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 969.951 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 109.259 µs/fwd
+  - **RadixAttention_11**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.289 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.700 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 44.008 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2074.394 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.179 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 11.518 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 3.909 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.119 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.899 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.360 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 3.649 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.329 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.210 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.770 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 8.809 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.370 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.349 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.119 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 7.129 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.939 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 15.479 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.380 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 16.309 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.909 µs/fwd
+  - **RowParallelLinear_94**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 387.840 µs/fwd
+  - **GemmaRMSNorm_95**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.329 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_47**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.139 µs/fwd
+    - **Qwen2MoeMLP_47**
+      - **MergedColumnParallelLinear_119**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.160 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 59.329 µs/fwd
+      - **SiluAndMul_47**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.089 µs/fwd
+      - **RowParallelLinear_95**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 101.689 µs/fwd
+    - **ReplicatedLinear_47**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.180 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.400 µs/fwd
+    - **TopK_47**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.619 µs/fwd
+    - **FusedMoE_47**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.749 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.919 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.809 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 46.639 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.858 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 50.209 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 503.391 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.479 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 755.750 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 561.650 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.992 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 766.206 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 159.959 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 715.038 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 310.351 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.760 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.912 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2114.418 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.968 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 304.879 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.040 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 476.471 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 604.798 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 146.048 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 192.887 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.031 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.424 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.606 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.424 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.416 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 9.952 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.392 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 70.264 µs/fwd
+
+### Layer 51
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_12**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 259.649 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 60.599 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2378.785 µs/fwd
+  - **GemmaRMSNorm_102**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.559 µs/fwd
+  - **QKVParallelLinear_12**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 973.612 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 115.099 µs/fwd
+  - **RadixAttention_12**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 24.709 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.790 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 44.978 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2175.374 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.320 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 9.489 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.339 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.229 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.990 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.579 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 5.009 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 7.129 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.349 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.730 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.479 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.300 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.070 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 6.479 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.199 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.409 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 15.569 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.279 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 16.749 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.979 µs/fwd
+  - **RowParallelLinear_102**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 390.440 µs/fwd
+  - **GemmaRMSNorm_103**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 183.600 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_51**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 177.190 µs/fwd
+    - **Qwen2MoeMLP_51**
+      - **MergedColumnParallelLinear_129**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.579 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.950 µs/fwd
+      - **SiluAndMul_51**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.029 µs/fwd
+      - **RowParallelLinear_103**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.240 µs/fwd
+    - **ReplicatedLinear_51**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.730 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.340 µs/fwd
+    - **TopK_51**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.619 µs/fwd
+    - **FusedMoE_51**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.739 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.989 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.699 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 45.559 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.228 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.639 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 506.830 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.459 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 749.481 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 562.000 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.576 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 749.030 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.735 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 720.438 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.575 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.232 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.400 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2130.035 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.832 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 305.183 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.159 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 477.959 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 607.414 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.760 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.624 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 169.375 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.824 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.310 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.135 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.304 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.008 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.328 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 66.567 µs/fwd
+
+### Layer 55
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_13**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 259.090 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 59.879 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2387.855 µs/fwd
+  - **GemmaRMSNorm_110**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.480 µs/fwd
+  - **QKVParallelLinear_13**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 970.201 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 115.149 µs/fwd
+  - **RadixAttention_13**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 24.409 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 6.110 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 45.498 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2079.104 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.210 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 10.469 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 5.549 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.149 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 2.910 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.500 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.119 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 4.279 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.500 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 3.010 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.100 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 4.429 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 3.749 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 7.488 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.619 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.000 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 15.119 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.470 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 15.059 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.849 µs/fwd
+  - **RowParallelLinear_110**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 387.470 µs/fwd
+  - **GemmaRMSNorm_111**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.389 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_55**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 180.479 µs/fwd
+    - **Qwen2MoeMLP_55**
+      - **MergedColumnParallelLinear_139**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.859 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.919 µs/fwd
+      - **SiluAndMul_55**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.229 µs/fwd
+      - **RowParallelLinear_111**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 102.299 µs/fwd
+    - **ReplicatedLinear_55**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.749 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.090 µs/fwd
+    - **TopK_55**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.529 µs/fwd
+    - **FusedMoE_55**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.619 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.659 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.639 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 66.179 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.318 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 49.979 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 486.390 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.419 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 740.431 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 558.110 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.776 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 805.150 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.264 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 719.398 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 310.471 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.808 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.640 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2107.938 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.960 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 307.463 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.272 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 471.142 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 608.239 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 145.864 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.879 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 170.983 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 56.568 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 559.670 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.776 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.504 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.128 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.776 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 67.096 µs/fwd
+
+### Layer 59
+
+
+#### AMD — recorded
+
+- **Qwen3_5AttentionDecoderLayer_14**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 259.569 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 61.559 µs/fwd
+  - `ncclDevKernel_Generic_1(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 2379.985 µs/fwd
+  - **GemmaRMSNorm_118**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.309 µs/fwd
+  - **QKVParallelLinear_14**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 970.042 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 113.190 µs/fwd
+  - **RadixAttention_14**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 23.899 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 5.790 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 44.618 µs/fwd
+    - `aiter::fmha_fwd_hd256_fp8_causal_group_gfx950` — 1 calls/fwd; 2149.414 µs/fwd
+    - `at::native::unrolled_elementwise_kernel` — 0.5 calls/fwd; 2.220 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 1.5 calls/fwd; 10.129 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 6.809 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 2.130 µs/fwd
+    - `at::native::reduce_kernel` — 0.5 calls/fwd; 3.090 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 1.500 µs/fwd
+    - `rocprim::ROCPRIM_400200_NS::detail::trampoline_kernel` — 1 calls/fwd; 4.019 µs/fwd
+    - `(anonymous namespace)::elementwise_kernel_with_index` — 1 calls/fwd; 5.589 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 3.490 µs/fwd
+    - `at::native::reduce_kernel` — 0.25 calls/fwd; 1.800 µs/fwd
+    - `compute_cuda_kernel` — 0.5 calls/fwd; 9.110 µs/fwd
+    - `at::native::_scatter_gather_elementwise_kernel` — 0.5 calls/fwd; 3.979 µs/fwd
+    - `at::native::index_elementwise_kernel` — 0.5 calls/fwd; 2.869 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1.5 calls/fwd; 7.348 µs/fwd
+    - `at::native::index_elementwise_kernel` — 1 calls/fwd; 8.979 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.790 µs/fwd
+    - `at::native::reduce_kernel` — 1 calls/fwd; 16.029 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 4.389 µs/fwd
+    - `at::native::vectorized_gather_kernel` — 1 calls/fwd; 14.079 µs/fwd
+    - `at::native::elementwise_kernel_manual_unroll` — 0.5 calls/fwd; 1.869 µs/fwd
+  - **RowParallelLinear_118**
+    - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 387.450 µs/fwd
+  - **GemmaRMSNorm_119**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 181.639 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_59**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 179.229 µs/fwd
+    - **Qwen2MoeMLP_59**
+      - **MergedColumnParallelLinear_149**
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.120 µs/fwd
+        - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.930 µs/fwd
+      - **SiluAndMul_59**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 16.119 µs/fwd
+      - **RowParallelLinear_119**
+        - `rocBLAS/Tensile MT256x256x64` — 1 calls/fwd; 103.879 µs/fwd
+    - **ReplicatedLinear_59**
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 57.570 µs/fwd
+      - `rocBLAS/Tensile MT256x256x64` — 0.5 calls/fwd; 58.150 µs/fwd
+    - **TopK_59**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 36.539 µs/fwd
+    - **FusedMoE_59**
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 5.779 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 4.699 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 6.629 µs/fwd
+      - `aiter::opus_moe_sorting_entry` — 1 calls/fwd; 54.119 µs/fwd
+      - `aiter::dynamic_per_group_scaled_quant_kernel` — 2 calls/fwd; 99.729 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 48.729 µs/fwd
+      - `mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32` — 1 calls/fwd; 488.080 µs/fwd
+      - `aiter::mxfp4_moe_sort_kernel` — 1 calls/fwd; 7.479 µs/fwd
+      - `mfma_moe2_afp4_wfp4_bf16_cshuffle_t64x256x256_vscale_fix3_fp4opt_v1_persist_cu256_sbm128_acc0` — 1 calls/fwd; 732.161 µs/fwd
+      - `moe_reduction_kernel_0` — 1 calls/fwd; 567.791 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 57.792 µs/fwd
+  - `ncclDevKernel_AllReduce_Sum_bf16_RING_LL(ncclDevKernelArgsStorage<4096ul>)` — 1 calls/fwd; 784.574 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.128 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 718.182 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 309.367 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 3.064 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 50.672 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16VarSeqQ128Kv128PersistentContext` — 1 calls/fwd; 2128.826 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 0.5 calls/fwd; 0.840 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 303.255 µs/fwd
+  - **GemmaRMSNorm (post-attention)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign128...` — 1 calls/fwd; 160.343 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x128x512u2_s3x3x3x3x1x3_et128x32_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_fCp_bN_ldgsts_ldgstsSf_rg...` — 1 calls/fwd; 461.423 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x128x256_s6_et128x128_m256x128x64_c2x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 596.582 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 146.168 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_256x128_64x5_2x2_2cta_h_bz_TNT` — 2 calls/fwd; 193.015 µs/fwd
+      - `memcpy128` — 1 calls/fwd; 168.840 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeTMAKernel_object_at__CopyAtom_ThrID10_TVLayoutSrc1819201_TVLayoutDst1819201_Val...` — 1 calls/fwd; 55.712 µs/fwd
+      - `moe::dev::finalize::finalizeKernelVecLoad` — 1 calls/fwd; 558.743 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesHistogramScoresKernel` — 1 calls/fwd; 123.600 µs/fwd
+      - `moe::dev::routing::routingInitExpertCounts` — 1 calls/fwd; 1.256 µs/fwd
+      - `moe::dev::routing::routingIndicesCoopKernel` — 1 calls/fwd; 10.016 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 16.192 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_128x256_64x6_2x1_2cta_v_bz_TNT` — 1 calls/fwd; 68.552 µs/fwd
+
+## Decode (TARGET_VERIFY): linear_attention
+
+
+### Layer 0
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_0**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.021 µs/fwd
+  - **GemmaRMSNorm_0**
+    - `_gemma_rmsnorm_kernel` — 1 calls/fwd; 4.537 µs/fwd
+  - **Qwen3_5GatedDeltaNet_0**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.603 µs/fwd
+    - **MergedColumnParallelLinear_0**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.243 µs/fwd
+    - **MergedColumnParallelLinear_1**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.285 µs/fwd
+    - **RadixLinearAttention_0**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.537 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.702 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 11.575 µs/fwd
+    - **RMSNorm_0**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.350 µs/fwd
+    - **RowParallelLinear_0**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 7.017 µs/fwd
+  - **GemmaRMSNorm_1**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.203 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_0**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.822 µs/fwd
+    - **Qwen2MoeMLP_0**
+      - **MergedColumnParallelLinear_2**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.467 µs/fwd
+      - **SiluAndMul_0**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.576 µs/fwd
+      - **RowParallelLinear_1**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 5.025 µs/fwd
+    - **ReplicatedLinear_0**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.095 µs/fwd
+    - **TopK_0**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 10.226 µs/fwd
+    - **FusedMoE_0**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.972 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `kernel_cutlass_kernel_flashinfernormkernelsrmsnormRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64409640961_tensorptrbf16gmemalign16o40961_tensorptrbf1...` — 1 calls/fwd; 3.111 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.866 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.462 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 7.514 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.840 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.182 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.465 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.127 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.286 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.712 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.820 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.686 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.209 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.482 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.251 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.364 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.892 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.526 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.508 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.985 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.418 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.224 µs/fwd
+
+### Layer 1
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_1**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.318 µs/fwd
+  - **GemmaRMSNorm_2**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.400 µs/fwd
+  - **Qwen3_5GatedDeltaNet_1**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.693 µs/fwd
+    - **MergedColumnParallelLinear_3**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.120 µs/fwd
+    - **MergedColumnParallelLinear_4**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.356 µs/fwd
+    - **RadixLinearAttention_1**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.531 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.558 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.689 µs/fwd
+    - **RMSNorm_1**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.300 µs/fwd
+    - **RowParallelLinear_2**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.953 µs/fwd
+  - **GemmaRMSNorm_3**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.221 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_1**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.670 µs/fwd
+    - **Qwen2MoeMLP_1**
+      - **MergedColumnParallelLinear_5**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.971 µs/fwd
+      - **SiluAndMul_1**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.590 µs/fwd
+      - **RowParallelLinear_3**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.346 µs/fwd
+    - **ReplicatedLinear_1**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.362 µs/fwd
+    - **TopK_1**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.760 µs/fwd
+    - **FusedMoE_1**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.722 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.644 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.825 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.977 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.251 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.247 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.960 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.440 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.225 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.358 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.428 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.897 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 28.705 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.398 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.424 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.118 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.432 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.966 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.491 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.398 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.930 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.509 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.994 µs/fwd
+
+### Layer 2
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_2**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.367 µs/fwd
+  - **GemmaRMSNorm_4**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.227 µs/fwd
+  - **Qwen3_5GatedDeltaNet_2**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.415 µs/fwd
+    - **MergedColumnParallelLinear_6**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.078 µs/fwd
+    - **MergedColumnParallelLinear_7**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.556 µs/fwd
+    - **RadixLinearAttention_2**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.435 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.513 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.644 µs/fwd
+    - **RMSNorm_2**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.349 µs/fwd
+    - **RowParallelLinear_4**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 7.054 µs/fwd
+  - **GemmaRMSNorm_5**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.280 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_2**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.695 µs/fwd
+    - **Qwen2MoeMLP_2**
+      - **MergedColumnParallelLinear_8**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.900 µs/fwd
+      - **SiluAndMul_2**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.461 µs/fwd
+      - **RowParallelLinear_5**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.323 µs/fwd
+    - **ReplicatedLinear_2**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.301 µs/fwd
+    - **TopK_2**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.824 µs/fwd
+    - **FusedMoE_2**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 53.813 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.407 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.968 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.438 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.242 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.879 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.115 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.574 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.240 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.306 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.480 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.797 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 29.629 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.950 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.456 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.997 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.536 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.956 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.516 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.467 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.769 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.181 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.970 µs/fwd
+
+### Layer 4
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_3**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.778 µs/fwd
+  - **GemmaRMSNorm_8**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.338 µs/fwd
+  - **Qwen3_5GatedDeltaNet_3**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.771 µs/fwd
+    - **MergedColumnParallelLinear_10**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.015 µs/fwd
+    - **MergedColumnParallelLinear_11**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.011 µs/fwd
+    - **RadixLinearAttention_3**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.569 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.618 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 11.005 µs/fwd
+    - **RMSNorm_3**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.333 µs/fwd
+    - **RowParallelLinear_8**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.725 µs/fwd
+  - **GemmaRMSNorm_9**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.254 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_4**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.767 µs/fwd
+    - **Qwen2MoeMLP_4**
+      - **MergedColumnParallelLinear_12**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.885 µs/fwd
+      - **SiluAndMul_4**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.585 µs/fwd
+      - **RowParallelLinear_9**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.464 µs/fwd
+    - **ReplicatedLinear_4**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.208 µs/fwd
+    - **TopK_4**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.844 µs/fwd
+    - **FusedMoE_4**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.220 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.555 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.885 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.187 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.375 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.202 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.094 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.584 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.139 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.304 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.546 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.736 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 29.665 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.896 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.361 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.848 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.578 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.831 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.454 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.288 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.639 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.267 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.026 µs/fwd
+
+### Layer 5
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_4**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.035 µs/fwd
+  - **GemmaRMSNorm_10**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.461 µs/fwd
+  - **Qwen3_5GatedDeltaNet_4**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.614 µs/fwd
+    - **MergedColumnParallelLinear_13**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.504 µs/fwd
+    - **MergedColumnParallelLinear_14**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.313 µs/fwd
+    - **RadixLinearAttention_4**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.513 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.662 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.697 µs/fwd
+    - **RMSNorm_4**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.264 µs/fwd
+    - **RowParallelLinear_10**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.950 µs/fwd
+  - **GemmaRMSNorm_11**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.217 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_5**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.742 µs/fwd
+    - **Qwen2MoeMLP_5**
+      - **MergedColumnParallelLinear_15**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.892 µs/fwd
+      - **SiluAndMul_5**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.594 µs/fwd
+      - **RowParallelLinear_11**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.314 µs/fwd
+    - **ReplicatedLinear_5**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.293 µs/fwd
+    - **TopK_5**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.636 µs/fwd
+    - **FusedMoE_5**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.638 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.566 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.947 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.764 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.289 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.820 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.196 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.593 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.153 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.331 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.622 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.851 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 29.421 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.996 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.465 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.784 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.572 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.830 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.509 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.481 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.818 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.047 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.983 µs/fwd
+
+### Layer 6
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_5**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.822 µs/fwd
+  - **GemmaRMSNorm_12**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.306 µs/fwd
+  - **Qwen3_5GatedDeltaNet_5**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.536 µs/fwd
+    - **MergedColumnParallelLinear_16**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.142 µs/fwd
+    - **MergedColumnParallelLinear_17**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.297 µs/fwd
+    - **RadixLinearAttention_5**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.608 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.593 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.645 µs/fwd
+    - **RMSNorm_5**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.307 µs/fwd
+    - **RowParallelLinear_12**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 7.036 µs/fwd
+  - **GemmaRMSNorm_13**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.244 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_6**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.674 µs/fwd
+    - **Qwen2MoeMLP_6**
+      - **MergedColumnParallelLinear_18**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.855 µs/fwd
+      - **SiluAndMul_6**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.478 µs/fwd
+      - **RowParallelLinear_13**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.316 µs/fwd
+    - **ReplicatedLinear_6**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.282 µs/fwd
+    - **TopK_6**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.811 µs/fwd
+    - **FusedMoE_6**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.433 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.472 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.908 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.782 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.321 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.054 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.342 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.580 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.146 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.314 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.710 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.419 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 29.234 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.876 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.278 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.721 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.565 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.833 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.420 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.308 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.651 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.084 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.957 µs/fwd
+
+### Layer 8
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_6**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.947 µs/fwd
+  - **GemmaRMSNorm_16**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.396 µs/fwd
+  - **Qwen3_5GatedDeltaNet_6**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.666 µs/fwd
+    - **MergedColumnParallelLinear_20**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.449 µs/fwd
+    - **MergedColumnParallelLinear_21**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.257 µs/fwd
+    - **RadixLinearAttention_6**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.565 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.553 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 11.244 µs/fwd
+    - **RMSNorm_6**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.300 µs/fwd
+    - **RowParallelLinear_16**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.711 µs/fwd
+  - **GemmaRMSNorm_17**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.203 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_8**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.807 µs/fwd
+    - **Qwen2MoeMLP_8**
+      - **MergedColumnParallelLinear_22**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.910 µs/fwd
+      - **SiluAndMul_8**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.549 µs/fwd
+      - **RowParallelLinear_17**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.456 µs/fwd
+    - **ReplicatedLinear_8**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.270 µs/fwd
+    - **TopK_8**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.740 µs/fwd
+    - **FusedMoE_8**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.332 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.835 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 3.006 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.781 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.466 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.941 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.113 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.581 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.149 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.216 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.523 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.926 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 29.625 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 20.368 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.453 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.855 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.595 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.891 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.370 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.262 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.687 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.227 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.046 µs/fwd
+
+### Layer 9
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_7**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.418 µs/fwd
+  - **GemmaRMSNorm_18**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.390 µs/fwd
+  - **Qwen3_5GatedDeltaNet_7**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.791 µs/fwd
+    - **MergedColumnParallelLinear_23**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.978 µs/fwd
+    - **MergedColumnParallelLinear_24**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.225 µs/fwd
+    - **RadixLinearAttention_7**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.590 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.633 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.821 µs/fwd
+    - **RMSNorm_7**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.307 µs/fwd
+    - **RowParallelLinear_18**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.984 µs/fwd
+  - **GemmaRMSNorm_19**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.261 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_9**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.638 µs/fwd
+    - **Qwen2MoeMLP_9**
+      - **MergedColumnParallelLinear_25**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.953 µs/fwd
+      - **SiluAndMul_9**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.604 µs/fwd
+      - **RowParallelLinear_19**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.280 µs/fwd
+    - **ReplicatedLinear_9**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.448 µs/fwd
+    - **TopK_9**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.821 µs/fwd
+    - **FusedMoE_9**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 53.926 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.174 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 3.014 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.185 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.522 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.798 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.245 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.593 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.159 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.299 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.613 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.580 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 28.814 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.607 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.405 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.818 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.604 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.860 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.455 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.491 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.783 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.097 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.942 µs/fwd
+
+### Layer 10
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_8**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.181 µs/fwd
+  - **GemmaRMSNorm_20**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.387 µs/fwd
+  - **Qwen3_5GatedDeltaNet_8**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.584 µs/fwd
+    - **MergedColumnParallelLinear_26**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.061 µs/fwd
+    - **MergedColumnParallelLinear_27**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.328 µs/fwd
+    - **RadixLinearAttention_8**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.412 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.491 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.645 µs/fwd
+    - **RMSNorm_8**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.351 µs/fwd
+    - **RowParallelLinear_20**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.975 µs/fwd
+  - **GemmaRMSNorm_21**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.243 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_10**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.798 µs/fwd
+    - **Qwen2MoeMLP_10**
+      - **MergedColumnParallelLinear_28**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.836 µs/fwd
+      - **SiluAndMul_10**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.457 µs/fwd
+      - **RowParallelLinear_21**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.396 µs/fwd
+    - **ReplicatedLinear_10**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.478 µs/fwd
+    - **TopK_10**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.787 µs/fwd
+    - **FusedMoE_10**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.216 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.813 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.966 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.863 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.872 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.924 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.197 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.570 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.138 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.339 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.546 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.643 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 28.950 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.647 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.450 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.864 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.594 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.912 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.474 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.450 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.849 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.093 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.971 µs/fwd
+
+### Layer 12
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_9**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.822 µs/fwd
+  - **GemmaRMSNorm_24**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.451 µs/fwd
+  - **Qwen3_5GatedDeltaNet_9**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.624 µs/fwd
+    - **MergedColumnParallelLinear_30**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.937 µs/fwd
+    - **MergedColumnParallelLinear_31**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.067 µs/fwd
+    - **RadixLinearAttention_9**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.493 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.664 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.981 µs/fwd
+    - **RMSNorm_9**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.307 µs/fwd
+    - **RowParallelLinear_24**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.759 µs/fwd
+  - **GemmaRMSNorm_25**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.245 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_12**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.883 µs/fwd
+    - **Qwen2MoeMLP_12**
+      - **MergedColumnParallelLinear_32**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.898 µs/fwd
+      - **SiluAndMul_12**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.613 µs/fwd
+      - **RowParallelLinear_25**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.435 µs/fwd
+    - **ReplicatedLinear_12**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.271 µs/fwd
+    - **TopK_12**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.781 µs/fwd
+    - **FusedMoE_12**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 53.626 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.404 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.983 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.927 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.019 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.936 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.025 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.600 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.183 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.193 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.582 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.437 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.910 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.170 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.366 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.818 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.602 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.883 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.387 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.328 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.668 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.135 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.945 µs/fwd
+
+### Layer 13
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_10**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.860 µs/fwd
+  - **GemmaRMSNorm_26**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.364 µs/fwd
+  - **Qwen3_5GatedDeltaNet_10**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.594 µs/fwd
+    - **MergedColumnParallelLinear_33**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.911 µs/fwd
+    - **MergedColumnParallelLinear_34**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.190 µs/fwd
+    - **RadixLinearAttention_10**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.642 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.652 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.666 µs/fwd
+    - **RMSNorm_10**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.254 µs/fwd
+    - **RowParallelLinear_26**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.945 µs/fwd
+  - **GemmaRMSNorm_27**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.200 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_13**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.669 µs/fwd
+    - **Qwen2MoeMLP_13**
+      - **MergedColumnParallelLinear_35**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.874 µs/fwd
+      - **SiluAndMul_13**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.545 µs/fwd
+      - **RowParallelLinear_27**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.320 µs/fwd
+    - **ReplicatedLinear_13**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.256 µs/fwd
+    - **TopK_13**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.733 µs/fwd
+    - **FusedMoE_13**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.200 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.728 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.939 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.364 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.451 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.791 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.264 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.572 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.163 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.342 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.545 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.436 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 28.576 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.363 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.393 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.737 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.564 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.852 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.532 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.480 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.802 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.102 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.997 µs/fwd
+
+### Layer 14
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_11**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.683 µs/fwd
+  - **GemmaRMSNorm_28**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.414 µs/fwd
+  - **Qwen3_5GatedDeltaNet_11**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.571 µs/fwd
+    - **MergedColumnParallelLinear_36**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.924 µs/fwd
+    - **MergedColumnParallelLinear_37**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.426 µs/fwd
+    - **RadixLinearAttention_11**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.500 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.602 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.643 µs/fwd
+    - **RMSNorm_11**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.328 µs/fwd
+    - **RowParallelLinear_28**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.962 µs/fwd
+  - **GemmaRMSNorm_29**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.257 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_14**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.661 µs/fwd
+    - **Qwen2MoeMLP_14**
+      - **MergedColumnParallelLinear_38**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.891 µs/fwd
+      - **SiluAndMul_14**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.527 µs/fwd
+      - **RowParallelLinear_29**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.252 µs/fwd
+    - **ReplicatedLinear_14**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.231 µs/fwd
+    - **TopK_14**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.836 µs/fwd
+    - **FusedMoE_14**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.966 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.406 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 3.029 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.988 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.003 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.200 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.115 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.581 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.174 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.300 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.477 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.192 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 28.871 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.938 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.249 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.726 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.578 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.881 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.344 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.342 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.628 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.095 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.016 µs/fwd
+
+### Layer 16
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_12**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.695 µs/fwd
+  - **GemmaRMSNorm_32**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.523 µs/fwd
+  - **Qwen3_5GatedDeltaNet_12**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.713 µs/fwd
+    - **MergedColumnParallelLinear_40**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.799 µs/fwd
+    - **MergedColumnParallelLinear_41**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.364 µs/fwd
+    - **RadixLinearAttention_12**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.578 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.694 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.985 µs/fwd
+    - **RMSNorm_12**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.310 µs/fwd
+    - **RowParallelLinear_32**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.842 µs/fwd
+  - **GemmaRMSNorm_33**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.230 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_16**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.776 µs/fwd
+    - **Qwen2MoeMLP_16**
+      - **MergedColumnParallelLinear_42**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.925 µs/fwd
+      - **SiluAndMul_16**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.614 µs/fwd
+      - **RowParallelLinear_33**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.355 µs/fwd
+    - **ReplicatedLinear_16**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.222 µs/fwd
+    - **TopK_16**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.651 µs/fwd
+    - **FusedMoE_16**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.554 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.749 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.925 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.892 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.693 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.165 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.539 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.566 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.196 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.361 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.665 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.725 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.895 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.170 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.291 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.914 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.563 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.839 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.294 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.346 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.696 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.125 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.929 µs/fwd
+
+### Layer 17
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_13**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.713 µs/fwd
+  - **GemmaRMSNorm_34**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.358 µs/fwd
+  - **Qwen3_5GatedDeltaNet_13**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.611 µs/fwd
+    - **MergedColumnParallelLinear_43**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.002 µs/fwd
+    - **MergedColumnParallelLinear_44**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.389 µs/fwd
+    - **RadixLinearAttention_13**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.656 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.667 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.700 µs/fwd
+    - **RMSNorm_13**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.279 µs/fwd
+    - **RowParallelLinear_34**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.834 µs/fwd
+  - **GemmaRMSNorm_35**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.248 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_17**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.697 µs/fwd
+    - **Qwen2MoeMLP_17**
+      - **MergedColumnParallelLinear_45**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.990 µs/fwd
+      - **SiluAndMul_17**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.506 µs/fwd
+      - **RowParallelLinear_35**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.298 µs/fwd
+    - **ReplicatedLinear_17**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.248 µs/fwd
+    - **TopK_17**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.835 µs/fwd
+    - **FusedMoE_17**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.304 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.727 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.933 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.294 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.710 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.810 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.006 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.592 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.168 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.293 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.550 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.525 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.758 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.153 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.303 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.931 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.576 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.687 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.449 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.406 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.738 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.004 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.155 µs/fwd
+
+### Layer 18
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_14**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.505 µs/fwd
+  - **GemmaRMSNorm_36**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.378 µs/fwd
+  - **Qwen3_5GatedDeltaNet_14**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.514 µs/fwd
+    - **MergedColumnParallelLinear_46**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.500 µs/fwd
+    - **MergedColumnParallelLinear_47**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.599 µs/fwd
+    - **RadixLinearAttention_14**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.404 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.547 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.645 µs/fwd
+    - **RMSNorm_14**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.274 µs/fwd
+    - **RowParallelLinear_36**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.643 µs/fwd
+  - **GemmaRMSNorm_37**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.205 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_18**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.683 µs/fwd
+    - **Qwen2MoeMLP_18**
+      - **MergedColumnParallelLinear_48**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.884 µs/fwd
+      - **SiluAndMul_18**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.460 µs/fwd
+      - **RowParallelLinear_37**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.253 µs/fwd
+    - **ReplicatedLinear_18**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.244 µs/fwd
+    - **TopK_18**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.676 µs/fwd
+    - **FusedMoE_18**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.651 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.255 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.748 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.147 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.150 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.952 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.793 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.411 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.138 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.350 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.409 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 8.331 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.152 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.627 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.379 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.940 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.429 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.761 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.461 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.208 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.811 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.118 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.123 µs/fwd
+
+### Layer 20
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_15**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.119 µs/fwd
+  - **GemmaRMSNorm_40**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.449 µs/fwd
+  - **Qwen3_5GatedDeltaNet_15**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.629 µs/fwd
+    - **MergedColumnParallelLinear_50**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.542 µs/fwd
+    - **MergedColumnParallelLinear_51**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.338 µs/fwd
+    - **RadixLinearAttention_15**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.458 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.629 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 11.025 µs/fwd
+    - **RMSNorm_15**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.292 µs/fwd
+    - **RowParallelLinear_40**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.756 µs/fwd
+  - **GemmaRMSNorm_41**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.221 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_20**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.765 µs/fwd
+    - **Qwen2MoeMLP_20**
+      - **MergedColumnParallelLinear_52**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.916 µs/fwd
+      - **SiluAndMul_20**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.612 µs/fwd
+      - **RowParallelLinear_41**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.407 µs/fwd
+    - **ReplicatedLinear_20**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.190 µs/fwd
+    - **TopK_20**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.719 µs/fwd
+    - **FusedMoE_20**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.314 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.595 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.817 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.227 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.577 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.924 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.871 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.450 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.161 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.163 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.407 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.927 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.853 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.962 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.397 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.067 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.442 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.802 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.506 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.533 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.772 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.254 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.100 µs/fwd
+
+### Layer 21
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_16**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.973 µs/fwd
+  - **GemmaRMSNorm_42**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.380 µs/fwd
+  - **Qwen3_5GatedDeltaNet_16**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.577 µs/fwd
+    - **MergedColumnParallelLinear_53**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.824 µs/fwd
+    - **MergedColumnParallelLinear_54**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.199 µs/fwd
+    - **RadixLinearAttention_16**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.696 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.651 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.620 µs/fwd
+    - **RMSNorm_16**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.267 µs/fwd
+    - **RowParallelLinear_42**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.674 µs/fwd
+  - **GemmaRMSNorm_43**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.211 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_21**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.688 µs/fwd
+    - **Qwen2MoeMLP_21**
+      - **MergedColumnParallelLinear_55**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.861 µs/fwd
+      - **SiluAndMul_21**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.493 µs/fwd
+      - **RowParallelLinear_43**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.351 µs/fwd
+    - **ReplicatedLinear_21**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.245 µs/fwd
+    - **TopK_21**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.780 µs/fwd
+    - **FusedMoE_21**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.024 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.326 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.875 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.068 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.844 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.039 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.075 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.429 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.153 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.274 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.269 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.734 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.505 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.069 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.325 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.963 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.373 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.873 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.521 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.302 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.788 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.529 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.184 µs/fwd
+
+### Layer 22
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_17**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.695 µs/fwd
+  - **GemmaRMSNorm_44**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.394 µs/fwd
+  - **Qwen3_5GatedDeltaNet_17**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.533 µs/fwd
+    - **MergedColumnParallelLinear_56**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.540 µs/fwd
+    - **MergedColumnParallelLinear_57**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.378 µs/fwd
+    - **RadixLinearAttention_17**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.425 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.563 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.556 µs/fwd
+    - **RMSNorm_17**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.315 µs/fwd
+    - **RowParallelLinear_44**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.764 µs/fwd
+  - **GemmaRMSNorm_45**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.235 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_22**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.689 µs/fwd
+    - **Qwen2MoeMLP_22**
+      - **MergedColumnParallelLinear_58**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.865 µs/fwd
+      - **SiluAndMul_22**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.541 µs/fwd
+      - **RowParallelLinear_45**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.236 µs/fwd
+    - **ReplicatedLinear_22**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.214 µs/fwd
+    - **TopK_22**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.689 µs/fwd
+    - **FusedMoE_22**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.808 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.451 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.794 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.587 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.781 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.142 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.974 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.432 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.175 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.181 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.373 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.326 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 26.440 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.158 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.438 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.153 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.409 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.710 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.538 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.605 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.792 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.236 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.087 µs/fwd
+
+### Layer 24
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_18**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.577 µs/fwd
+  - **GemmaRMSNorm_48**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.489 µs/fwd
+  - **Qwen3_5GatedDeltaNet_18**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.666 µs/fwd
+    - **MergedColumnParallelLinear_60**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.683 µs/fwd
+    - **MergedColumnParallelLinear_61**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.471 µs/fwd
+    - **RadixLinearAttention_18**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.585 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.694 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.954 µs/fwd
+    - **RMSNorm_18**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.307 µs/fwd
+    - **RowParallelLinear_48**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.799 µs/fwd
+  - **GemmaRMSNorm_49**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.221 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_24**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.787 µs/fwd
+    - **Qwen2MoeMLP_24**
+      - **MergedColumnParallelLinear_62**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.989 µs/fwd
+      - **SiluAndMul_24**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.600 µs/fwd
+      - **RowParallelLinear_49**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.331 µs/fwd
+    - **ReplicatedLinear_24**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.217 µs/fwd
+    - **TopK_24**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.738 µs/fwd
+    - **FusedMoE_24**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.702 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.927 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.870 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.238 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.042 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.650 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.009 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.449 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.118 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.154 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.411 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.961 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.984 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.997 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.393 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.160 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.448 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.883 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.549 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.492 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.799 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.126 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.112 µs/fwd
+
+### Layer 25
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_19**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.956 µs/fwd
+  - **GemmaRMSNorm_50**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.350 µs/fwd
+  - **Qwen3_5GatedDeltaNet_19**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.582 µs/fwd
+    - **MergedColumnParallelLinear_63**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.826 µs/fwd
+    - **MergedColumnParallelLinear_64**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.187 µs/fwd
+    - **RadixLinearAttention_19**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.664 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.666 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.657 µs/fwd
+    - **RMSNorm_19**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.269 µs/fwd
+    - **RowParallelLinear_50**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.760 µs/fwd
+  - **GemmaRMSNorm_51**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.238 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_25**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.685 µs/fwd
+    - **Qwen2MoeMLP_25**
+      - **MergedColumnParallelLinear_65**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.923 µs/fwd
+      - **SiluAndMul_25**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.482 µs/fwd
+      - **RowParallelLinear_51**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.294 µs/fwd
+    - **ReplicatedLinear_25**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.295 µs/fwd
+    - **TopK_25**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.738 µs/fwd
+    - **FusedMoE_25**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.286 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.179 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.817 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.038 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.050 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.970 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.960 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.438 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.078 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.327 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.521 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.647 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 26.749 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.419 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.379 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.810 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.433 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.910 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.489 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.402 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.855 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.361 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.026 µs/fwd
+
+### Layer 26
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_20**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.602 µs/fwd
+  - **GemmaRMSNorm_52**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.368 µs/fwd
+  - **Qwen3_5GatedDeltaNet_20**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.507 µs/fwd
+    - **MergedColumnParallelLinear_66**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.933 µs/fwd
+    - **MergedColumnParallelLinear_67**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.486 µs/fwd
+    - **RadixLinearAttention_20**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.411 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.565 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.590 µs/fwd
+    - **RMSNorm_20**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.296 µs/fwd
+    - **RowParallelLinear_52**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.593 µs/fwd
+  - **GemmaRMSNorm_53**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.211 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_26**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.622 µs/fwd
+    - **Qwen2MoeMLP_26**
+      - **MergedColumnParallelLinear_68**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.835 µs/fwd
+      - **SiluAndMul_26**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.467 µs/fwd
+      - **RowParallelLinear_53**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.225 µs/fwd
+    - **ReplicatedLinear_26**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.200 µs/fwd
+    - **TopK_26**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.719 µs/fwd
+    - **FusedMoE_26**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.269 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.661 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.989 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.711 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.263 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.149 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.980 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.586 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.217 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.263 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.497 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.819 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.576 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.655 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.395 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.949 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.623 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.862 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.495 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.543 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.844 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.143 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.982 µs/fwd
+
+### Layer 28
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_21**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.048 µs/fwd
+  - **GemmaRMSNorm_56**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.452 µs/fwd
+  - **Qwen3_5GatedDeltaNet_21**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.605 µs/fwd
+    - **MergedColumnParallelLinear_70**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.793 µs/fwd
+    - **MergedColumnParallelLinear_71**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.282 µs/fwd
+    - **RadixLinearAttention_21**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.500 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.629 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.937 µs/fwd
+    - **RMSNorm_21**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.270 µs/fwd
+    - **RowParallelLinear_56**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.701 µs/fwd
+  - **GemmaRMSNorm_57**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.205 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_28**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.803 µs/fwd
+    - **Qwen2MoeMLP_28**
+      - **MergedColumnParallelLinear_72**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.866 µs/fwd
+      - **SiluAndMul_28**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.585 µs/fwd
+      - **RowParallelLinear_57**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.464 µs/fwd
+    - **ReplicatedLinear_28**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.133 µs/fwd
+    - **TopK_28**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.595 µs/fwd
+    - **FusedMoE_28**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.175 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.424 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.945 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.410 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.952 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.525 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.055 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.565 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.237 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.323 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.471 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.657 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.837 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.138 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.461 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.842 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.554 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.900 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.390 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.264 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.672 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.103 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.983 µs/fwd
+
+### Layer 29
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_22**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.416 µs/fwd
+  - **GemmaRMSNorm_58**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.359 µs/fwd
+  - **Qwen3_5GatedDeltaNet_22**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.584 µs/fwd
+    - **MergedColumnParallelLinear_73**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.047 µs/fwd
+    - **MergedColumnParallelLinear_74**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.182 µs/fwd
+    - **RadixLinearAttention_22**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.693 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.660 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.711 µs/fwd
+    - **RMSNorm_22**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.304 µs/fwd
+    - **RowParallelLinear_58**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.994 µs/fwd
+  - **GemmaRMSNorm_59**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.226 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_29**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.693 µs/fwd
+    - **Qwen2MoeMLP_29**
+      - **MergedColumnParallelLinear_75**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.905 µs/fwd
+      - **SiluAndMul_29**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.485 µs/fwd
+      - **RowParallelLinear_59**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.258 µs/fwd
+    - **ReplicatedLinear_29**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.292 µs/fwd
+    - **TopK_29**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.813 µs/fwd
+    - **FusedMoE_29**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.737 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.192 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.961 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.660 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.701 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.805 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.408 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.574 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.167 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.292 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.523 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.981 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.022 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.032 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.418 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.730 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.562 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.828 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.411 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.561 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.775 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.099 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.025 µs/fwd
+
+### Layer 30
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_23**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.947 µs/fwd
+  - **GemmaRMSNorm_60**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.363 µs/fwd
+  - **Qwen3_5GatedDeltaNet_23**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.514 µs/fwd
+    - **MergedColumnParallelLinear_76**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.965 µs/fwd
+    - **MergedColumnParallelLinear_77**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.262 µs/fwd
+    - **RadixLinearAttention_23**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.402 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.576 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.595 µs/fwd
+    - **RMSNorm_23**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.309 µs/fwd
+    - **RowParallelLinear_60**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 7.014 µs/fwd
+  - **GemmaRMSNorm_61**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.234 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_30**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.704 µs/fwd
+    - **Qwen2MoeMLP_30**
+      - **MergedColumnParallelLinear_78**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.944 µs/fwd
+      - **SiluAndMul_30**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.509 µs/fwd
+      - **RowParallelLinear_61**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.234 µs/fwd
+    - **ReplicatedLinear_30**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.249 µs/fwd
+    - **TopK_30**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.602 µs/fwd
+    - **FusedMoE_30**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.086 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.687 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.912 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 12.519 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.066 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.634 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.210 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.570 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.174 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.329 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.554 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.412 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.489 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.409 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.391 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.874 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.588 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.872 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.459 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.444 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.860 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.509 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.962 µs/fwd
+
+### Layer 32
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_24**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.698 µs/fwd
+  - **GemmaRMSNorm_64**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.493 µs/fwd
+  - **Qwen3_5GatedDeltaNet_24**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.658 µs/fwd
+    - **MergedColumnParallelLinear_80**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.927 µs/fwd
+    - **MergedColumnParallelLinear_81**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.323 µs/fwd
+    - **RadixLinearAttention_24**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.516 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.700 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.980 µs/fwd
+    - **RMSNorm_24**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.314 µs/fwd
+    - **RowParallelLinear_64**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.763 µs/fwd
+  - **GemmaRMSNorm_65**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.214 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_32**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.777 µs/fwd
+    - **Qwen2MoeMLP_32**
+      - **MergedColumnParallelLinear_82**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.876 µs/fwd
+      - **SiluAndMul_32**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.604 µs/fwd
+      - **RowParallelLinear_65**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.374 µs/fwd
+    - **ReplicatedLinear_32**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.180 µs/fwd
+    - **TopK_32**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.787 µs/fwd
+    - **FusedMoE_32**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.373 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.323 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.823 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.026 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.240 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.130 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.963 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.435 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.144 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.157 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.394 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.116 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.463 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.574 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.427 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.981 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.441 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.867 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.613 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.457 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.790 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.170 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.111 µs/fwd
+
+### Layer 33
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_25**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.536 µs/fwd
+  - **GemmaRMSNorm_66**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.347 µs/fwd
+  - **Qwen3_5GatedDeltaNet_25**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.578 µs/fwd
+    - **MergedColumnParallelLinear_83**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.035 µs/fwd
+    - **MergedColumnParallelLinear_84**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.242 µs/fwd
+    - **RadixLinearAttention_25**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.629 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.653 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.684 µs/fwd
+    - **RMSNorm_25**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.256 µs/fwd
+    - **RowParallelLinear_66**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.935 µs/fwd
+  - **GemmaRMSNorm_67**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.230 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_33**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.688 µs/fwd
+    - **Qwen2MoeMLP_33**
+      - **MergedColumnParallelLinear_85**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.880 µs/fwd
+      - **SiluAndMul_33**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.457 µs/fwd
+      - **RowParallelLinear_67**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.285 µs/fwd
+    - **ReplicatedLinear_33**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.318 µs/fwd
+    - **TopK_33**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.927 µs/fwd
+    - **FusedMoE_33**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.643 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.375 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.868 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.788 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.864 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.096 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.055 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.455 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.131 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.124 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.434 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.861 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 23.756 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.160 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.374 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.831 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.374 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.894 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.456 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.519 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.811 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.085 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.062 µs/fwd
+
+### Layer 34
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_26**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.115 µs/fwd
+  - **GemmaRMSNorm_68**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.394 µs/fwd
+  - **Qwen3_5GatedDeltaNet_26**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.516 µs/fwd
+    - **MergedColumnParallelLinear_86**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.135 µs/fwd
+    - **MergedColumnParallelLinear_87**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.394 µs/fwd
+    - **RadixLinearAttention_26**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.414 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.571 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.638 µs/fwd
+    - **RMSNorm_26**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.297 µs/fwd
+    - **RowParallelLinear_68**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.920 µs/fwd
+  - **GemmaRMSNorm_69**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.205 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_34**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.622 µs/fwd
+    - **Qwen2MoeMLP_34**
+      - **MergedColumnParallelLinear_88**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.910 µs/fwd
+      - **SiluAndMul_34**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.484 µs/fwd
+      - **RowParallelLinear_69**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.225 µs/fwd
+    - **ReplicatedLinear_34**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.220 µs/fwd
+    - **TopK_34**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.587 µs/fwd
+    - **FusedMoE_34**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 53.104 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.461 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.929 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 12.094 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.283 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.167 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.190 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.600 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.157 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.317 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.537 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.193 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.661 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.396 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.399 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.977 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.579 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.884 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.503 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.430 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.861 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.097 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.924 µs/fwd
+
+### Layer 36
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_27**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.680 µs/fwd
+  - **GemmaRMSNorm_72**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.471 µs/fwd
+  - **Qwen3_5GatedDeltaNet_27**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.611 µs/fwd
+    - **MergedColumnParallelLinear_90**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.896 µs/fwd
+    - **MergedColumnParallelLinear_91**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.305 µs/fwd
+    - **RadixLinearAttention_27**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.493 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.638 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.942 µs/fwd
+    - **RMSNorm_27**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.280 µs/fwd
+    - **RowParallelLinear_72**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.660 µs/fwd
+  - **GemmaRMSNorm_73**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.213 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_36**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.785 µs/fwd
+    - **Qwen2MoeMLP_36**
+      - **MergedColumnParallelLinear_92**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.936 µs/fwd
+      - **SiluAndMul_36**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.600 µs/fwd
+      - **RowParallelLinear_73**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.356 µs/fwd
+    - **ReplicatedLinear_36**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.173 µs/fwd
+    - **TopK_36**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.670 µs/fwd
+    - **FusedMoE_36**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.633 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.155 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.984 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.789 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.024 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.955 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.206 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.569 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.138 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.240 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.530 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.489 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.423 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.634 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.251 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.822 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.601 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.890 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.380 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.356 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.646 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.327 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.979 µs/fwd
+
+### Layer 37
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_28**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.995 µs/fwd
+  - **GemmaRMSNorm_74**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.378 µs/fwd
+  - **Qwen3_5GatedDeltaNet_28**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.599 µs/fwd
+    - **MergedColumnParallelLinear_93**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.042 µs/fwd
+    - **MergedColumnParallelLinear_94**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.097 µs/fwd
+    - **RadixLinearAttention_28**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.685 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.665 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.655 µs/fwd
+    - **RMSNorm_28**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.287 µs/fwd
+    - **RowParallelLinear_74**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.874 µs/fwd
+  - **GemmaRMSNorm_75**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.222 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_37**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.648 µs/fwd
+    - **Qwen2MoeMLP_37**
+      - **MergedColumnParallelLinear_95**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.897 µs/fwd
+      - **SiluAndMul_37**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.478 µs/fwd
+      - **RowParallelLinear_75**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.270 µs/fwd
+    - **ReplicatedLinear_37**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.278 µs/fwd
+    - **TopK_37**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.787 µs/fwd
+    - **FusedMoE_37**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 53.575 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.958 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.965 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.900 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.504 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.037 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.025 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.611 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.181 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.359 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.479 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.749 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.854 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.319 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.402 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.832 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.566 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.819 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.522 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.406 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.892 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.125 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.057 µs/fwd
+
+### Layer 38
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_29**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.500 µs/fwd
+  - **GemmaRMSNorm_76**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.363 µs/fwd
+  - **Qwen3_5GatedDeltaNet_29**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.509 µs/fwd
+    - **MergedColumnParallelLinear_96**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.919 µs/fwd
+    - **MergedColumnParallelLinear_97**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.262 µs/fwd
+    - **RadixLinearAttention_29**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.389 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.555 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.600 µs/fwd
+    - **RMSNorm_29**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.307 µs/fwd
+    - **RowParallelLinear_76**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.673 µs/fwd
+  - **GemmaRMSNorm_77**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.215 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_38**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.679 µs/fwd
+    - **Qwen2MoeMLP_38**
+      - **MergedColumnParallelLinear_98**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.889 µs/fwd
+      - **SiluAndMul_38**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.518 µs/fwd
+      - **RowParallelLinear_77**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.222 µs/fwd
+    - **ReplicatedLinear_38**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.265 µs/fwd
+    - **TopK_38**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.656 µs/fwd
+    - **FusedMoE_38**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 54.128 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.456 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.975 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.761 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.216 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.041 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.062 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.589 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.198 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.298 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.674 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.371 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.630 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.773 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.254 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.786 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.605 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.910 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.393 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.304 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.568 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.113 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.943 µs/fwd
+
+### Layer 40
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_30**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.883 µs/fwd
+  - **GemmaRMSNorm_80**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.489 µs/fwd
+  - **Qwen3_5GatedDeltaNet_30**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.673 µs/fwd
+    - **MergedColumnParallelLinear_100**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.422 µs/fwd
+    - **MergedColumnParallelLinear_101**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.311 µs/fwd
+    - **RadixLinearAttention_30**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.516 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.722 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.904 µs/fwd
+    - **RMSNorm_30**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.305 µs/fwd
+    - **RowParallelLinear_80**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.741 µs/fwd
+  - **GemmaRMSNorm_81**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.226 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_40**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.803 µs/fwd
+    - **Qwen2MoeMLP_40**
+      - **MergedColumnParallelLinear_102**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.923 µs/fwd
+      - **SiluAndMul_40**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.613 µs/fwd
+      - **RowParallelLinear_81**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.381 µs/fwd
+    - **ReplicatedLinear_40**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.230 µs/fwd
+    - **TopK_40**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.768 µs/fwd
+    - **FusedMoE_40**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.038 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.641 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.946 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.614 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.429 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.879 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.064 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.572 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.135 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.243 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.635 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.765 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.569 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.845 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.365 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.647 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.579 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.942 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.344 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.340 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.614 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.251 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.984 µs/fwd
+
+### Layer 41
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_31**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.395 µs/fwd
+  - **GemmaRMSNorm_82**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.351 µs/fwd
+  - **Qwen3_5GatedDeltaNet_31**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.605 µs/fwd
+    - **MergedColumnParallelLinear_103**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.087 µs/fwd
+    - **MergedColumnParallelLinear_104**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.167 µs/fwd
+    - **RadixLinearAttention_31**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.640 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.532 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.480 µs/fwd
+    - **RMSNorm_31**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.276 µs/fwd
+    - **RowParallelLinear_82**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.679 µs/fwd
+  - **GemmaRMSNorm_83**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.214 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_41**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.670 µs/fwd
+    - **Qwen2MoeMLP_41**
+      - **MergedColumnParallelLinear_105**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.887 µs/fwd
+      - **SiluAndMul_41**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.454 µs/fwd
+      - **RowParallelLinear_83**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.266 µs/fwd
+    - **ReplicatedLinear_41**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.229 µs/fwd
+    - **TopK_41**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.669 µs/fwd
+    - **FusedMoE_41**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.359 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.532 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.989 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.226 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.711 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.273 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.151 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.594 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.246 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.335 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.689 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.077 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.950 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.952 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.321 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.905 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.604 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.752 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.453 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.257 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.817 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.062 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.128 µs/fwd
+
+### Layer 42
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_32**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.146 µs/fwd
+  - **GemmaRMSNorm_84**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.380 µs/fwd
+  - **Qwen3_5GatedDeltaNet_32**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.523 µs/fwd
+    - **MergedColumnParallelLinear_106**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.953 µs/fwd
+    - **MergedColumnParallelLinear_107**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.534 µs/fwd
+    - **RadixLinearAttention_32**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.455 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.582 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.550 µs/fwd
+    - **RMSNorm_32**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.319 µs/fwd
+    - **RowParallelLinear_84**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.772 µs/fwd
+  - **GemmaRMSNorm_85**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.221 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_42**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.630 µs/fwd
+    - **Qwen2MoeMLP_42**
+      - **MergedColumnParallelLinear_108**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.865 µs/fwd
+      - **SiluAndMul_42**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.471 µs/fwd
+      - **RowParallelLinear_85**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.257 µs/fwd
+    - **ReplicatedLinear_42**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.224 µs/fwd
+    - **TopK_42**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.767 µs/fwd
+    - **FusedMoE_42**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.785 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.439 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.768 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.898 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.871 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.168 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.095 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.464 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.126 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.230 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.449 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.865 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.457 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.842 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.340 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.992 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.432 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.787 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.412 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.352 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.787 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.093 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.136 µs/fwd
+
+### Layer 44
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_33**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.283 µs/fwd
+  - **GemmaRMSNorm_88**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.461 µs/fwd
+  - **Qwen3_5GatedDeltaNet_33**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.639 µs/fwd
+    - **MergedColumnParallelLinear_110**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.922 µs/fwd
+    - **MergedColumnParallelLinear_111**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.153 µs/fwd
+    - **RadixLinearAttention_33**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.558 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.670 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.914 µs/fwd
+    - **RMSNorm_33**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.266 µs/fwd
+    - **RowParallelLinear_88**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.692 µs/fwd
+  - **GemmaRMSNorm_89**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.187 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_44**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.760 µs/fwd
+    - **Qwen2MoeMLP_44**
+      - **MergedColumnParallelLinear_112**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.844 µs/fwd
+      - **SiluAndMul_44**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.577 µs/fwd
+      - **RowParallelLinear_89**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.364 µs/fwd
+    - **ReplicatedLinear_44**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.106 µs/fwd
+    - **TopK_44**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.826 µs/fwd
+    - **FusedMoE_44**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 50.977 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.204 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.772 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 10.740 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.601 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.030 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.850 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.457 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.156 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.190 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.441 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.365 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.507 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.575 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.421 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.053 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.414 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.720 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.494 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.473 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.856 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.069 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.105 µs/fwd
+
+### Layer 45
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_34**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.151 µs/fwd
+  - **GemmaRMSNorm_90**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.342 µs/fwd
+  - **Qwen3_5GatedDeltaNet_34**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.511 µs/fwd
+    - **MergedColumnParallelLinear_113**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.818 µs/fwd
+    - **MergedColumnParallelLinear_114**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.163 µs/fwd
+    - **RadixLinearAttention_34**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.593 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.577 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.562 µs/fwd
+    - **RMSNorm_34**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.301 µs/fwd
+    - **RowParallelLinear_90**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.728 µs/fwd
+  - **GemmaRMSNorm_91**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.235 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_45**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.685 µs/fwd
+    - **Qwen2MoeMLP_45**
+      - **MergedColumnParallelLinear_115**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.834 µs/fwd
+      - **SiluAndMul_45**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.502 µs/fwd
+      - **RowParallelLinear_91**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.282 µs/fwd
+    - **ReplicatedLinear_45**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.314 µs/fwd
+    - **TopK_45**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.738 µs/fwd
+    - **FusedMoE_45**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.547 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.370 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.868 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.739 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.819 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.072 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.881 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.448 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.196 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.133 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.406 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.253 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.305 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.338 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.291 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.138 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.435 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.849 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.457 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.326 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.756 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.390 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.120 µs/fwd
+
+### Layer 46
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_35**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.558 µs/fwd
+  - **GemmaRMSNorm_92**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.367 µs/fwd
+  - **Qwen3_5GatedDeltaNet_35**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.525 µs/fwd
+    - **MergedColumnParallelLinear_116**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.915 µs/fwd
+    - **MergedColumnParallelLinear_117**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.323 µs/fwd
+    - **RadixLinearAttention_35**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.405 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.554 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.575 µs/fwd
+    - **RMSNorm_35**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.282 µs/fwd
+    - **RowParallelLinear_92**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.633 µs/fwd
+  - **GemmaRMSNorm_93**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.211 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_46**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.689 µs/fwd
+    - **Qwen2MoeMLP_46**
+      - **MergedColumnParallelLinear_118**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.848 µs/fwd
+      - **SiluAndMul_46**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.497 µs/fwd
+      - **RowParallelLinear_93**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.238 µs/fwd
+    - **ReplicatedLinear_46**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.236 µs/fwd
+    - **TopK_46**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.667 µs/fwd
+    - **FusedMoE_46**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.246 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.269 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.788 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 12.469 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.865 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.984 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.907 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.454 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.154 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.326 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.361 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.036 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.652 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.855 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.458 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.108 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.417 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.929 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.520 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.452 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.834 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.287 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.162 µs/fwd
+
+### Layer 48
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_36**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.958 µs/fwd
+  - **GemmaRMSNorm_96**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.452 µs/fwd
+  - **Qwen3_5GatedDeltaNet_36**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.657 µs/fwd
+    - **MergedColumnParallelLinear_120**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.763 µs/fwd
+    - **MergedColumnParallelLinear_121**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.190 µs/fwd
+    - **RadixLinearAttention_36**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.536 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.687 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.892 µs/fwd
+    - **RMSNorm_36**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.306 µs/fwd
+    - **RowParallelLinear_96**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.716 µs/fwd
+  - **GemmaRMSNorm_97**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.243 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_48**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.822 µs/fwd
+    - **Qwen2MoeMLP_48**
+      - **MergedColumnParallelLinear_122**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.911 µs/fwd
+      - **SiluAndMul_48**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.624 µs/fwd
+      - **RowParallelLinear_97**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.342 µs/fwd
+    - **ReplicatedLinear_48**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.245 µs/fwd
+    - **TopK_48**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.707 µs/fwd
+    - **FusedMoE_48**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.977 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.487 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.846 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.300 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.213 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.541 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.970 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.433 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.213 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.129 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.475 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.875 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.546 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.141 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.388 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.051 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.441 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.785 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.526 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.579 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.801 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.393 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.095 µs/fwd
+
+### Layer 49
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_37**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.498 µs/fwd
+  - **GemmaRMSNorm_98**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.378 µs/fwd
+  - **Qwen3_5GatedDeltaNet_37**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.471 µs/fwd
+    - **MergedColumnParallelLinear_123**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.813 µs/fwd
+    - **MergedColumnParallelLinear_124**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.331 µs/fwd
+    - **RadixLinearAttention_37**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.528 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.528 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.560 µs/fwd
+    - **RMSNorm_37**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.260 µs/fwd
+    - **RowParallelLinear_98**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.811 µs/fwd
+  - **GemmaRMSNorm_99**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.200 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_49**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.678 µs/fwd
+    - **Qwen2MoeMLP_49**
+      - **MergedColumnParallelLinear_125**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.833 µs/fwd
+      - **SiluAndMul_49**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.442 µs/fwd
+      - **RowParallelLinear_99**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.269 µs/fwd
+    - **ReplicatedLinear_49**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.260 µs/fwd
+    - **TopK_49**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.763 µs/fwd
+    - **FusedMoE_49**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 52.324 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.097 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.777 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.193 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.017 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.822 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.005 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.429 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.069 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.287 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.406 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 8.010 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.330 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.693 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.406 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.793 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.436 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.864 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.514 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.423 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.810 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.116 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.965 µs/fwd
+
+### Layer 50
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_38**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.338 µs/fwd
+  - **GemmaRMSNorm_100**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.372 µs/fwd
+  - **Qwen3_5GatedDeltaNet_38**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.532 µs/fwd
+    - **MergedColumnParallelLinear_126**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.024 µs/fwd
+    - **MergedColumnParallelLinear_127**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.498 µs/fwd
+    - **RadixLinearAttention_38**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.403 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.574 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.594 µs/fwd
+    - **RMSNorm_38**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.331 µs/fwd
+    - **RowParallelLinear_100**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.711 µs/fwd
+  - **GemmaRMSNorm_101**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.239 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_50**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.616 µs/fwd
+    - **Qwen2MoeMLP_50**
+      - **MergedColumnParallelLinear_128**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.900 µs/fwd
+      - **SiluAndMul_50**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.467 µs/fwd
+      - **RowParallelLinear_101**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.222 µs/fwd
+    - **ReplicatedLinear_50**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.328 µs/fwd
+    - **TopK_50**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.754 µs/fwd
+    - **FusedMoE_50**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.749 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.135 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.966 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.800 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.275 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.983 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.994 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.594 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.137 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.355 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.582 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.500 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.461 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.121 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.420 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.883 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.569 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.862 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.515 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.504 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.692 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.126 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.990 µs/fwd
+
+### Layer 52
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_39**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.967 µs/fwd
+  - **GemmaRMSNorm_104**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.494 µs/fwd
+  - **Qwen3_5GatedDeltaNet_39**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.651 µs/fwd
+    - **MergedColumnParallelLinear_130**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.901 µs/fwd
+    - **MergedColumnParallelLinear_131**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.283 µs/fwd
+    - **RadixLinearAttention_39**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.571 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.676 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.946 µs/fwd
+    - **RMSNorm_39**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.280 µs/fwd
+    - **RowParallelLinear_104**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.734 µs/fwd
+  - **GemmaRMSNorm_105**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.205 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_52**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.776 µs/fwd
+    - **Qwen2MoeMLP_52**
+      - **MergedColumnParallelLinear_132**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.839 µs/fwd
+      - **SiluAndMul_52**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.565 µs/fwd
+      - **RowParallelLinear_105**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.384 µs/fwd
+    - **ReplicatedLinear_52**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.085 µs/fwd
+    - **TopK_52**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.756 µs/fwd
+    - **FusedMoE_52**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.622 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.659 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.817 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.304 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.911 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.990 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.910 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.409 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.146 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.308 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.285 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.317 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.720 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.987 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.386 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.029 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.393 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.816 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.513 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.398 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.861 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 2.975 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.177 µs/fwd
+
+### Layer 53
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_40**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.158 µs/fwd
+  - **GemmaRMSNorm_106**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.325 µs/fwd
+  - **Qwen3_5GatedDeltaNet_40**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.501 µs/fwd
+    - **MergedColumnParallelLinear_133**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.127 µs/fwd
+    - **MergedColumnParallelLinear_134**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.224 µs/fwd
+    - **RadixLinearAttention_40**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.569 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.571 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.491 µs/fwd
+    - **RMSNorm_40**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.302 µs/fwd
+    - **RowParallelLinear_106**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.671 µs/fwd
+  - **GemmaRMSNorm_107**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.240 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_53**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.696 µs/fwd
+    - **Qwen2MoeMLP_53**
+      - **MergedColumnParallelLinear_135**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.853 µs/fwd
+      - **SiluAndMul_53**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.497 µs/fwd
+      - **RowParallelLinear_107**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.353 µs/fwd
+    - **ReplicatedLinear_53**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.278 µs/fwd
+    - **TopK_53**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.742 µs/fwd
+    - **FusedMoE_53**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.381 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.500 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.797 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 12.315 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.817 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.128 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.101 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.451 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.260 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.285 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.447 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.706 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.483 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.599 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.333 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.094 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.419 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.883 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.487 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.361 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.782 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.557 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.105 µs/fwd
+
+### Layer 54
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_41**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.147 µs/fwd
+  - **GemmaRMSNorm_108**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.409 µs/fwd
+  - **Qwen3_5GatedDeltaNet_41**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.532 µs/fwd
+    - **MergedColumnParallelLinear_136**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.916 µs/fwd
+    - **MergedColumnParallelLinear_137**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.249 µs/fwd
+    - **RadixLinearAttention_41**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.408 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.550 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.551 µs/fwd
+    - **RMSNorm_41**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.261 µs/fwd
+    - **RowParallelLinear_108**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.696 µs/fwd
+  - **GemmaRMSNorm_109**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.207 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_54**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.658 µs/fwd
+    - **Qwen2MoeMLP_54**
+      - **MergedColumnParallelLinear_138**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.842 µs/fwd
+      - **SiluAndMul_54**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.464 µs/fwd
+      - **RowParallelLinear_109**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.215 µs/fwd
+    - **ReplicatedLinear_54**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.248 µs/fwd
+    - **TopK_54**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.647 µs/fwd
+    - **FusedMoE_54**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 50.540 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.011 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.795 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.363 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.585 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.169 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.916 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.452 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.096 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.347 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.337 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.300 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 23.739 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 16.960 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.395 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.976 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.435 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.770 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.550 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.471 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.942 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.058 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.162 µs/fwd
+
+### Layer 56
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_42**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.732 µs/fwd
+  - **GemmaRMSNorm_112**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.471 µs/fwd
+  - **Qwen3_5GatedDeltaNet_42**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.644 µs/fwd
+    - **MergedColumnParallelLinear_140**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.781 µs/fwd
+    - **MergedColumnParallelLinear_141**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 9.095 µs/fwd
+    - **RadixLinearAttention_42**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.564 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.676 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 11.033 µs/fwd
+    - **RMSNorm_42**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.273 µs/fwd
+    - **RowParallelLinear_112**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.696 µs/fwd
+  - **GemmaRMSNorm_113**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.231 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_56**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.842 µs/fwd
+    - **Qwen2MoeMLP_56**
+      - **MergedColumnParallelLinear_142**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.919 µs/fwd
+      - **SiluAndMul_56**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.622 µs/fwd
+      - **RowParallelLinear_113**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.362 µs/fwd
+    - **ReplicatedLinear_56**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.158 µs/fwd
+    - **TopK_56**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.725 µs/fwd
+    - **FusedMoE_56**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 50.181 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.453 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.830 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.056 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.006 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.139 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.111 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.455 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.188 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.234 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.290 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.300 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 22.868 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 16.564 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.444 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.960 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.432 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.847 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.569 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.469 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.902 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.288 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.135 µs/fwd
+
+### Layer 57
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_43**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.358 µs/fwd
+  - **GemmaRMSNorm_114**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.269 µs/fwd
+  - **Qwen3_5GatedDeltaNet_43**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.489 µs/fwd
+    - **MergedColumnParallelLinear_143**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 13.034 µs/fwd
+    - **MergedColumnParallelLinear_144**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.169 µs/fwd
+    - **RadixLinearAttention_43**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.547 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.525 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.584 µs/fwd
+    - **RMSNorm_43**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.314 µs/fwd
+    - **RowParallelLinear_114**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.728 µs/fwd
+  - **GemmaRMSNorm_115**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.207 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_57**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.675 µs/fwd
+    - **Qwen2MoeMLP_57**
+      - **MergedColumnParallelLinear_145**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.836 µs/fwd
+      - **SiluAndMul_57**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.447 µs/fwd
+      - **RowParallelLinear_115**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.318 µs/fwd
+    - **ReplicatedLinear_57**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.325 µs/fwd
+    - **TopK_57**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.768 µs/fwd
+    - **FusedMoE_57**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 49.899 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.191 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.859 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.749 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 5.656 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.710 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 3.953 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.437 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.136 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.163 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.531 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.988 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 21.745 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 15.761 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.427 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.719 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.416 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.948 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.444 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.504 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.788 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.146 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.917 µs/fwd
+
+### Layer 58
+
+
+#### AMD — inferred
+
+- **Qwen3_5LinearDecoderLayer_44**
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 9.185 µs/fwd
+  - **GemmaRMSNorm_116**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.358 µs/fwd
+  - **Qwen3_5GatedDeltaNet_44**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 4.516 µs/fwd
+    - **MergedColumnParallelLinear_146**
+      - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.987 µs/fwd
+    - **MergedColumnParallelLinear_147**
+      - `rocBLAS/Tensile MT16x16x1024` — 1 calls/fwd; 8.469 µs/fwd
+    - **RadixLinearAttention_44**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.439 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 4.555 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.560 µs/fwd
+    - **RMSNorm_44**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 4.328 µs/fwd
+    - **RowParallelLinear_116**
+      - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.676 µs/fwd
+  - **GemmaRMSNorm_117**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.244 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_58**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.670 µs/fwd
+    - **Qwen2MoeMLP_58**
+      - **MergedColumnParallelLinear_148**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.878 µs/fwd
+      - **SiluAndMul_58**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.492 µs/fwd
+      - **RowParallelLinear_117**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.315 µs/fwd
+    - **ReplicatedLinear_58**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.207 µs/fwd
+    - **TopK_58**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.746 µs/fwd
+    - **FusedMoE_58**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 50.600 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5LinearDecoderLayer**
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.524 µs/fwd
+  - **Qwen3_5GatedDeltaNet**
+    - `fused_qkvzba_split_reshape_cat_contiguous_kernel` — 1 calls/fwd; 2.947 µs/fwd
+    - **MergedColumnParallelLinear (QKV/Z projection)**
+      - `nvjet_sm100_tst_64x16_64x16_4x1_v_bz_TNT` — 1 calls/fwd; 11.042 µs/fwd
+    - **MergedColumnParallelLinear (B/A gating projection)**
+      - `nvjet_sm100_tst_64x16_64x16_1x1_h_bz_splitK_TNT` — 1 calls/fwd; 4.973 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 2.831 µs/fwd
+    - **RadixLinearAttention**
+      - `_causal_conv1d_update_kernel` — 1 calls/fwd; 4.090 µs/fwd
+      - `fused_qkv_split_gdn_prefill_kernel` — 1 calls/fwd; 1.588 µs/fwd
+      - `fused_sigmoid_gating_delta_rule_update_kernel` — 1 calls/fwd; 10.243 µs/fwd
+    - **RMSNorm (gated output)**
+      - `_layer_norm_fwd_1pass_kernel` — 1 calls/fwd; 2.339 µs/fwd
+    - **RowParallelLinear (attention output)**
+      - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.540 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.291 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 22.830 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 16.555 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.412 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.824 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.595 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.830 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.470 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.417 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.827 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.100 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.987 µs/fwd
+
+## Decode (TARGET_VERIFY): full_attention
+
+
+### Layer 3
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_0**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.642 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.091 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 15.786 µs/fwd
+  - **GemmaRMSNorm_6**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.258 µs/fwd
+  - **QKVParallelLinear_0**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.586 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.683 µs/fwd
+  - **RadixAttention_0**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.208 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.256 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 48.452 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.636 µs/fwd
+  - **RowParallelLinear_6**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.870 µs/fwd
+  - **GemmaRMSNorm_7**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.079 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_3**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.768 µs/fwd
+    - **Qwen2MoeMLP_3**
+      - **MergedColumnParallelLinear_9**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.973 µs/fwd
+      - **SiluAndMul_3**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.478 µs/fwd
+      - **RowParallelLinear_7**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.407 µs/fwd
+    - **ReplicatedLinear_3**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.233 µs/fwd
+    - **TopK_3**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.814 µs/fwd
+    - **FusedMoE_3**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.763 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.609 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.527 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.310 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.094 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.830 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.145 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.965 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.699 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.410 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.230 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.144 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.172 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.375 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.915 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.432 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.893 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.518 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.452 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.816 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.392 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.920 µs/fwd
+
+### Layer 7
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_1**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.605 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.088 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.052 µs/fwd
+  - **GemmaRMSNorm_14**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.384 µs/fwd
+  - **QKVParallelLinear_1**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.480 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.520 µs/fwd
+  - **RadixAttention_1**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.172 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.235 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.660 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.394 µs/fwd
+  - **RowParallelLinear_14**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 7.160 µs/fwd
+  - **GemmaRMSNorm_15**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.227 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_7**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.840 µs/fwd
+    - **Qwen2MoeMLP_7**
+      - **MergedColumnParallelLinear_19**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.915 µs/fwd
+      - **SiluAndMul_7**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.531 µs/fwd
+      - **RowParallelLinear_15**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.359 µs/fwd
+    - **ReplicatedLinear_7**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.313 µs/fwd
+    - **TopK_7**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.893 µs/fwd
+    - **FusedMoE_7**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.910 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.637 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.493 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.331 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.970 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.796 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.445 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.986 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.710 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.676 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.722 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.573 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.677 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.350 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.022 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.545 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.701 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.484 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.340 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.758 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.161 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.016 µs/fwd
+
+### Layer 11
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_2**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.643 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.229 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.798 µs/fwd
+  - **GemmaRMSNorm_22**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.274 µs/fwd
+  - **QKVParallelLinear_2**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.562 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.653 µs/fwd
+  - **RadixAttention_2**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.248 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.274 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 57.853 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.542 µs/fwd
+  - **RowParallelLinear_22**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.867 µs/fwd
+  - **GemmaRMSNorm_23**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.182 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_11**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.833 µs/fwd
+    - **Qwen2MoeMLP_11**
+      - **MergedColumnParallelLinear_29**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.839 µs/fwd
+      - **SiluAndMul_11**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.475 µs/fwd
+      - **RowParallelLinear_23**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.412 µs/fwd
+    - **ReplicatedLinear_11**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.260 µs/fwd
+    - **TopK_11**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.889 µs/fwd
+    - **FusedMoE_11**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.735 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.503 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.417 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.322 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.027 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.824 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.205 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.885 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 25.057 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.515 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.559 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 28.175 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.496 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.431 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.033 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.408 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.886 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.532 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.521 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.746 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.272 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.973 µs/fwd
+
+### Layer 15
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_3**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.598 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.182 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.084 µs/fwd
+  - **GemmaRMSNorm_30**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.273 µs/fwd
+  - **QKVParallelLinear_3**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.593 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.620 µs/fwd
+  - **RadixAttention_3**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.176 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.233 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 62.820 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.322 µs/fwd
+  - **RowParallelLinear_30**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.618 µs/fwd
+  - **GemmaRMSNorm_31**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.176 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_15**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.798 µs/fwd
+    - **Qwen2MoeMLP_15**
+      - **MergedColumnParallelLinear_39**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.844 µs/fwd
+      - **SiluAndMul_15**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.605 µs/fwd
+      - **RowParallelLinear_31**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.422 µs/fwd
+    - **ReplicatedLinear_15**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.324 µs/fwd
+    - **TopK_15**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.932 µs/fwd
+    - **FusedMoE_15**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.595 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.801 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.019 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.272 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.973 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.674 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.440 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 4.070 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.751 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.607 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.289 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 27.479 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 19.588 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.378 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.042 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.575 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.712 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.519 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.234 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.791 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.103 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.114 µs/fwd
+
+### Layer 19
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_4**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.598 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.239 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.175 µs/fwd
+  - **GemmaRMSNorm_38**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.249 µs/fwd
+  - **QKVParallelLinear_4**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.420 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.634 µs/fwd
+  - **RadixAttention_4**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.203 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.253 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 62.778 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.310 µs/fwd
+  - **RowParallelLinear_38**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.762 µs/fwd
+  - **GemmaRMSNorm_39**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.195 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_19**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.736 µs/fwd
+    - **Qwen2MoeMLP_19**
+      - **MergedColumnParallelLinear_49**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.860 µs/fwd
+      - **SiluAndMul_19**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.585 µs/fwd
+      - **RowParallelLinear_39**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.360 µs/fwd
+    - **ReplicatedLinear_19**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.243 µs/fwd
+    - **TopK_19**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.885 µs/fwd
+    - **FusedMoE_19**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.855 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.665 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.520 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.268 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.998 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.660 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.445 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.959 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 25.194 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.444 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.197 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 26.532 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.791 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.417 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.106 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.576 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.766 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.461 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.313 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.747 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.066 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.155 µs/fwd
+
+### Layer 23
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_5**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.600 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.182 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.305 µs/fwd
+  - **GemmaRMSNorm_46**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.266 µs/fwd
+  - **QKVParallelLinear_5**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.211 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.604 µs/fwd
+  - **RadixAttention_5**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.158 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.211 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.048 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.340 µs/fwd
+  - **RowParallelLinear_46**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.805 µs/fwd
+  - **GemmaRMSNorm_47**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.158 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_23**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.776 µs/fwd
+    - **Qwen2MoeMLP_23**
+      - **MergedColumnParallelLinear_59**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.931 µs/fwd
+      - **SiluAndMul_23**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.585 µs/fwd
+      - **RowParallelLinear_47**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.368 µs/fwd
+    - **ReplicatedLinear_23**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.270 µs/fwd
+    - **TopK_23**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.919 µs/fwd
+    - **FusedMoE_23**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.195 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.514 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 5.779 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.195 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.796 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.830 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.157 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.878 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.638 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.380 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.510 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.677 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.245 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.424 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.801 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.439 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.853 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.481 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.405 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.843 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.154 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.046 µs/fwd
+
+### Layer 27
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_6**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.578 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.207 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.057 µs/fwd
+  - **GemmaRMSNorm_54**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.230 µs/fwd
+  - **QKVParallelLinear_6**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.447 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.594 µs/fwd
+  - **RadixAttention_6**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.198 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.249 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.113 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.422 µs/fwd
+  - **RowParallelLinear_54**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.669 µs/fwd
+  - **GemmaRMSNorm_55**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.196 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_27**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.759 µs/fwd
+    - **Qwen2MoeMLP_27**
+      - **MergedColumnParallelLinear_69**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.918 µs/fwd
+      - **SiluAndMul_27**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.594 µs/fwd
+      - **RowParallelLinear_55**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.362 µs/fwd
+    - **ReplicatedLinear_27**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.254 µs/fwd
+    - **TopK_27**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.843 µs/fwd
+    - **FusedMoE_27**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 50.362 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.521 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.385 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.354 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.032 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.847 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.173 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.932 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.907 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.443 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.533 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 25.084 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.094 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.390 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.014 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.455 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.871 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.404 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.411 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.854 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.023 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.951 µs/fwd
+
+### Layer 31
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_7**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.602 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.168 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.150 µs/fwd
+  - **GemmaRMSNorm_62**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.251 µs/fwd
+  - **QKVParallelLinear_7**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.445 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.613 µs/fwd
+  - **RadixAttention_7**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.164 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.227 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.091 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.305 µs/fwd
+  - **RowParallelLinear_62**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.981 µs/fwd
+  - **GemmaRMSNorm_63**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.165 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_31**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.762 µs/fwd
+    - **Qwen2MoeMLP_31**
+      - **MergedColumnParallelLinear_79**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.894 µs/fwd
+      - **SiluAndMul_31**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.586 µs/fwd
+      - **RowParallelLinear_63**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.354 µs/fwd
+    - **ReplicatedLinear_31**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.305 µs/fwd
+    - **TopK_31**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.805 µs/fwd
+    - **FusedMoE_31**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.398 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.590 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.197 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.364 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.932 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.784 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.195 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.784 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.472 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.578 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.863 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.950 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 18.037 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.422 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.916 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.464 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.802 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.464 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.524 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.738 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.081 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.976 µs/fwd
+
+### Layer 35
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_8**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.587 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.205 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.193 µs/fwd
+  - **GemmaRMSNorm_70**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.222 µs/fwd
+  - **QKVParallelLinear_8**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.190 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.600 µs/fwd
+  - **RadixAttention_8**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.181 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.251 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.162 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.484 µs/fwd
+  - **RowParallelLinear_70**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.974 µs/fwd
+  - **GemmaRMSNorm_71**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.186 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_35**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.750 µs/fwd
+    - **Qwen2MoeMLP_35**
+      - **MergedColumnParallelLinear_89**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.874 µs/fwd
+      - **SiluAndMul_35**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.591 µs/fwd
+      - **RowParallelLinear_71**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.422 µs/fwd
+    - **ReplicatedLinear_35**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.274 µs/fwd
+    - **TopK_35**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.873 µs/fwd
+    - **FusedMoE_35**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.557 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.630 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.100 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.374 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.947 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.957 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.168 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.840 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.444 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.407 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.738 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.727 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.787 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.408 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.030 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.408 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.851 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.520 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.599 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.789 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.469 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.901 µs/fwd
+
+### Layer 39
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_9**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.611 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.167 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.149 µs/fwd
+  - **GemmaRMSNorm_78**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.287 µs/fwd
+  - **QKVParallelLinear_9**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.471 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.624 µs/fwd
+  - **RadixAttention_9**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.165 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.235 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.025 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.465 µs/fwd
+  - **RowParallelLinear_78**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.772 µs/fwd
+  - **GemmaRMSNorm_79**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.147 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_39**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.754 µs/fwd
+    - **Qwen2MoeMLP_39**
+      - **MergedColumnParallelLinear_99**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.891 µs/fwd
+      - **SiluAndMul_39**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.569 µs/fwd
+      - **RowParallelLinear_79**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.371 µs/fwd
+    - **ReplicatedLinear_39**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.262 µs/fwd
+    - **TopK_39**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.884 µs/fwd
+    - **FusedMoE_39**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.678 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.651 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.689 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.326 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.002 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.679 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.441 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 4.089 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.599 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.559 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.478 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 23.891 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.404 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.246 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.040 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.561 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.620 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.472 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.226 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.850 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 2.972 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.024 µs/fwd
+
+### Layer 43
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_10**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.551 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.181 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.027 µs/fwd
+  - **GemmaRMSNorm_86**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.208 µs/fwd
+  - **QKVParallelLinear_10**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.427 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.577 µs/fwd
+  - **RadixAttention_10**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.156 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.220 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 63.362 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.332 µs/fwd
+  - **RowParallelLinear_86**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.694 µs/fwd
+  - **GemmaRMSNorm_87**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.172 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_43**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.759 µs/fwd
+    - **Qwen2MoeMLP_43**
+      - **MergedColumnParallelLinear_109**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.883 µs/fwd
+      - **SiluAndMul_43**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.596 µs/fwd
+      - **RowParallelLinear_87**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.405 µs/fwd
+    - **ReplicatedLinear_43**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.242 µs/fwd
+    - **TopK_43**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.941 µs/fwd
+    - **FusedMoE_43**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.280 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.650 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.120 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.338 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.128 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.732 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.442 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 4.046 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 25.229 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.622 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.090 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.241 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.931 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.329 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.083 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.612 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.807 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.522 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.275 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.868 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 2.964 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 3.081 µs/fwd
+
+### Layer 47
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_11**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.625 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.181 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.113 µs/fwd
+  - **GemmaRMSNorm_94**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.276 µs/fwd
+  - **QKVParallelLinear_11**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.158 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.651 µs/fwd
+  - **RadixAttention_11**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.214 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.382 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 62.853 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.484 µs/fwd
+  - **RowParallelLinear_94**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.747 µs/fwd
+  - **GemmaRMSNorm_95**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.169 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_47**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.741 µs/fwd
+    - **Qwen2MoeMLP_47**
+      - **MergedColumnParallelLinear_119**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.942 µs/fwd
+      - **SiluAndMul_47**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.581 µs/fwd
+      - **RowParallelLinear_95**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.351 µs/fwd
+    - **ReplicatedLinear_47**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.280 µs/fwd
+    - **TopK_47**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.842 µs/fwd
+    - **FusedMoE_47**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 50.357 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.484 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 5.872 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.319 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.066 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.930 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.157 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.830 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.505 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.362 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.972 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 23.628 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.400 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.385 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 11.059 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.392 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.892 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.536 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.520 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.834 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.500 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.915 µs/fwd
+
+### Layer 51
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_12**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.679 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.187 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.160 µs/fwd
+  - **GemmaRMSNorm_102**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.222 µs/fwd
+  - **QKVParallelLinear_12**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.540 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.676 µs/fwd
+  - **RadixAttention_12**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.156 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.324 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 62.939 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.365 µs/fwd
+  - **RowParallelLinear_102**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.696 µs/fwd
+  - **GemmaRMSNorm_103**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.185 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_51**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.796 µs/fwd
+    - **Qwen2MoeMLP_51**
+      - **MergedColumnParallelLinear_129**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.919 µs/fwd
+      - **SiluAndMul_51**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.595 µs/fwd
+      - **RowParallelLinear_103**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.355 µs/fwd
+    - **ReplicatedLinear_51**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.226 µs/fwd
+    - **TopK_51**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.871 µs/fwd
+    - **FusedMoE_51**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 51.177 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.520 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.428 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.389 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.966 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.958 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.168 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.873 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.914 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.358 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.081 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 24.692 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 17.841 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.391 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.850 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.429 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.867 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.522 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.425 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.871 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.322 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.902 µs/fwd
+
+### Layer 55
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_13**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.725 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.200 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.057 µs/fwd
+  - **GemmaRMSNorm_110**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.282 µs/fwd
+  - **QKVParallelLinear_13**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.505 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.749 µs/fwd
+  - **RadixAttention_13**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.224 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.382 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 62.967 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.394 µs/fwd
+  - **RowParallelLinear_110**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.749 µs/fwd
+  - **GemmaRMSNorm_111**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.186 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_55**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.755 µs/fwd
+    - **Qwen2MoeMLP_55**
+      - **MergedColumnParallelLinear_139**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.888 µs/fwd
+      - **SiluAndMul_55**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.578 µs/fwd
+      - **RowParallelLinear_111**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.363 µs/fwd
+    - **ReplicatedLinear_55**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.376 µs/fwd
+    - **TopK_55**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.856 µs/fwd
+    - **FusedMoE_55**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 49.053 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.512 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.114 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.398 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 4.077 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.807 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.180 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.850 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.611 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.478 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.912 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 20.641 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 16.141 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.449 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.906 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.388 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.881 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.515 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.530 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.767 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.234 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.938 µs/fwd
+
+### Layer 59
+
+
+#### AMD — inferred
+
+- **Qwen3_5AttentionDecoderLayer_14**
+  - `_fused_qk_gemma_rmsnorm_gate_kernel` — 1 calls/fwd; 4.693 µs/fwd
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 4.182 µs/fwd
+  - `aiter::cross_device_reduce_1stage` — 1 calls/fwd; 8.171 µs/fwd
+  - **GemmaRMSNorm_118**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.350 µs/fwd
+  - **QKVParallelLinear_14**
+    - `rocBLAS/Tensile MT32x16x1024` — 1 calls/fwd; 12.396 µs/fwd
+  - **MRotaryEmbedding_0**
+    - `_triton_mrope_forward_fused` — 1 calls/fwd; 4.682 µs/fwd
+  - **RadixAttention_14**
+    - `reshape_and_cache_flash` — 1 calls/fwd; 4.165 µs/fwd
+    - `at::native::vectorized_elementwise_kernel` — 1 calls/fwd; 4.313 µs/fwd
+    - `kernel_unified_attention_3d_num_query_heads_8_num_queries_per_kv_8_BLOCK_SIZE_16_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128_num_warps_2_waves_per_eu...` — 1 calls/fwd; 62.966 µs/fwd
+    - `reduce_segments_num_query_heads_8_TILE_SIZE_16_HEAD_SIZE_256_NUM_SEGMENTS_PER_SEQ_128` — 1 calls/fwd; 19.479 µs/fwd
+  - **RowParallelLinear_118**
+    - `hgemm_bf16_16x64x256x3_SPK2_W1x1x2_BLDS1_TN_AS1_0` — 1 calls/fwd; 6.719 µs/fwd
+  - **GemmaRMSNorm_119**
+    - `_gemma_fused_add_rmsnorm_kernel` — 1 calls/fwd; 4.147 µs/fwd
+  - **Qwen2MoeSparseMoeBlock_59**
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 4.754 µs/fwd
+    - **Qwen2MoeMLP_59**
+      - **MergedColumnParallelLinear_149**
+        - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 4.889 µs/fwd
+      - **SiluAndMul_59**
+        - `sgl_hip::activation::act_and_mul_kernel` — 1 calls/fwd; 4.574 µs/fwd
+      - **RowParallelLinear_119**
+        - `rocBLAS/Tensile MT16x16x128` — 1 calls/fwd; 4.342 µs/fwd
+    - **ReplicatedLinear_59**
+      - `hgemm_bf16_16x64x64x8_SPK8_W1x2x1_BLDS1_TN_AS1_0` — 1 calls/fwd; 5.230 µs/fwd
+    - **TopK_59**
+      - `vllm::moe::topkGatingSoftmax` — 1 calls/fwd; 9.818 µs/fwd
+    - **FusedMoE_59**
+      - `aiter::fmoe_bf16_pertokenMXfp4_g1u1_flat_novs_silu_16x256` — 1 calls/fwd; 49.341 µs/fwd
+
+#### NVIDIA — inferred
+
+- **Qwen3_5AttentionDecoderLayer**
+  - `_fused_sigmoid_mul_kernel` — 1 calls/fwd; 1.493 µs/fwd
+  - **GemmaRMSNorm (input; may fuse preceding reduction)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 6.463 µs/fwd
+  - **QKVParallelLinear**
+    - `nvjet_sm100_tst_64x16_64x16_2x1_2cta_v_bz_splitK_TNT` — 1 calls/fwd; 9.347 µs/fwd
+    - `cublasLt::splitKreduce_kernel` — 1 calls/fwd; 3.979 µs/fwd
+  - **Fused Q/K preparation + MRotaryEmbedding (cross-module)**
+    - `_fused_qk_rmsnorm_rope_gate_kernel` — 1 calls/fwd; 2.927 µs/fwd
+  - **RadixAttention**
+    - `at::native::vectorized_elementwise_kernel` — 2 calls/fwd; 2.202 µs/fwd
+    - `(anonymous namespace)::fused_fp8_qkv_kv_cache_kernel` — 1 calls/fwd; 3.831 µs/fwd
+    - `fmhaSm100fKernel_QkvE4m3OBfloat16H256PagedKvCausalP16MultiCtasKvVarSeqQ32Kv128StaticSwapsAbForGen` — 1 calls/fwd; 24.761 µs/fwd
+  - **RowParallelLinear (attention output)**
+    - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 6.329 µs/fwd
+  - **Fused attention reduction + GemmaRMSNorm (cross-module)**
+    - `flashinfer::trtllm_mnnvl_allreduce::oneshotAllreduceFusionKernel` — 1 calls/fwd; 7.449 µs/fwd
+  - **Qwen2MoeSparseMoeBlock**
+    - `bmm_E2m1_E2m1E2m1_Fp32_Ab16_Bb16_Cb16_t128x8x512_s5_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_ldgsts_ldgstsSf_rgTma_clmp_swiGlu_dynB_...` — 1 calls/fwd; 20.221 µs/fwd
+    - `bmm_Bfloat16_E2m1E2m1_Fp32_Ab16_Bb16tokFp32_t128x8x256_s9_et128x8_m128x8x64_c1x1x1_rM_TN_transOut_schPd2x1x2x3_biasFp32M_bN_rgTma_clmp_dynB_sm100f` — 1 calls/fwd; 15.956 µs/fwd
+    - `_fused_gate_sigmoid_mul_add_kernel` — 1 calls/fwd; 2.540 µs/fwd
+    - **Projection work (shared expert/router attribution ambiguous)**
+      - `nvjet_sm100_tst_32x64_64x16_4x1_v_bz_splitK_TNN` — 2 calls/fwd; 10.837 µs/fwd
+      - `memcpy32_post` — 1 calls/fwd; 1.438 µs/fwd
+      - `cublasLt::splitKreduce_kernel` — 2 calls/fwd; 5.887 µs/fwd
+    - **FusedMoE**
+      - `kernel_cutlass_kernel_flashinferquantizationkernelsnvfp4_quantizeNVFP4QuantizeLinearKernel_object_at__tensorptrbf16gmemalign16o409640961_tensorptri8gmemalign...` — 1 calls/fwd; 2.501 µs/fwd
+      - `moe::dev::finalize::finalizeKernel` — 1 calls/fwd; 4.521 µs/fwd
+    - **TopK / FusedMoE routing (fused backend; boundary inferred)**
+      - `moe::dev::routing::routingCustom::routingIndicesDynBlockKernel` — 1 calls/fwd; 7.776 µs/fwd
+    - **Qwen2MoeMLP (shared expert)**
+      - **SiluAndMul**
+        - `(anonymous namespace)::act_and_mul_kernel` — 1 calls/fwd; 3.033 µs/fwd
+      - **RowParallelLinear (down)**
+        - `nvjet_sm100_tst_64x8_64x16_2x2_h_bz_TNT` — 1 calls/fwd; 2.826 µs/fwd

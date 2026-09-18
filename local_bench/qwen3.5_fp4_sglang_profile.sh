@@ -42,7 +42,7 @@ NUM_PROMPTS_MULT=${NUM_PROMPTS_MULT:-1}
 # profiler -> requests, so warmup never leaks into the captured window.
 WARMUP_MULT=${WARMUP_MULT:-1}
 
-PROFILE_DIR=${PROFILE_DIR:-/var/home/sglang_profiling5}
+PROFILE_DIR=${PROFILE_DIR:-/var/home/sglang_profiling6}
 LOG_DIR=${LOG_DIR:-"$PROFILE_DIR/logs"}
 ACTIVITIES=${ACTIVITIES:-"CPU GPU"}
 BY_STAGE=${BY_STAGE:-0}

@@ -1,0 +1,31 @@
+{
+  "AMD": {
+    "literal_copy_id_events": 0,
+    "excluded_gpu_intervals_for_overlap": [
+      {
+        "name": "Memcpy HtoD (Host -> Device)",
+        "duration_us": 565608.881,
+        "timestamp_us": 6674266745705.745
+      },
+      {
+        "name": "void aiter::mxfp4_moe_sort_kernel<256, 128, 4, 32>(unsigned char*, unsigned char*, int const*, int const*, int, int, int, int, int)",
+        "duration_us": 641267.463,
+        "timestamp_us": 6674266862256.647
+      },
+      {
+        "name": "Memcpy HtoD (Host -> Device)",
+        "duration_us": 479288.827,
+        "timestamp_us": 6674267497425.919
+      },
+      {
+        "name": "mfma_moe1_silu_mul_afp4_wfp4_bf16_t128x128x256_pm1_async_xcd4_v32",
+        "duration_us": 278824.221,
+        "timestamp_us": 6674267971477.441
+      }
+    ]
+  },
+  "NVIDIA": {
+    "literal_copy_id_events": 0,
+    "excluded_gpu_intervals_for_overlap": []
+  }
+}

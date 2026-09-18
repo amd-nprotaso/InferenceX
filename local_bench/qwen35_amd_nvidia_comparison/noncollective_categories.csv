@@ -1,0 +1,25 @@
+vendor,phase,category,calls_per_forward,sum_gpu_ms_per_forward
+AMD,Prefill,Outside decoder layers,45.5,0.6155160000000001
+AMD,Prefill,Standalone layer norms,120.0,21.661796000000013
+AMD,Prefill,Attention projections,165.0,91.46043250000005
+AMD,Prefill,Linear-attention pipeline,887.5,87.13528699999999
+AMD,Prefill,MoE block including shared expert and router,1020.0,152.87159000000034
+AMD,Prefill,Full-attention pipeline,330.0,32.64544950000001
+AMD,Decode,Outside decoder layers,5.0,0.1290120967741935
+AMD,Decode,Standalone layer norms,120.0,0.5146321612903222
+AMD,Decode,Attention projections,165.0,1.5629307741935425
+AMD,Decode,Linear-attention pipeline,225.0,1.295014258064502
+AMD,Decode,MoE block including shared expert and router,420.0,5.135912548387085
+AMD,Decode,Full-attention pipeline,105.0,1.5457027096774143
+NVIDIA,Prefill,Outside decoder layers,52.0,0.5667804999999999
+NVIDIA,Prefill,Standalone layer norms,120.0,19.14378349999999
+NVIDIA,Prefill,Attention projections,165.0,67.17568050000004
+NVIDIA,Prefill,Linear-attention pipeline,888.5,97.92444200000007
+NVIDIA,Prefill,MoE block including shared expert and router,780.0,144.7322604999998
+NVIDIA,Prefill,Full-attention pipeline,97.5,38.11648949999999
+NVIDIA,Decode,Outside decoder layers,5.0,0.12075729032258058
+NVIDIA,Decode,Standalone layer norms,1.0,0.0031112258064516134
+NVIDIA,Decode,Attention projections,225.0,1.45467187096774
+NVIDIA,Decode,Linear-attention pipeline,225.0,0.9414714193548362
+NVIDIA,Decode,MoE block including shared expert and router,780.0,5.147100387096801
+NVIDIA,Decode,Full-attention pipeline,90.0,0.5302864838709697

@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
+# NOTICE: This file has been modified from the original source.
+# Changes:
+# - Preserve AMD Artifactory installation with staged, validated archive extraction. Date: September 8, 2026
 """Install a skill or agent from the AMD SLAI Marketplace (Artifactory)."""
 
-from __future__ import annotations
 
 import argparse
 import io
 import json
 import os
 import shutil
+import stat
 import sys
 import tempfile
 import urllib.error
@@ -77,29 +80,48 @@ def _download_and_extract(base_url: str, entry: dict, name: str, dest_dir: str) 
     if not data[:4].startswith(b"PK"):
         raise InstallError(f"Downloaded payload for '{name}' is not a ZIP archive")
 
-    os.makedirs(dest_dir, exist_ok=True)
-
+    # Validate the entire archive before publishing any installed content.
     prefix = f"{name}/"
     with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        planned = []
+        names = set()
         for info in zf.infolist():
-            if info.is_dir():
-                continue
+            mode = (info.external_attr >> 16) & 0o170000
+            expected = stat.S_IFDIR if info.is_dir() else stat.S_IFREG
+            if mode not in (0, expected):
+                raise InstallError(f"Special files are not allowed: {info.filename}")
             fname = info.filename
+            if "\\" in fname or (len(fname) > 1 and fname[1] == ":"):
+                raise InstallError(f"Non-portable archive path: {fname}")
             if fname.startswith("./"):
                 fname = fname[2:]
             if fname.startswith(prefix):
                 fname = fname[len(prefix):]
-            if not fname:
+            if not fname or info.is_dir():
                 continue
             norm = os.path.normpath(fname)
-            if norm.startswith("..") or os.path.isabs(norm):
+            if norm == "." or norm.startswith("..") or os.path.isabs(norm):
                 raise InstallError(f"Unsafe path in archive: {info.filename}")
-            out_path = os.path.join(dest_dir, fname)
-            parent = os.path.dirname(out_path)
-            if parent:
-                os.makedirs(parent, exist_ok=True)
-            with zf.open(info) as src, open(out_path, "wb") as dst:
-                shutil.copyfileobj(src, dst)
+            if norm in names:
+                raise InstallError(f"Duplicate archive path: {norm}")
+            names.add(norm)
+            planned.append((info, norm))
+
+        parent = os.path.dirname(os.path.abspath(dest_dir))
+        os.makedirs(parent, exist_ok=True)
+        if os.path.lexists(dest_dir):
+            raise InstallError(f"Destination already exists: {dest_dir}")
+        with tempfile.TemporaryDirectory(prefix=".amd-skill-", dir=parent) as staging:
+            content = os.path.join(staging, "content")
+            os.mkdir(content)
+            for info, relative in planned:
+                out_path = os.path.join(content, relative)
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+                with zf.open(info) as src, open(out_path, "xb") as dst:
+                    shutil.copyfileobj(src, dst)
+            if os.path.lexists(dest_dir):
+                raise InstallError(f"Destination already exists: {dest_dir}")
+            os.rename(content, dest_dir)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -125,7 +147,7 @@ def main(argv: list[str]) -> int:
         for asset_name in args.assets:
             install_name = args.name if len(args.assets) == 1 and args.name else asset_name
             dest_dir = os.path.join(dest_root, install_name)
-            if os.path.exists(dest_dir):
+            if os.path.lexists(dest_dir):
                 raise InstallError(f"Destination already exists: {dest_dir}")
 
             asset_type, entry = _find_asset(manifest, asset_name)

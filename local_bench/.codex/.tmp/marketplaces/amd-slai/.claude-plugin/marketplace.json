@@ -74,6 +74,15 @@
       }
     },
     {
+      "name": "adoc2pdf",
+      "source": {
+        "source": "local",
+        "path": "./plugins/adoc2pdf"
+      },
+      "category": "skill",
+      "version": "1.0.8"
+    },
+    {
       "name": "adra-bug-hunter",
       "source": {
         "source": "local",
@@ -140,7 +149,7 @@
         "path": "./plugins/aecg-scoe-swg-deck"
       },
       "category": "skill",
-      "version": "1.0.15",
+      "version": "1.0.20",
       "interface": {
         "shortDescription": "Generate AECG SCoE / AMD-Xilinx Security Working Group (SWG) 2026 PowerPoint"
       }
@@ -224,9 +233,9 @@
         "path": "./plugins/agent-claim"
       },
       "category": "skill",
-      "version": "1.0.1",
+      "version": "1.0.9",
       "interface": {
-        "shortDescription": "Framework-agnostic claim convention for AI agents working JIRA tickets. Defines the `ai-claimed`"
+        "shortDescription": "Framework-agnostic claim convention for AI agents working JIRA tickets. Defines the `ai-claimed` label, the first-by-(ts, id) arbitration protocol,..."
       }
     },
     {
@@ -260,9 +269,9 @@
         "path": "./plugins/agent-email"
       },
       "category": "skill",
-      "version": "2.1.1",
+      "version": "2.1.29",
       "interface": {
-        "shortDescription": "Use when an agent needs to email the user, send email updates or progress reports, email"
+        "shortDescription": "Use when an agent needs to email the user, send email updates or progress reports, email periodically, notify when done, ask questions over email, ..."
       }
     },
     {
@@ -272,7 +281,7 @@
         "path": "./plugins/agent-exec-summary"
       },
       "category": "skill",
-      "version": "1.2.7",
+      "version": "1.2.9",
       "interface": {
         "shortDescription": "Use when an AFK or long-running agent must send progress emails AND when"
       }
@@ -356,10 +365,7 @@
         "path": "./plugins/agents-audit"
       },
       "category": "skill",
-      "version": "1.0.2",
-      "interface": {
-        "shortDescription": "Use when the user runs /agents-audit; when the session-stop hook fires requesting a knowledge"
-      }
+      "version": "2.3.6"
     },
     {
       "name": "agv",
@@ -404,7 +410,7 @@
         "path": "./plugins/ai-security-scan"
       },
       "category": "skill",
-      "version": "1.0.41",
+      "version": "1.0.42",
       "interface": {
         "shortDescription": "LLM-hardened security scanner for skills, agents, and MCP servers. Detects"
       }
@@ -599,6 +605,18 @@
       }
     },
     {
+      "name": "amd-soc-wa-build-prep",
+      "source": {
+        "source": "local",
+        "path": "./plugins/amd-soc-wa-build-prep"
+      },
+      "category": "skill",
+      "version": "5.0.1",
+      "interface": {
+        "shortDescription": "Create or check out an AMD DV work area for a project code-line, and"
+      }
+    },
+    {
       "name": "amd-tools-installer",
       "source": {
         "source": "local",
@@ -710,7 +728,7 @@
         "path": "./plugins/argus"
       },
       "category": "skill",
-      "version": "1.9.1"
+      "version": "1.9.3"
     },
     {
       "name": "ask-matt",
@@ -755,7 +773,7 @@
         "path": "./plugins/atlassian"
       },
       "category": "skill",
-      "version": "0.9.12",
+      "version": "0.9.14",
       "interface": {
         "shortDescription": "Use the atlassian CLI to interact with Jira and Confluence. Use when"
       }
@@ -809,16 +827,25 @@
       }
     },
     {
+      "name": "auto-downloader",
+      "source": {
+        "source": "local",
+        "path": "./plugins/auto-downloader"
+      },
+      "category": "skill",
+      "version": "1.0.4",
+      "interface": {
+        "shortDescription": "Bulk-download every file listed on a web page (membership/paywalled"
+      }
+    },
+    {
       "name": "auto-work",
       "source": {
         "source": "local",
         "path": "./plugins/auto-work"
       },
       "category": "skill",
-      "version": "3.0.2",
-      "interface": {
-        "shortDescription": "Generic orchestrator. Claims a JIRA via tasktree-claim, preps a fresh P4 changelist, dispatches"
-      }
+      "version": "3.0.49"
     },
     {
       "name": "auto-work-db",
@@ -968,7 +995,7 @@
         "path": "./plugins/bms-selleros-commercial-fae-account-level"
       },
       "category": "skill",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "interface": {
         "shortDescription": "For AMD commercial FAEs (field application engineers) - read an account or deal through a technical lens using the SellerOS MCP. Triggers on \"FAE n..."
       }
@@ -980,9 +1007,9 @@
         "path": "./plugins/bms-selleros-commercial-seller-account-level"
       },
       "category": "skill",
-      "version": "1.0.0",
+      "version": "1.0.3",
       "interface": {
-        "shortDescription": "Runs any of 19 sales plays at the account or opportunity level for AMD commercial sellers using the SellerOS MCP. Use this skill when you need acco..."
+        "shortDescription": "For AMD AEs, TEs, ISEs, ISRs, and their leaders working their own or a named rep's book - run any of 19 sales plays at the account level, using the..."
       }
     },
     {
@@ -992,7 +1019,7 @@
         "path": "./plugins/bms-selleros-toolkit"
       },
       "category": "skill",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "interface": {
         "shortDescription": "Small, generic SellerOS MCP helper capabilities that don't belong to any one account-level persona skill - currently HTML publishing (upload a self..."
       }
@@ -1076,7 +1103,7 @@
         "path": "./plugins/brainstorm-gfx"
       },
       "category": "skill",
-      "version": "1.0.4"
+      "version": "1.0.6"
     },
     {
       "name": "brainstorming",
@@ -1088,6 +1115,18 @@
       "version": "1.0.0",
       "interface": {
         "shortDescription": "You MUST use this before any creative work - creating features, building"
+      }
+    },
+    {
+      "name": "build-ifwi-release",
+      "source": {
+        "source": "local",
+        "path": "./plugins/build-ifwi-release"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "Cuts an IFWI release end-to-end - builds a Release ASIC IFWI, reviews the ASIC's primary release/DIT SKUs, applies the new ASIC IFWI to build their..."
       }
     },
     {
@@ -1121,10 +1160,7 @@
         "path": "./plugins/build-sram"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Full memory rebuild flow (buildMyRam, update_memserver, bootenv, clean build). Use when RAM"
-      }
+      "version": "1.0.7"
     },
     {
       "name": "bus-port-highlight-offline",
@@ -1370,7 +1406,7 @@
         "path": "./plugins/cex-analysis"
       },
       "category": "skill",
-      "version": "1.0.2",
+      "version": "1.0.4",
       "interface": {
         "shortDescription": "Debug counterexample (CEX) traces from formal verification runs. Use"
       }
@@ -1463,6 +1499,18 @@
       "version": "1.3.3",
       "interface": {
         "shortDescription": "Power gating clamp verification using FSDB waveforms and xover_signal.lst"
+      }
+    },
+    {
+      "name": "claude-remotecontrol-teams",
+      "source": {
+        "source": "local",
+        "path": "./plugins/claude-remotecontrol-teams"
+      },
+      "category": "skill",
+      "version": "1.0.1",
+      "interface": {
+        "shortDescription": "Control and monitor a Claude Code task from Microsoft Teams, so you"
       }
     },
     {
@@ -1619,6 +1667,18 @@
       }
     },
     {
+      "name": "codeline-access-check",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codeline-access-check"
+      },
+      "category": "skill",
+      "version": "0.2.0",
+      "interface": {
+        "shortDescription": "Answer \"which Unix / TechProtect groups are needed to access this Perforce"
+      }
+    },
+    {
       "name": "codeql-fp-verify",
       "source": {
         "source": "local",
@@ -1769,7 +1829,7 @@
         "path": "./plugins/confluence"
       },
       "category": "skill",
-      "version": "1.1.8",
+      "version": "1.1.10",
       "interface": {
         "shortDescription": "Use the atlassian CLI to interact with Confluence Cloud. Use when creating,"
       }
@@ -1895,10 +1955,7 @@
         "path": "./plugins/consensus-debug"
       },
       "category": "skill",
-      "version": "1.0.2",
-      "interface": {
-        "shortDescription": "Use when a failure spans multiple domains (e.g., new-vs-old RTL pipeline, RTL+CSIM cross-check,"
-      }
+      "version": "1.0.8"
     },
     {
       "name": "context-manager",
@@ -2174,7 +2231,7 @@
         "path": "./plugins/cross-model"
       },
       "category": "skill",
-      "version": "1.0.5"
+      "version": "1.0.7"
     },
     {
       "name": "custom-coverage",
@@ -2303,10 +2360,7 @@
         "path": "./plugins/dc-elab"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Use when about to run dc_elab; when about to invoke `dj rt -s dc_elab` or any DJ command"
-      }
+      "version": "1.0.7"
     },
     {
       "name": "dc-lol",
@@ -2315,7 +2369,7 @@
         "path": "./plugins/dc-lol"
       },
       "category": "skill",
-      "version": "1.0.9"
+      "version": "1.0.11"
     },
     {
       "name": "dclabops-mount-ubb8",
@@ -2369,10 +2423,7 @@
         "path": "./plugins/debug-dj-test"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Use when needing to re-run a failing DJ test with -DDEBUG or -DGCLOG_ENABLE to get a debug"
-      }
+      "version": "1.0.9"
     },
     {
       "name": "debug-hang",
@@ -2537,7 +2588,7 @@
         "path": "./plugins/diagramx-ai"
       },
       "category": "skill",
-      "version": "1.10.5",
+      "version": "1.12.1",
       "interface": {
         "shortDescription": "Cross-domain skill that converts text, RTL, specs, DV test plans, logs,"
       }
@@ -2549,10 +2600,7 @@
         "path": "./plugins/dialectic-debug"
       },
       "category": "skill",
-      "version": "1.0.3",
-      "interface": {
-        "shortDescription": "Use when your agent name contains \"reviewer\", \"critic\", or \"skeptic\"; when spawned by TeamCreate"
-      }
+      "version": "1.0.10"
     },
     {
       "name": "die-id-lookup",
@@ -2864,10 +2912,7 @@
         "path": "./plugins/dv-verification"
       },
       "category": "skill",
-      "version": "1.0.3",
-      "interface": {
-        "shortDescription": "Use when building or modifying UVM testbench components, writing UVM tests or sequences,"
-      }
+      "version": "1.0.9"
     },
     {
       "name": "dvt-mcp",
@@ -3119,7 +3164,7 @@
         "path": "./plugins/explore-design"
       },
       "category": "skill",
-      "version": "1.1.13",
+      "version": "1.1.16",
       "interface": {
         "shortDescription": "You MUST use this before authoring a MAS for a greenfield Tier-2b/3"
       }
@@ -3275,6 +3320,18 @@
       }
     },
     {
+      "name": "formal-coverage",
+      "source": {
+        "source": "local",
+        "path": "./plugins/formal-coverage"
+      },
+      "category": "skill",
+      "version": "0.1.3",
+      "interface": {
+        "shortDescription": "Run Jasper Coverage App methodology on a formal block. By default measures structural coverage (dead RTL lines, unreachable assertions, line/toggle..."
+      }
+    },
+    {
       "name": "formal-dj-flow",
       "source": {
         "source": "local",
@@ -3293,7 +3350,7 @@
         "path": "./plugins/formal-gui"
       },
       "category": "skill",
-      "version": "1.0.42",
+      "version": "1.0.44",
       "interface": {
         "shortDescription": "Formal Orchestrator GUI and launcher — embedded xterm agent terminal, 10-step review workflow (proof plan, SVA, flow setup, results, fixes, report)..."
       }
@@ -3353,7 +3410,7 @@
         "path": "./plugins/formal-resources"
       },
       "category": "skill",
-      "version": "1.1.13",
+      "version": "1.1.14",
       "interface": {
         "shortDescription": "Shared knowledge base for the formal verification agent suite: protocol"
       }
@@ -3389,9 +3446,21 @@
         "path": "./plugins/formal-spec-checker"
       },
       "category": "skill",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "interface": {
         "shortDescription": "Pre-formal RTL-vs-spec static analysis. Given a spec document and RTL"
+      }
+    },
+    {
+      "name": "formal-strategy",
+      "source": {
+        "source": "local",
+        "path": "./plugins/formal-strategy"
+      },
+      "category": "skill",
+      "version": "1.0.2",
+      "interface": {
+        "shortDescription": "Turn a block's specification documents into a formal verification strategy document, before any properties are written and without reading the RTL...."
       }
     },
     {
@@ -3401,7 +3470,7 @@
         "path": "./plugins/formal-tools"
       },
       "category": "skill",
-      "version": "1.2.1",
+      "version": "1.2.3",
       "interface": {
         "shortDescription": "Install and use both formal MCP servers in one step — (1) the Formal"
       }
@@ -3425,9 +3494,9 @@
         "path": "./plugins/fpga-crp-creator"
       },
       "category": "skill",
-      "version": "1.0.54",
+      "version": "1.0.57",
       "interface": {
-        "shortDescription": "Generates an AMD AECG CRP PowerPoint end-to-end: searches case emails,"
+        "shortDescription": "DEPRECATED — renamed to fpga-rma-triage; install that instead. Generates"
       }
     },
     {
@@ -3443,15 +3512,27 @@
       }
     },
     {
+      "name": "fpga-rma-triage",
+      "source": {
+        "source": "local",
+        "path": "./plugins/fpga-rma-triage"
+      },
+      "category": "skill",
+      "version": "1.0.75",
+      "interface": {
+        "shortDescription": "Automates full triage of new FPGA RMA cases (FPGA scope only). Collects"
+      }
+    },
+    {
       "name": "fpga-salesforce-mcp-setup",
       "source": {
         "source": "local",
         "path": "./plugins/fpga-salesforce-mcp-setup"
       },
       "category": "skill",
-      "version": "1.0.6",
+      "version": "1.0.13",
       "interface": {
-        "shortDescription": "Scope: AMD AECG FPGA only - connects to the Xilinx Salesforce org"
+        "shortDescription": "Scope: AMD AECG FPGA only - connects to the Xilinx Salesforce org (xilinx.my.salesforce.com)"
       }
     },
     {
@@ -3509,7 +3590,7 @@
         "path": "./plugins/gap-ticket-automation"
       },
       "category": "skill",
-      "version": "1.25.0",
+      "version": "1.25.1",
       "interface": {
         "shortDescription": "Automate GAP JIRA ticket test selection. Fetches failed tests from a ticket, XOAH URL, Jira filter, or JQL URL; scores by pass rate and runtime; an..."
       }
@@ -3554,10 +3635,7 @@
         "path": "./plugins/gdb"
       },
       "category": "skill",
-      "version": "1.1.0",
-      "interface": {
-        "shortDescription": "Use when starting or using a GDB debugging session for CSIM/RTL simv executables — debugging CSIM model code, DPI functions, simv binaries; setting..."
-      }
+      "version": "1.1.10"
     },
     {
       "name": "gen-clk-xls",
@@ -3566,7 +3644,7 @@
         "path": "./plugins/gen-clk-xls"
       },
       "category": "skill",
-      "version": "1.0.1"
+      "version": "1.1.0"
     },
     {
       "name": "gen-fml-flow",
@@ -3686,6 +3764,18 @@
       "version": "0.1.5"
     },
     {
+      "name": "gfx-build-failure-investigator",
+      "source": {
+        "source": "local",
+        "path": "./plugins/gfx-build-failure-investigator"
+      },
+      "category": "skill",
+      "version": "1.0.1",
+      "interface": {
+        "shortDescription": "Investigates Gfx Constructicon build failures by job ID or build URL, classifies root causes (environment, code, packaging, or other), pinpoints of..."
+      }
+    },
+    {
       "name": "gfx-debug-waves",
       "source": {
         "source": "local",
@@ -3716,7 +3806,7 @@
         "path": "./plugins/gfx-doctor"
       },
       "category": "skill",
-      "version": "1.0.9"
+      "version": "1.0.12"
     },
     {
       "name": "gfx-hw-init",
@@ -3725,7 +3815,7 @@
         "path": "./plugins/gfx-hw-init"
       },
       "category": "skill",
-      "version": "1.5.2"
+      "version": "1.8.0"
     },
     {
       "name": "gfx-jg",
@@ -3983,7 +4073,7 @@
         "path": "./plugins/git-mkwa"
       },
       "category": "skill",
-      "version": "1.1.1"
+      "version": "1.3.2"
     },
     {
       "name": "git-p4-commands",
@@ -4430,7 +4520,7 @@
         "path": "./plugins/implement-mas"
       },
       "category": "skill",
-      "version": "1.0.1"
+      "version": "1.1.1"
     },
     {
       "name": "implement-spec",
@@ -4520,9 +4610,21 @@
         "path": "./plugins/intentify"
       },
       "category": "skill",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "interface": {
         "shortDescription": "Turns a vague request into a precise, target-tuned prompt for another"
+      }
+    },
+    {
+      "name": "iohub-ecr-jira-fetch",
+      "source": {
+        "source": "local",
+        "path": "./plugins/iohub-ecr-jira-fetch"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "Fetches fixed and known bugs for a project from the IOHUB Jira domain (DEIPCIOH) when given the project code and board code. Use this skill when yo..."
       }
     },
     {
@@ -4628,9 +4730,9 @@
         "path": "./plugins/jira"
       },
       "category": "skill",
-      "version": "1.1.7",
+      "version": "1.1.9",
       "interface": {
-        "shortDescription": "Use the atlassian CLI to interact with Jira Cloud. Use when creating,"
+        "shortDescription": "Use the unified Atlassian CLI, which authenticates Jira and Confluence"
       }
     },
     {
@@ -4865,10 +4967,7 @@
         "path": "./plugins/lec-debug"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Use when the user says \"LEC failed\", \"Formality failed\", \"non-equivalent points\", \"NEP\","
-      }
+      "version": "1.0.7"
     },
     {
       "name": "ledger",
@@ -4889,7 +4988,7 @@
         "path": "./plugins/library-read"
       },
       "category": "skill",
-      "version": "1.2.0",
+      "version": "1.4.0",
       "interface": {
         "shortDescription": "This skill analyzes material from an internal AMD library and solves a vast variety of engineering problems. The library contains peer-reviewed pub..."
       }
@@ -5105,6 +5204,18 @@
       "version": "1.2.0",
       "interface": {
         "shortDescription": "Read, post, and reply to Viva Engage community threads via Microsoft"
+      }
+    },
+    {
+      "name": "m365-forms",
+      "source": {
+        "source": "local",
+        "path": "./plugins/m365-forms"
+      },
+      "category": "skill",
+      "version": "1.0.1",
+      "interface": {
+        "shortDescription": "Create, read, and fill out Microsoft Forms surveys, quizzes and polls"
       }
     },
     {
@@ -5888,6 +5999,30 @@
       }
     },
     {
+      "name": "nbio-management-ai-skill-linter",
+      "source": {
+        "source": "local",
+        "path": "./plugins/nbio-management-ai-skill-linter"
+      },
+      "category": "skill",
+      "version": "4.1.1",
+      "interface": {
+        "shortDescription": "Lint a Management-AI Skill for conformance to the three-layer model"
+      }
+    },
+    {
+      "name": "new-skill",
+      "source": {
+        "source": "local",
+        "path": "./plugins/new-skill"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "A general-purpose skill template for building automated workflows and intelligent agents. Use this skill as a starting point when creating new skil..."
+      }
+    },
+    {
       "name": "new-test-bringup",
       "source": {
         "source": "local",
@@ -5996,15 +6131,39 @@
       }
     },
     {
+      "name": "no-ai-slop",
+      "source": {
+        "source": "local",
+        "path": "./plugins/no-ai-slop"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when t..."
+      }
+    },
+    {
+      "name": "no-fluff",
+      "source": {
+        "source": "local",
+        "path": "./plugins/no-fluff"
+      },
+      "category": "skill",
+      "version": "1.0.3",
+      "interface": {
+        "shortDescription": "Reshapes responses to be terse, action-first, and easy to scan — cutting"
+      }
+    },
+    {
       "name": "noc-tile-switch-bound-place",
       "source": {
         "source": "local",
         "path": "./plugins/noc-tile-switch-bound-place"
       },
       "category": "skill",
-      "version": "1.2.3",
+      "version": "1.3.4",
       "interface": {
-        "shortDescription": "Generate bounds_<tile>_LSB_preDFT.tcl (hard switch-core placement bounds)"
+        "shortDescription": "Generate bounds_<tile>_LSB_preDFT.tcl (hard switch-core placement bounds) and port_placement_<tile>_LSB_preDFT.tcl (DEF-injection top-level port pl..."
       }
     },
     {
@@ -6014,7 +6173,7 @@
         "path": "./plugins/nocgen-ai"
       },
       "category": "skill",
-      "version": "0.1.7",
+      "version": "0.1.11",
       "interface": {
         "shortDescription": "AMD internal source-grounded assistant for Arteris FlexNoC/FlexGen NoC"
       }
@@ -6267,6 +6426,18 @@
       },
       "category": "skill",
       "version": "1.4.1"
+    },
+    {
+      "name": "p4-cl-to-git",
+      "source": {
+        "source": "local",
+        "path": "./plugins/p4-cl-to-git"
+      },
+      "category": "skill",
+      "version": "1.0.4",
+      "interface": {
+        "shortDescription": "Integrate SUBMITTED Perforce changelists into a Git checkout with a live branch"
+      }
     },
     {
       "name": "p4-cli",
@@ -6689,9 +6860,9 @@
         "path": "./plugins/perl-gen-rtl"
       },
       "category": "skill",
-      "version": "1.0.2",
+      "version": "1.0.10",
       "interface": {
-        "shortDescription": "Build-time perl-generated RTL (.v.pl / .sv.pl / \"deperl\"). Use when a block needs to instantiate"
+        "shortDescription": "Build-time perl-generated RTL (.v.pl / .sv.pl / \"deperl\"). Use when a block needs to instantiate, replace, or reconfigure a Virtual_Fifo, mct_slot_..."
       }
     },
     {
@@ -6746,7 +6917,7 @@
         "path": "./plugins/plan-ahead"
       },
       "category": "skill",
-      "version": "1.0.0"
+      "version": "1.0.6"
     },
     {
       "name": "playwright-cli",
@@ -7442,6 +7613,18 @@
       }
     },
     {
+      "name": "praskann-skill",
+      "source": {
+        "source": "local",
+        "path": "./plugins/praskann-skill"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "A general-purpose productivity skill for automating tasks and streamlining workflows. Use it when you need a reliable starting point for building o..."
+      }
+    },
+    {
       "name": "pre-include",
       "source": {
         "source": "local",
@@ -7508,7 +7691,7 @@
         "path": "./plugins/project-server-onboarding"
       },
       "category": "skill",
-      "version": "1.0.0",
+      "version": "2.1.0",
       "interface": {
         "shortDescription": "Guides a PM through SWPMO onboarding and creates the Project Server Onboarding Jira request through a guided web form. Use to onboard a program or ..."
       }
@@ -7637,10 +7820,7 @@
         "path": "./plugins/quality-review"
       },
       "category": "skill",
-      "version": "1.0.6",
-      "interface": {
-        "shortDescription": "Use when reviewing completed work for production readiness, inspecting P4 shelves before"
-      }
+      "version": "1.0.12"
     },
     {
       "name": "quill",
@@ -7652,6 +7832,18 @@
       "version": "0.2.0",
       "interface": {
         "shortDescription": "Reviews, rewrites, lints, and fixes documentation quality issues through"
+      }
+    },
+    {
+      "name": "racer-bar-validate",
+      "source": {
+        "source": "local",
+        "path": "./plugins/racer-bar-validate"
+      },
+      "category": "skill",
+      "version": "1.1.5",
+      "interface": {
+        "shortDescription": "Validates a RACER (SimNow + CSim) model end-to-end by staging it from"
       }
     },
     {
@@ -7772,10 +7964,7 @@
         "path": "./plugins/regression-triage"
       },
       "category": "skill",
-      "version": "1.0.2",
-      "interface": {
-        "shortDescription": "Use when the user says \"triage\", \"triage results\", \"triage failures\", or \"summarize failures\";"
-      }
+      "version": "1.0.9"
     },
     {
       "name": "regspec",
@@ -7841,7 +8030,7 @@
         "path": "./plugins/requesting-code-review-gfx"
       },
       "category": "skill",
-      "version": "1.0.4"
+      "version": "1.0.5"
     },
     {
       "name": "required-training-companion",
@@ -7898,7 +8087,7 @@
         "path": "./plugins/review-code"
       },
       "category": "skill",
-      "version": "0.2.3"
+      "version": "0.2.5"
     },
     {
       "name": "review-concurrency",
@@ -7976,9 +8165,9 @@
         "path": "./plugins/review-panel"
       },
       "category": "skill",
-      "version": "1.5.7",
+      "version": "2.0.5",
       "interface": {
-        "shortDescription": "Convenes a 3-seat reviewer panel (dialectic + devils-advocate + senior)"
+        "shortDescription": "Convenes a 3-lens tiered reviewer panel (dialectic + devils-advocate + senior)"
       }
     },
     {
@@ -8081,10 +8270,7 @@
         "path": "./plugins/revise-with-codstd"
       },
       "category": "skill",
-      "version": "1.0.4",
-      "interface": {
-        "shortDescription": "Use when about to invoke `revise` (the AMD AI code-review tool, loaded via `module load sip_infra/current`);"
-      }
+      "version": "1.1.6"
     },
     {
       "name": "rhsc-grid-powermap",
@@ -8123,6 +8309,18 @@
       }
     },
     {
+      "name": "rma-check",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rma-check"
+      },
+      "category": "skill",
+      "version": "1.0.2",
+      "interface": {
+        "shortDescription": "Query AMD Hotpot RMA tables (Snowflake) for one or more serial numbers or RMA numbers. Returns RMA status, customer, fail reason, compensation type..."
+      }
+    },
+    {
       "name": "rocm-docs-reviewer",
       "source": {
         "source": "local",
@@ -8156,6 +8354,18 @@
       "version": "1.0.1",
       "interface": {
         "shortDescription": "Provision or audit an AGS ROCm team space in Jira Cloud from a template project. Use when an ICCM ticket requests a new ROCm project space."
+      }
+    },
+    {
+      "name": "rocm-tpm-dashboard",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rocm-tpm-dashboard"
+      },
+      "category": "skill",
+      "version": "1.4.1",
+      "interface": {
+        "shortDescription": "Package a dashboard (Streamlit, or Flask/other Python web app) into the exact repo structure the AMD ROCm TPM dashboard platform needs, so it deplo..."
       }
     },
     {
@@ -8234,7 +8444,7 @@
         "path": "./plugins/rtl-bug-hunter"
       },
       "category": "skill",
-      "version": "1.1.1",
+      "version": "1.1.4",
       "interface": {
         "shortDescription": "Audit Verilog and SystemVerilog RTL for evidence-backed functional bugs"
       }
@@ -8246,10 +8456,7 @@
         "path": "./plugins/rtl-coding-standards"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Use when about to Edit or Write any .v or .sv file under blocks/*/src/rtl/; when planning"
-      }
+      "version": "1.0.10"
     },
     {
       "name": "rtl-comparison",
@@ -8282,7 +8489,7 @@
         "path": "./plugins/rtl-explorer"
       },
       "category": "skill",
-      "version": "4.0.6",
+      "version": "4.0.7",
       "interface": {
         "shortDescription": "Generate a self-contained interactive HTML file that visualizes the RTL"
       }
@@ -8306,7 +8513,7 @@
         "path": "./plugins/rtl-ppa-collect"
       },
       "category": "skill",
-      "version": "1.6.21"
+      "version": "1.6.27"
     },
     {
       "name": "rtl-ppa-diagnose",
@@ -8384,10 +8591,7 @@
         "path": "./plugins/rtl-submit-readiness"
       },
       "category": "skill",
-      "version": "1.0.5",
-      "interface": {
-        "shortDescription": "Use AFTER an RTL change has passed its final full test and is being prepared for submit —"
-      }
+      "version": "1.0.10"
     },
     {
       "name": "rtl-validation-workflow",
@@ -8396,10 +8600,7 @@
         "path": "./plugins/rtl-validation-workflow"
       },
       "category": "skill",
-      "version": "1.0.5",
-      "interface": {
-        "shortDescription": "Use when running and interpreting builds/tests AFTER an RTL change has been made — i.e.,"
-      }
+      "version": "1.0.11"
     },
     {
       "name": "rubber-duck",
@@ -8432,10 +8633,7 @@
         "path": "./plugins/run-lec"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Use when RTL changes need LEC verification, after refactoring or optimization that should"
-      }
+      "version": "1.0.10"
     },
     {
       "name": "ryayokum-skill",
@@ -8507,6 +8705,18 @@
       }
     },
     {
+      "name": "salesforce-wts-case-summary",
+      "source": {
+        "source": "local",
+        "path": "./plugins/salesforce-wts-case-summary"
+      },
+      "category": "skill",
+      "version": "1.1.4",
+      "interface": {
+        "shortDescription": "Summarises one or more WTS (Worldwide Technical Support) Salesforce"
+      }
+    },
+    {
       "name": "sap-je-upload",
       "source": {
         "source": "local",
@@ -8561,6 +8771,18 @@
       "version": "2.0.3",
       "interface": {
         "shortDescription": "Intelligent testcase path resolution, LLM prompt generation, and automated testcase modification for coverage enhancement. Resolves file paths, gen..."
+      }
+    },
+    {
+      "name": "sbalasin-skill",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sbalasin-skill"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "A general-purpose productivity skill for automating and streamlining common tasks. Use this skill when you need a reliable, configurable agent to h..."
       }
     },
     {
@@ -8744,10 +8966,7 @@
         "path": "./plugins/setup-email"
       },
       "category": "skill",
-      "version": "1.0.6",
-      "interface": {
-        "shortDescription": "One-time bring-up for the OAuth2 / Outlook (Office365) IMAP token that powers the agent-email"
-      }
+      "version": "1.1.2"
     },
     {
       "name": "setup-matt-pocock-skills",
@@ -8801,10 +9020,7 @@
         "path": "./plugins/silimate"
       },
       "category": "skill",
-      "version": "1.0.2",
-      "interface": {
-        "shortDescription": "Use when running Silimate Preqorsor for predictive PPA/timing analysis; when asked to \"qualify"
-      }
+      "version": "1.2.8"
     },
     {
       "name": "siloti",
@@ -8828,6 +9044,18 @@
       "version": "1.0.6",
       "interface": {
         "shortDescription": "Extract hardware/config parameters from Compass simulation runs. Auto-detects the"
+      }
+    },
+    {
+      "name": "simnow-multi-machine-gen",
+      "source": {
+        "source": "local",
+        "path": "./plugins/simnow-multi-machine-gen"
+      },
+      "category": "skill",
+      "version": "1.0.0",
+      "interface": {
+        "shortDescription": "Converts a SimNow single-machine BSD configuration script into a multi-machine (A+A mode) BSD and .now script pair by splitting CPU and GPU devices..."
       }
     },
     {
@@ -8861,7 +9089,7 @@
         "path": "./plugins/skill-creator"
       },
       "category": "skill",
-      "version": "1.0.47",
+      "version": "1.0.50",
       "interface": {
         "shortDescription": "Guide for creating effective skills that extend AI agent capabilities"
       }
@@ -8942,10 +9170,7 @@
         "path": "./plugins/slai-app-creator"
       },
       "category": "skill",
-      "version": "0.0.92",
-      "interface": {
-        "shortDescription": "End-to-end: deploy my app / slai-app-creator / slai-app-platform onboard"
-      }
+      "version": "0.0.97"
     },
     {
       "name": "slai-artifactory-releaser",
@@ -9536,7 +9761,7 @@
         "path": "./plugins/sn-current"
       },
       "category": "skill",
-      "version": "1.0.11",
+      "version": "1.0.14",
       "interface": {
         "shortDescription": "Pull Jira issues for a named, saved JQL query and write a flattened JSON"
       }
@@ -9908,7 +10133,7 @@
         "path": "./plugins/sn-pm-ppt"
       },
       "category": "skill",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "interface": {
         "shortDescription": "Build a PM execution-status PowerPoint by filling a fixed corporate template"
       }
@@ -9983,6 +10208,18 @@
       "version": "1.0.1",
       "interface": {
         "shortDescription": "SimNow skill: sn-pr-merge"
+      }
+    },
+    {
+      "name": "sn-pr-report",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sn-pr-report"
+      },
+      "category": "skill",
+      "version": "0.1.5",
+      "interface": {
+        "shortDescription": "Report status (branch, checks, approvals, mergeable state, CI/Jenkins"
       }
     },
     {
@@ -10769,18 +11006,6 @@
       }
     },
     {
-      "name": "ssadeh-general-skill",
-      "source": {
-        "source": "local",
-        "path": "./plugins/ssadeh-general-skill"
-      },
-      "category": "skill",
-      "version": "1.0.0",
-      "interface": {
-        "shortDescription": "A general-purpose skill for automating tasks and providing intelligent assistance. Use this skill when you need a flexible, reusable agent capabili..."
-      }
-    },
-    {
       "name": "ssl-cert",
       "source": {
         "source": "local",
@@ -10841,10 +11066,7 @@
         "path": "./plugins/structured-debug"
       },
       "category": "skill",
-      "version": "1.0.6",
-      "interface": {
-        "shortDescription": "Use when the user says \"root-cause\", \"Root-cause this regression failure\", \"find the root"
-      }
+      "version": "1.0.12"
     },
     {
       "name": "structurizr",
@@ -10865,10 +11087,7 @@
         "path": "./plugins/stuck-recovery"
       },
       "category": "skill",
-      "version": "1.0.1",
-      "interface": {
-        "shortDescription": "Use when agent spent 3+ iterations on same problem without progress, progress velocity is"
-      }
+      "version": "1.0.7"
     },
     {
       "name": "subagent-driven-development",
@@ -10985,7 +11204,7 @@
         "path": "./plugins/sva-auditor"
       },
       "category": "skill",
-      "version": "1.0.6",
+      "version": "1.0.8",
       "interface": {
         "shortDescription": "Quality gate for generated SVA files. Runs mechanical checks (grep/regex/count)"
       }
@@ -10997,7 +11216,7 @@
         "path": "./plugins/sva-author-skill"
       },
       "category": "skill",
-      "version": "1.1.1",
+      "version": "1.1.3",
       "interface": {
         "shortDescription": "Use when writing SVA assertions, assumptions, cover properties, or vacuity"
       }
@@ -11225,9 +11444,9 @@
         "path": "./plugins/tasktree-bootstrap"
       },
       "category": "skill",
-      "version": "1.1.0",
+      "version": "1.1.6",
       "interface": {
-        "shortDescription": "Mark an existing or newly-created Epic as a tasktree-managed root. v0.4 bootstrap is single-step"
+        "shortDescription": "Mark an existing or newly-created Epic as a tasktree-managed root. v0.4 bootstrap is single-step — stamp `tasktree-root` and optionally set Fix Ver..."
       }
     },
     {
@@ -11237,10 +11456,7 @@
         "path": "./plugins/tasktree-claim"
       },
       "category": "skill",
-      "version": "2.1.0",
-      "interface": {
-        "shortDescription": "Use when about to start work on a JIRA that may be picked up concurrently by other workers"
-      }
+      "version": "3.0.6"
     },
     {
       "name": "tasktree-pm",
@@ -11249,9 +11465,9 @@
         "path": "./plugins/tasktree-pm"
       },
       "category": "skill",
-      "version": "1.1.0",
+      "version": "1.5.70",
       "interface": {
-        "shortDescription": "PM (project manager) reconciler. Walks invalidations, computes per-neighbour cascade decisions"
+        "shortDescription": "PM (project manager) reconciler. Walks invalidations, computes per-neighbour cascade decisions (INVALIDATE/EDIT/KEEP/CREATE), recommends or applies..."
       }
     },
     {
@@ -11261,9 +11477,9 @@
         "path": "./plugins/tasktree-review"
       },
       "category": "skill",
-      "version": "1.0.2",
+      "version": "1.0.8",
       "interface": {
-        "shortDescription": "Periodic audit sweep across all tasktree-managed tickets in a project. Surfaces stuck claims,"
+        "shortDescription": "Periodic audit sweep across all tasktree-managed tickets in a project. Surfaces stuck claims, cycles, drift, unread errors. Read-mostly; one privil..."
       }
     },
     {
@@ -11273,9 +11489,9 @@
         "path": "./plugins/tasktree-shared"
       },
       "category": "skill",
-      "version": "1.1.0",
+      "version": "1.1.15",
       "interface": {
-        "shortDescription": "Shared vocabulary, schema, JQL helpers, error path, and kill-switch logic for the tasktree"
+        "shortDescription": "Shared vocabulary, schema, JQL helpers, error path, and kill-switch logic for the tasktree framework (v0.4). Loaded by every other tasktree skill."
       }
     },
     {
@@ -11285,9 +11501,9 @@
         "path": "./plugins/tasktree-worker"
       },
       "category": "skill",
-      "version": "1.1.0",
+      "version": "1.1.8",
       "interface": {
-        "shortDescription": "Pick up a tasktree ticket, plan, work, and either close or self-invalidate. Maintains the"
+        "shortDescription": "Pick up a tasktree ticket, plan, work, and either close or self-invalidate. Maintains the worker-control comment, registers an hourly self-renewing..."
       }
     },
     {
@@ -11309,10 +11525,7 @@
         "path": "./plugins/tcl-shell"
       },
       "category": "skill",
-      "version": "1.1.0",
-      "interface": {
-        "shortDescription": "Use when spawning or driving a long-lived interactive TCL EDA tool — JasperGold (FPV), dc_shell (Design Compiler), pt_shell (PrimeTime), or any tcl..."
-      }
+      "version": "1.1.7"
     },
     {
       "name": "tdd",
@@ -11348,6 +11561,18 @@
       "version": "1.2.3",
       "interface": {
         "shortDescription": "Teach the user a new skill or concept, within this workspace."
+      }
+    },
+    {
+      "name": "team-event-organizer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/team-event-organizer"
+      },
+      "category": "skill",
+      "version": "0.1.1",
+      "interface": {
+        "shortDescription": "Run, extend, test, and sanitize the bundled self-contained team-event"
       }
     },
     {
@@ -11582,7 +11807,7 @@
         "path": "./plugins/tile-port-placement"
       },
       "category": "skill",
-      "version": "1.1.2",
+      "version": "1.1.4",
       "interface": {
         "shortDescription": "Generate connectivity-verified, catch-wrapped port_placement.tcl scripts"
       }
@@ -11747,9 +11972,9 @@
         "path": "./plugins/token-efficiency-analyzer"
       },
       "category": "skill",
-      "version": "1.15.2",
+      "version": "1.16.3",
       "interface": {
-        "shortDescription": "Find out where your agent''s tokens actually went. Reads raw Claude"
+        "shortDescription": "Forensic token-waste analysis of Claude Code, Codex and Kilo Code session"
       }
     },
     {
@@ -11921,7 +12146,7 @@
         "path": "./plugins/ue-test-selection"
       },
       "category": "skill",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "interface": {
         "shortDescription": "Pick the best representative test in a JIRA UE (Unique Error) ticket for AI triage — AIBF culprit-CL ranking plus Smart BlameFinder physical valida..."
       }
@@ -12026,10 +12251,7 @@
         "path": "./plugins/urg-test-grading"
       },
       "category": "skill",
-      "version": "3.1.6",
-      "interface": {
-        "shortDescription": "Use when asked to \"grade tests\", \"reduce regression\", \"optimize test list\", \"coverage grading\","
-      }
+      "version": "3.1.12"
     },
     {
       "name": "urg-text-parser",
@@ -12089,6 +12311,18 @@
       "version": "1.0.0",
       "interface": {
         "shortDescription": "Find similar bugs across a codebase after fixing one - pattern characterization, regex search, triage, batch fix."
+      }
+    },
+    {
+      "name": "vbaisane-specs-explainer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/vbaisane-specs-explainer"
+      },
+      "category": "skill",
+      "version": "1.0.1",
+      "interface": {
+        "shortDescription": "Ask the user for a specification file path (PDF, DOCX, or PPTX), convert"
       }
     },
     {
@@ -12662,7 +12896,7 @@
         "path": "./plugins/write-testplan"
       },
       "category": "skill",
-      "version": "1.2.3"
+      "version": "1.2.7"
     },
     {
       "name": "write-vas",
@@ -12671,7 +12905,7 @@
         "path": "./plugins/write-vas"
       },
       "category": "skill",
-      "version": "1.25.3"
+      "version": "1.25.7"
     },
     {
       "name": "writing-amdgpu-tests",
@@ -12740,7 +12974,7 @@
         "path": "./plugins/ws-vs-pkg-scan-init-tdr-compare"
       },
       "category": "skill",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "interface": {
         "shortDescription": "Verify that a scan-init (or any setup) function programs the same TDRs the same way at Wafer-Sort (WS) and Package (PKG), at both the C++ source an..."
       }
@@ -12995,7 +13229,7 @@
         "path": "./plugins/zoom-hub"
       },
       "category": "skill",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "interface": {
         "shortDescription": "Extract Zoom transcripts (and optional AI meeting-notes summaries) from"
       }
@@ -13091,7 +13325,7 @@
         "path": "./plugins/cex-debug"
       },
       "category": "agent",
-      "version": "1.1.6",
+      "version": "1.1.8",
       "interface": {
         "shortDescription": "Use when debugging counterexample (CEX) traces from formal property"
       }
@@ -13235,9 +13469,9 @@
         "path": "./plugins/formal-orchestrator"
       },
       "category": "agent",
-      "version": "1.1.8",
+      "version": "1.1.11",
       "interface": {
-        "shortDescription": "Autonomous formal verification orchestrator — full loop from intake through proof plan, SVA authoring, flow generation, LSF job submission, CEX ana..."
+        "shortDescription": "Autonomous formal verification orchestrator — full loop from intake through"
       }
     },
     {
@@ -13247,9 +13481,9 @@
         "path": "./plugins/formal-planner"
       },
       "category": "agent",
-      "version": "1.0.22",
+      "version": "1.0.26",
       "interface": {
-        "shortDescription": "Use when planning formal verification strategy, creating proof plans, defining assume-guarantee partitions, selecting cutpoints and abstractions, s..."
+        "shortDescription": "Use when planning formal verification strategy, creating proof plans,"
       }
     },
     {
@@ -13604,7 +13838,7 @@
         "path": "./plugins/sva-author"
       },
       "category": "agent",
-      "version": "1.2.30",
+      "version": "1.2.31",
       "interface": {
         "shortDescription": "SVA property authoring specialist for block-level formal verification and simulation. Translates design intent and interface behavior into high-qua..."
       }

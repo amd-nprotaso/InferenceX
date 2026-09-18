@@ -34,6 +34,7 @@ _HOOKS = (
     ("_flydsl_hook_conv", os.path.join(_ROOT, "conv", "bootstrap", "sitecustomize.py")),
     ("_flydsl_hook_gdn", os.path.join(_ROOT, "chunk_gated_delta_rule", "bootstrap", "sitecustomize.py")),
     ("_flydsl_hook_moe_decode", os.path.join(_ROOT, "moe_decode", "bootstrap", "sitecustomize.py")),
+    ("_flydsl_hook_gdn_decode", os.path.join(_ROOT, "gdn_decode", "bootstrap", "sitecustomize.py")),
 )
 
 

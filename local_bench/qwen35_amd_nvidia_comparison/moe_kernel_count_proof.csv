@@ -1,0 +1,9 @@
+vendor,phase,scope,min_calls_per_layer,max_calls_per_layer,calls_per_layer,calls_per_forward,gpu_ms_per_forward,layer_instances_checked
+AMD,Prefill,Entire MoE block,17,17,17.0,1020.0,152.87159000000034,120
+AMD,Prefill,Routed expert core incl routing,12,12,12.0,720.0,120.9419315000002,120
+AMD,Decode,Entire MoE block,7,7,7.0,420.0,5.135912548387085,1860
+AMD,Decode,Routed expert core incl routing,2,2,2.0,120.0,3.70979025806453,1860
+NVIDIA,Prefill,Entire MoE block,13,13,13.0,780.0,144.7322604999998,120
+NVIDIA,Prefill,Routed expert core incl routing,7,7,7.0,420.0,109.14078149999992,120
+NVIDIA,Decode,Entire MoE block,13,13,13.0,780.0,5.147100387096801,1860
+NVIDIA,Decode,Routed expert core incl routing,5,5,5.0,300.0,3.534281935483903,1860

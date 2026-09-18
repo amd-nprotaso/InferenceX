@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+# NOTICE: This file has been modified from the original source.
+# Changes:
+# - Preserve AMD Artifactory catalog listing through the upstream merge. Date: September 8, 2026
 """List skills and agents from the AMD SLAI Marketplace on Artifactory."""
 
-from __future__ import annotations
 
 import argparse
 import json

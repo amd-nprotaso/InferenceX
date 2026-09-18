@@ -1,0 +1,49 @@
+{
+  "AMD": {
+    "path": "/var/home/my_InferenceX/traces/amd/1789642053.9277868-TP-0.trace.json",
+    "device": "AMD Instinct MI355X",
+    "world_size": 4,
+    "target_forwards": {
+      "Prefill": 4,
+      "Decode (TARGET_VERIFY)": 31
+    },
+    "step_shapes": {
+      "step[EXTEND bs=1 toks=32768]": 1,
+      "step[EXTEND bs=2 toks=32766]": 1,
+      "step[EXTEND bs=2 toks=32768]": 1,
+      "step[EXTEND bs=1 toks=32464]": 1,
+      "step[TARGET_VERIFY bs=4]": 31
+    },
+    "total_kernels": 55837,
+    "kernels_linked_to_any_step": 47076,
+    "layer_kernels": 44245,
+    "layer_instances": 2100,
+    "amd_prefill_modules_validated": 240,
+    "kernel_0_host_stack": [
+      "causal_conv1d_flydsl.py(128): causal_conv1d_fn",
+      "flydsl/compiler/jit_function.py(1632): __call__",
+      "flydsl/compiler/jit_executor.py(210): __call__",
+      "<flydsl-dispatch>(48): dispatch"
+    ]
+  },
+  "NVIDIA": {
+    "path": "/var/home/my_InferenceX/traces/nvidia/1788441037.314373-TP-0.trace.json",
+    "device": "NVIDIA B200",
+    "world_size": 4,
+    "target_forwards": {
+      "Prefill": 4,
+      "Decode (TARGET_VERIFY)": 31
+    },
+    "step_shapes": {
+      "step[EXTEND bs=1 toks=32768]": 2,
+      "step[EXTEND bs=2 toks=32766]": 1,
+      "step[EXTEND bs=1 toks=32464]": 1,
+      "step[TARGET_VERIFY bs=4]": 31
+    },
+    "total_kernels": 60917,
+    "kernels_linked_to_any_step": 53988,
+    "layer_kernels": 53084,
+    "layer_instances": 2100,
+    "amd_prefill_modules_validated": 0
+  }
+}

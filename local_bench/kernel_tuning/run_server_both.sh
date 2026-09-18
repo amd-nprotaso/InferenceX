@@ -27,10 +27,13 @@ set -euo pipefail
 # window can be checked for "still compiling" rather than assumed warm.
 
 kt_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-export PYTHONPATH="$kt_dir/bootstrap_both:$kt_dir/conv:$kt_dir/chunk_gated_delta_rule:$kt_dir/moe_decode${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH="$kt_dir/bootstrap_both:$kt_dir/conv:$kt_dir/chunk_gated_delta_rule:$kt_dir/moe_decode:$kt_dir/gdn_decode${PYTHONPATH:+:$PYTHONPATH}"
 export SGLANG_FLYDSL_CAUSAL_CONV="${FLYDSL_CONV:-1}"
 export SGLANG_FLYDSL_GDN_CHUNK_H="${FLYDSL_GDN:-1}"
 export SGLANG_FLYDSL_COUNT_COMPILES="${FLYDSL_COUNT_COMPILES:-0}"
+# FlyDSL GDN decode recurrence (kernel_tuning/gdn_decode). Defaults off so
+# experiments written before it keep measuring what they were written to measure.
+export SGLANG_FLYDSL_GDN_DECODE="${FLYDSL_GDN_DECODE:-0}"
 
 # Decode MoE: the fused FlyDSL router+sort (change #2) and the atomic stage-2
 # epilogue (change #1, a tuned-CSV row). MOE_ATOMIC_EPILOGUE rides with

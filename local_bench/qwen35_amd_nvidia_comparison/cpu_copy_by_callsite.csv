@@ -1,0 +1,113 @@
+vendor,site,operation,count,cpu_total_ms,cpu_median_us,cpu_max_us,matched_gpu_total_ms,gpu_busy_during_call_ms,no_gpu_activity_during_call_ms,post_transfer_gap_total_ms
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2428): prepare_for_extend,hipMemcpyAsync,8,0.090349,5.97,47.879,0.11683199999999999,0.0353095703125,0.055040171875,0.09864846875000001
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocation.py(282): alloc_for_extend,hipMemcpyAsync,14,0.06323000000000001,4.6,5.44,0.06946600000000001,0.047150390625,0.016080546875000004,0.5425965
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/memory_pool.py(1457): _alloc_ping_pong_buffer,hipMemcpyAsync,4,0.015499000000000002,3.79,4.799,0.017516,0.0123359375,0.0031634921875000003,0.035764273437499994
+AMD,Request slot allocation,hipMemcpyAsync,4,0.017549,3.9894999999999996,5.75,0.011916,0.0079775390625,0.0095714609375,0.04928321875
+AMD,Request slot allocation,hipMemcpyWithStream,8,1.845394,18.509,962.608,0.21151300000000003,1.8180634765625,0.027331140625,0.16392840625000002
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocation.py(54): write_cache_indices,hipMemcpyAsync,4,0.025929999999999998,6.115,8.51,0.019036,0.019669921875,0.006260507812499999,0.104723765625
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2693): _mamba_radix_cache_v2_req_prepare_for_extend,hipMemcpyWithStream,6,0.250377,18.86,133.428,0.035835,0.2373916015625,0.012986046874999995,0.22508687500000002
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2428): prepare_for_extend,hipMemcpyWithStream,12,0.21492699999999998,16.56,26.589,0.078428,0.181990234375,0.0329383125,0.2992526640625
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2787): _collect_deferred_mamba_cow_and_clear,hipMemcpyAsync,2,0.0074800000000000005,3.74,4.12,0.019478,0.0033603515625,0.00412,0.027281765625000003
+AMD,/sgl-workspace/sglang/python/sglang/srt/sampling/sampling_batch_info.py(87): from_schedule_batch,hipMemcpyAsync,16,0.072778,4.46,5.74,0.08506399999999999,0.0542783203125,0.0185014765625,2920.093202601563
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/overlap_utils.py(87): resolve_forward_inputs,hipMemcpyAsync,4,0.05163,13.285,15.35,0.045196,0.0362802734375,0.015350039062500001,0.26702470312500004
+AMD,/sgl-workspace/sglang/python/sglang/srt/model_executor/forward_batch_info.py(722): init_new,hipMemcpyAsync,78,0.410283,5.215,7.97,0.2824030000000001,0.4043154296875,0.005973578124999993,0.47664094531249973
+AMD,/sgl-workspace/sglang/python/sglang/srt/model_executor/forward_batch_info.py(1234): _compute_mrope_positions_extend,hipMemcpyAsync,8,0.289035,30.049,55.439,1045.0457020000001,0.2733017578125,0.015734148437499998,0.17241810937500002
+AMD,Mamba clear_slots,hipMemcpyWithStream,3,22.196988,10874.187,11299.422,0.014997,21.9870458984375,0.2099421015625004,0.109442453125
+AMD,Graph input buffer copies,hipMemcpyAsync,195,0.8542560000000002,4.05,12.1,0.8266059999999992,0.813826171875,0.040447531250000016,0.011874468750000023
+AMD,AITER update_single_wrapper,hipMemcpyWithStream,8,1155.32264,6802.5365,579846.269,0.033232,1153.12668359375,2.1959564062499397,0.3828080390625
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(101): _forward_metadata,hipMemcpyAsync,10,0.04076,4.08,5.14,0.041510000000000005,0.0,0.04076,0.11468921875000002
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(101): _forward_metadata,hipMemcpyWithStream,4,0.08414,21.125,21.97,0.029675999999999998,0.049212890625,0.034927109375,0.10456521093750001
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(310): _init_track_conv_indices,hipMemcpyWithStream,8,0.17068799999999998,20.57,28.93,0.04135200000000001,0.06502734375,0.10566065625,0.3250884296875
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(333): _init_track_ssm_indices,hipMemcpyWithStream,24,0.544091,22.2895,31.91,0.12529599999999996,0.1252958984375,0.4187951015625,2.4203905234375
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(333): _init_track_ssm_indices,hipMemcpyAsync,8,0.08679899999999999,11.6845,19.94,0.035552,0.0045029296875,0.0822960703125,0.422770265625
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/linear/gdn_backend.py(407): init_forward_metadata,hipMemcpyWithStream,4,0.08417,21.59,21.89,0.021595999999999997,0.0363515625,0.047818437500000005,0.1176842734375
+AMD,FLA prepare_chunk_indices,hipMemcpyWithStream,8,10.947025000000002,527.1285,5994.127,0.041592,10.8412333984375,0.10579160156250035,2.85493534375
+AMD,FLA prepare_chunk_offsets,hipMemcpyWithStream,4,0.5119130000000001,109.7535,193.147,0.015156000000000001,0.51090625,0.0010067499999999825,0.1708039609375
+AMD,/sgl-workspace/sglang/python/sglang/srt/distributed/parallel_state.py(1204): _all_gather_into_tensor,hipMemcpyAsync,8,0.06632900000000001,7.2245,12.05,0.035991999999999996,0.066328125,1.187500000000341e-06,6.046874999999119e-06
+AMD,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_worker_v2.py(777): _draft_extend_for_prefill,hipMemcpyAsync,6,0.025089,4.16,5.059,0.025113999999999997,0.0250888671875,6.796875000003588e-07,6.117187500000565e-06
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/utils.py(31): _async_d2h,hipMemcpyAsync,66,0.324535,4.885,7.05,0.251094,0.3244951171875,4.344531249999539e-05,2.5424632421875013
+AMD,Eagle prefill tail tokens,hipMemcpyAsync,2,0.01099,5.495,6.07,0.008237999999999999,0.010990234375,7.812499999992895e-08,2.234375000000455e-06
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/scheduler_components/batch_result_processor.py(240): process_batch_result_prefill,hipEventSynchronize,4,3.5778360000000005,2.75,3569.896,0.0,3.5629638671875,0.014872992187500185,0.0
+AMD,Mamba slot donation,hipMemcpyAsync,6,0.04463,7.5649999999999995,9.1,0.8603959999999999,0.0446279296875,2.3046874999987922e-06,0.030246578125000013
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/memory_pool.py(1488): set_mamba_ping_pong_slot,hipMemcpyAsync,12,0.045899,3.795,4.77,0.038748,0.0458974609375,3.41406249999876e-06,0.265892625
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_cache/unified_tree_core.py(1131): _add_new_node,hipMemcpyAsync,7,0.03221,4.25,6.4,0.030633,0.0322099609375,6.640625000002842e-07,0.6511355546875001
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_cache/unified_tree_core.py(755): _match_post_processor,hipMemcpyAsync,4,0.01828,4.38,5.57,0.280637,0.0182802734375,4.687499999995737e-07,0.0568835078125
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_radix_cache.py(907): cache_unfinished_req,hipMemcpyAsync,5,0.020630000000000003,4.1,4.58,0.019195,0.02062890625,1.1718749999993782e-06,0.0108440625
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(3259): filter_batch,hipMemcpyAsync,2,0.00949,4.745,4.94,0.009038000000000001,0.009490234375,1.9531249999982237e-07,0.04472176562500001
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocator/mamba.py(66): alloc_group_end,hipMemcpyAsync,1,0.00547,5.47,5.47,0.0045590000000000006,0.0054697265625,2.734374999997513e-07,1.5468749999998366e-06
+AMD,AITER forward_extend,hipMemcpyWithStream,160,1105.2578700000004,23.0545,38222.812,0.8146,1102.7005654296875,2.5573045703124846,4.070454687500001
+AMD,AITER forward_extend,hipMemcpyAsync,16,0.068819,4.035,6.13,0.126824,0.033625,0.035193999999999996,1.584375000000282e-05
+AMD,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_utils.py(914): eagle_prepare_for_decode,hipMemcpyAsync,62,0.5107139999999997,7.97,71.989,0.17465799999999995,0.510677734375,4.0492187500000834e-05,206.59112813281243
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/overlap_utils.py(455): resolve_seq_lens_cpu,hipEventSynchronize,31,289.312662,9584.832,11023.254,0.0,287.999677734375,1.3129843046874994,0.0
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/overlap_utils.py(455): resolve_seq_lens_cpu,hipMemcpyWithStream,31,0.5421630000000001,17.06,27.7,0.13672900000000002,0.5420849609375,7.823437499999741e-05,145.40505127343752
+AMD,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_worker_common.py(212): prepare_for_draft,hipMemcpyAsync,31,0.15587700000000004,4.99,5.98,0.126209,0.150658203125,0.0052214765625,0.04991307031249999
+AMD,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_draft_cuda_graph_runner.py(514): execute,hipMemcpyAsync,31,0.14982600000000001,4.8,6.06,0.137729,0.1476708984375,0.0021585703124999984,0.06502881250000003
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(1928): set_mamba_track_indices_from_reqs,hipMemcpyAsync,31,0.199577,5.809,11.32,0.10644900000000002,0.199546875,3.141406249999967e-05,0.15767111718750002
+AMD,AITER _apply_cuda_graph_metadata,hipMemcpyAsync,31,0.12750900000000004,4.04,5.04,0.131209,0.127509765625,3.7109374999992893e-06,3.025781250000392e-05
+AMD,AITER _build_verify_unified_metadata,hipMemcpyAsync,31,0.13185899999999998,4.1,5.31,0.139169,0.13185546875,8.398437499999023e-06,3.314843749999774e-05
+AMD,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(563): _replay_metadata,hipMemcpyAsync,31,0.127348,3.98,4.84,0.13177,0.12734375,8.570312499998512e-06,3.273437500000309e-05
+AMD,/sgl-workspace/sglang/python/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py(1276): load_batch,hipMemcpyAsync,62,0.252687,4.015,5.289,0.23945800000000012,0.2526552734375,3.5867187499996514e-05,0.1773798906249999
+AMD,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_draft_extend_cuda_graph_runner.py(472): execute,hipMemcpyAsync,31,0.16607899999999998,5.17,10.03,0.127689,0.1660615234375,1.95703124999973e-05,3.0726562500006606e-05
+AMD,Decode result event wait,hipEventSynchronize,31,9.211578000000001,1.23,9174.208,0.0,9.1400146484375,0.07156839062500053,0.0
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_cache/components/mamba_component.py(528): prepare_for_caching_req,hipMemcpyAsync,4,0.022539999999999998,5.5600000000000005,6.49,0.012075999999999998,0.02253515625,5.078124999999823e-06,0.20956462499999998
+AMD,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocator/paged.py(310): _release_page_ids,hipMemcpyAsync,1,0.0056,5.6,5.6,0.013359,0.005599609375,3.9062499999964474e-07,0.0
+AMD,/sgl-workspace/sglang/python/sglang/srt/managers/scheduler_components/profiler_manager.py(313): _stop_profile,hipDeviceSynchronize,1,0.04803,48.03,48.03,0.0,0.0,0.04803,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2148): prepare_for_extend,cudaMemcpyAsync,20,0.11632899999999999,3.1950000000000003,33.179,0.02982400000000001,0.0167392578125,0.09958989843749999,0.6455343984374999
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocation.py(303): alloc_for_extend,cudaMemcpyAsync,19,0.075218,3.22,10.58,0.028704999999999998,0.0057197265625,0.06949899999999999,1.0255625781249997
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/memory_pool.py(1355): _alloc_ping_pong_buffer,cudaMemcpyAsync,4,0.03628,7.16,16.99,0.0063999999999999994,0.0092841796875,0.0269958203125,0.09846523437499999
+NVIDIA,Request slot allocation,cudaMemcpyAsync,14,0.06183,4.41,6.74,0.021600000000000005,0.0074501953125,0.054380000000000005,0.36860703125000005
+NVIDIA,Request slot allocation,cudaStreamSynchronize,8,122.61010599999997,9.254999999999999,122534.817,0.0,121.8085029296875,0.8016030703124953,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocation.py(303): alloc_for_extend,cudaStreamSynchronize,4,0.0704,13.065,35.21,0.0,0.005951171875,0.06444882812500001,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocation.py(55): write_cache_indices,cudaMemcpyAsync,4,0.018349,4.385,5.45,0.006496,0.0,0.018349,0.22937509374999998
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2421): _mamba_radix_cache_v2_req_prepare_for_extend,cudaMemcpyAsync,5,0.02603,5.41,7.51,0.016352,0.0,0.02603,0.25145366406249997
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2421): _mamba_radix_cache_v2_req_prepare_for_extend,cudaStreamSynchronize,5,0.065209,12.77,16.339,0.0,0.0163515625,0.0488574375,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2148): prepare_for_extend,cudaStreamSynchronize,12,0.10646899999999998,8.7295,13.89,0.0,0.015677734375,0.09079126562499998,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2507): _collect_deferred_mamba_cow_and_clear,cudaMemcpyAsync,2,0.01252,6.26,6.3,0.0031680000000000002,0.0,0.01252,0.06563180468749999
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/sampling/sampling_batch_info.py(82): from_schedule_batch,cudaMemcpyAsync,16,0.04478000000000001,2.6950000000000003,4.18,0.021312,0.0,0.04478000000000001,1897.0328862421873
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/overlap_utils.py(84): resolve_forward_inputs,cudaMemcpyAsync,4,0.025310000000000003,5.9,8.34,0.031647,0.0,0.025310000000000003,1.0279321015625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/model_executor/forward_batch_info.py(642): init_new,cudaMemcpyAsync,16,0.072039,3.6,13.75,0.017024,0.0330068359375,0.039032828125,0.404929125
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/model_executor/forward_batch_info.py(1090): _compute_mrope_positions,cudaMemcpyAsync,8,0.269928,30.67,48.84,0.14854399999999998,0.10466796875,0.1652604453125,0.8935351015625
+NVIDIA,Mamba clear_slots,cudaMemcpyAsync,3,0.011399999999999999,3.48,4.47,0.004096,0.0,0.011399999999999999,0.120638375
+NVIDIA,Mamba clear_slots,cudaStreamSynchronize,3,0.027849,10.379,10.56,0.0,0.004095703125,0.023753296875,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/model_executor/runner/prefill_cuda_graph_runner.py(921): load_batch,cudaMemcpyAsync,8,0.048098,4.4345,14.15,0.013248,0.0,0.048098,0.10681645312499997
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/trtllm_mha_backend.py(776): init_forward_metadata,cudaMemcpyAsync,10,0.04677,4.745,6.25,0.018337000000000003,0.0192021484375,0.027568046875,0.46581827343750004
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(62): _forward_metadata,cudaMemcpyAsync,22,0.107237,5.42,6.77,0.045535000000000006,0.0,0.107237,0.6382706640625001
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(62): _forward_metadata,cudaStreamSynchronize,8,0.094958,11.3795,15.009,0.0,0.021501953125,0.073456046875,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(245): _init_track_conv_indices,cudaMemcpyAsync,8,0.028789000000000002,3.5545,4.3,0.020481,0.005177734375,0.023611265625000002,0.24550142187500001
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(245): _init_track_conv_indices,cudaStreamSynchronize,8,0.08620900000000001,10.76,12.06,0.0,0.0204814453125,0.06572755468750001,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(268): _init_track_ssm_indices,cudaMemcpyAsync,32,0.39819699999999997,14.374500000000001,22.18,0.085407,0.0743935546875,0.32380344531249994,1.5104914374999994
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(268): _init_track_ssm_indices,cudaStreamSynchronize,24,0.047376999999999996,1.855,2.53,0.0,0.0,0.047376999999999996,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/linear/gdn_backend.py(342): init_forward_metadata,cudaMemcpyAsync,4,0.0138,3.41,4.04,0.01248,0.007904296875,0.005895703124999999,0.066975078125
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/linear/gdn_backend.py(342): init_forward_metadata,cudaStreamSynchronize,4,0.049289,12.335,12.88,0.0,0.0124794921875,0.0368095078125,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/mm_utils.py(1194): general_mm_embed_routine,cudaMemcpyAsync,4,0.036159,9.1495,10.09,0.33974200000000004,0.036158203125,1.0937499999990053e-06,0.016093937499999995
+NVIDIA,FLA prepare_chunk_indices,cudaMemcpyAsync,8,7.69933,184.728,3191.649,0.018335000000000004,7.521625,0.17770499999999984,0.861373984375
+NVIDIA,FLA prepare_chunk_indices,cudaStreamSynchronize,8,0.043800000000000006,5.380000000000001,8.47,0.0,0.004162109375,0.039637890625000005,0.0
+NVIDIA,FLA prepare_chunk_offsets,cudaMemcpyAsync,4,0.01966,4.09,7.59,0.005824,0.01966015625,5.078124999999823e-07,0.16633615625
+NVIDIA,FLA prepare_chunk_offsets,cudaStreamSynchronize,4,0.672062,195.6725,202.708,0.0,0.63612890625,0.03593309375,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/radix_linear_attention.py(123): unified_linear_attention_with_output,cudaMemcpyAsync,180,1.3624869999999993,7.3,23.289,7.280459999999999,1.3594453125,0.0030622812499999873,0.571805625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/radix_attention.py(256): unified_attention_with_output,cudaMemcpyAsync,60,0.42098699999999994,6.8,18.799,2.6514200000000003,0.420984375,8.992187499995197e-06,0.1546864453125
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_worker_v2.py(742): _draft_extend_for_prefill,cudaMemcpyAsync,5,0.039540000000000006,7.85,10.64,0.008320000000000001,0.0271240234375,0.012416171875,0.16838312499999997
+NVIDIA,Graph input buffer copies,cudaMemcpyAsync,181,0.8691049999999997,3.75,18.4,0.2876129999999999,0.79615234375,0.07296789062499996,0.49830594531250005
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/utils.py(25): _async_d2h,cudaMemcpyAsync,66,0.3673960000000001,6.7195,17.94,0.19388700000000011,0.3505283203125,0.0168751640625,1706.3723094531254
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/scheduler_components/batch_result_processor.py(180): process_batch_result_prefill,cudaEventSynchronize,4,0.028869,7.499499999999999,8.84,0.0,0.028548828125,0.00032054687499999976,0.0
+NVIDIA,Mamba slot donation,cudaMemcpyAsync,10,0.09204999999999999,9.07,15.45,0.027231999999999996,0.07100390625,0.021046289062499998,0.20793694531250004
+NVIDIA,Mamba slot donation,cudaStreamSynchronize,5,265.121335,8628.348,134961.957,0.0,263.4249951171875,1.696339882812498,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/memory_pool.py(1381): set_mamba_ping_pong_slot,cudaMemcpyAsync,10,0.05332,4.865,9.17,0.021023999999999998,0.0082890625,0.0450309375,0.645470140625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_radix_cache.py(1071): _add_new_node,cudaMemcpyAsync,6,0.0344,5.970000000000001,6.31,0.010145,0.0061904296875,0.028210000000000002,0.8329555859375002
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_radix_cache.py(975): _match_post_processor,cudaMemcpyAsync,4,0.02185,5.734999999999999,5.94,0.0069770000000000006,0.0,0.02185,0.18220659375000003
+NVIDIA,Eagle prefill tail tokens,cudaMemcpyAsync,2,0.01598,7.99,9.27,0.0031360000000000003,0.0159794921875,5.078124999995381e-07,0.09129564062500001
+NVIDIA,Eagle prefill tail tokens,cudaStreamSynchronize,1,135.004446,135004.446,135004.446,0.0,134.2518466796875,0.7525993203124963,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_radix_cache.py(790): cache_unfinished_req,cudaMemcpyAsync,3,0.01931,4.89,9.8,0.00528,0.0,0.01931,0.0200647265625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(2857): filter_batch,cudaMemcpyAsync,1,0.0039,3.9,3.9,0.001504,0.0,0.0039,0.023583890625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_utils.py(803): eagle_prepare_for_decode,cudaMemcpyAsync,62,0.34230700000000003,6.91,19.7,0.07033399999999995,0.2889931640625,0.053315046875,0.5047988125000004
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_worker_common.py(211): prepare_for_draft,cudaMemcpyAsync,31,0.256177,8.27,9.379,0.04838200000000001,0.2348154296875,0.021364812500000007,0.22461116406250006
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_draft_cuda_graph_runner.py(500): execute,cudaMemcpyAsync,31,0.19541899999999995,6.21,7.28,0.05072,0.179662109375,0.0157592734375,0.5951676953125002
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/schedule_batch.py(1688): set_mamba_track_indices_from_reqs,cudaMemcpyAsync,31,0.209089,6.59,7.94,0.029630000000000017,0.20606640625,0.003025390624999998,0.05456140625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/layers/attention/hybrid_linear_attn_backend.py(492): _replay_metadata,cudaMemcpyAsync,62,0.252888,3.995,6.839,0.10457799999999999,0.2377177734375,0.015176734374999997,0.3174327421875
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/model_executor/runner/decode_cuda_graph_runner.py(1058): load_batch,cudaMemcpyAsync,62,0.25982599999999995,4.29,13.18,0.095871,0.24055859375,0.019272328124999995,2.583063570312496
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/speculative/eagle_draft_extend_cuda_graph_runner.py(485): execute,cudaMemcpyAsync,31,0.277692,8.89,11.059,0.06038200000000001,0.2704990234375,0.007194523437500001,0.2953006171875
+NVIDIA,Decode result event wait,cudaEventSynchronize,31,85.28399499999999,3246.168,3666.453,0.0,79.5674921875,5.716503203125002,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/unified_cache_components/mamba_component.py(349): prepare_for_caching_req,cudaMemcpyAsync,4,0.031138999999999997,6.855,12.099,0.009343,0.030525390625,0.0006136875000000002,0.011967546875
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocator/paged.py(261): free,cudaMemcpyAsync,2,0.018389,9.1945,11.859,0.036224,0.0183896484375,0.0,0.051168390625
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/mem_cache/allocator/paged.py(261): free,cudaStreamSynchronize,1,5.6455969999999995,5645.597,5645.597,0.0,5.4287314453125,0.21686555468749974,0.0
+NVIDIA,/sgl-workspace/sglang/python/sglang/srt/managers/scheduler_components/profiler_manager.py(296): _stop_profile,cudaDeviceSynchronize,1,5.952093,5952.093,5952.093,0.0,0.0,5.952093,0.0
