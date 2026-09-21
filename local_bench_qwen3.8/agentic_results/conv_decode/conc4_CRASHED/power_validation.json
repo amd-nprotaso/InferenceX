@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "power_valid": false,
+  "reasons": [
+    "profile_artifacts_missing"
+  ],
+  "telemetry_source": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results/conv_decode/conc4/gpu_metrics.csv",
+  "benchmark_result": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results/conv_decode/conc4/agentic_power_window.json",
+  "benchmark_window": null,
+  "integration_method": "per_device_trapezoidal_with_linear_boundary_interpolation",
+  "power_percentile_method": "time_weighted_synchronized_total_piecewise_linear",
+  "expected_gpu_count": 1,
+  "observed_gpu_count": 0,
+  "observed_gpu_ids": [],
+  "per_gpu_sample_counts": {},
+  "per_gpu_max_sample_gap_s": {},
+  "per_gpu_energy_j": {},
+  "device_issues": {},
+  "boundary_degenerate_rows": {},
+  "accumulator_check": null,
+  "metrics": {},
+  "window_source": "aiperf_profile_lifecycle"
+}

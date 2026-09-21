@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-20",
+  "recipe": "/var/home/my_InferenceX/qwen3.8/InferenceX/benchmarks/single_node/agentic/qwen3.8next_fp4_mi355x_sglang_mtp.sh",
+  "recipe_modified": false,
+  "scenario": "agentic-coding (AgentX replay, semianalysis_cc_traces_weka_062126_256k)",
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4-PLEFP8",
+  "hardware": "1x MI355X (gfx950)",
+  "tp": 1, "ep": 1, "duration_s": 1800, "conc_list": [1, 4, 8],
+  "runs_per_point": 1,
+  "arms": {
+    "baseline": "stock Triton GDN decode + Triton causal-conv1d prefill",
+    "conv_decode": "AITER/FlyDSL GDN decode + AITER/FlyDSL prefill conv"
+  },
+  "sglang_commit": "3003ddf157", "aiter_commit": "4ad998328",
+  "patches_applied": ["0001", "0002", "0003", "0004", "0005", "optional/0006 (logging only)"],
+  "kernels_verified": "both ACTIVE in every conv_decode point, both OFF in every baseline point",
+  "ci_config_note": "CI master config runs this recipe at tp=8, conc-list [1,4,8,12,16]; this run is tp=1 over the subset that fits one GPU"
+}

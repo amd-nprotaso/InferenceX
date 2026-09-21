@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "power_valid": false,
+  "reasons": [
+    "expected_gpu_count_mismatch",
+    "benchmark_window_not_bracketed"
+  ],
+  "telemetry_source": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results/baseline/conc4/gpu_metrics.csv",
+  "benchmark_result": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results/baseline/conc4/agentic_power_window.json",
+  "benchmark_window": {
+    "start_time_unix": 1789756912.65971,
+    "end_time_unix": 1789758742.660993,
+    "reported_duration_s": 1830.0012831687927,
+    "integration_duration_s": 1830.0012831687927,
+    "completed": 352,
+    "total_input_tokens": 26473226,
+    "total_output_tokens": 340342
+  },
+  "integration_method": "per_device_trapezoidal_with_linear_boundary_interpolation",
+  "power_percentile_method": "time_weighted_synchronized_total_piecewise_linear",
+  "expected_gpu_count": 1,
+  "observed_gpu_count": 4,
+  "observed_gpu_ids": [
+    "0",
+    "1",
+    "2",
+    "3"
+  ],
+  "per_gpu_sample_counts": {
+    "0": 1795,
+    "1": 1795,
+    "2": 1795,
+    "3": 1795
+  },
+  "per_gpu_max_sample_gap_s": {},
+  "per_gpu_energy_j": {},
+  "device_issues": {
+    "0": [
+      "benchmark_window_not_bracketed"
+    ],
+    "1": [
+      "benchmark_window_not_bracketed"
+    ],
+    "2": [
+      "benchmark_window_not_bracketed"
+    ],
+    "3": [
+      "benchmark_window_not_bracketed"
+    ]
+  },
+  "boundary_degenerate_rows": {},
+  "accumulator_check": {
+    "available": true,
+    "accumulator_delta_j": 2192803.9170000106,
+    "integrated_stream_j": 2165332.5,
+    "relative_error": 0.01252798610356116,
+    "within_tolerance": true,
+    "tolerance": 0.05,
+    "per_gpu_delta_j": {
+      "0": 414263.6319999993,
+      "1": 420958.8030000031,
+      "2": 401145.6130000055,
+      "3": 956435.8690000027
+    },
+    "integrated_gpu_ids": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "unmatched_gpus": [],
+    "negative_delta_gpus": [],
+    "stream_span_s": 1866.0
+  },
+  "metrics": {}
+}

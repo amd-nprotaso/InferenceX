@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "power_valid": false,
+  "reasons": [
+    "expected_gpu_count_mismatch",
+    "benchmark_window_not_bracketed"
+  ],
+  "telemetry_source": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results_tp1_ci/conv_decode/conc4/gpu_metrics.csv",
+  "benchmark_result": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results_tp1_ci/conv_decode/conc4/agentic_power_window.json",
+  "benchmark_window": {
+    "start_time_unix": 1789901641.147282,
+    "end_time_unix": 1789903471.147881,
+    "reported_duration_s": 1830.0005991458893,
+    "integration_duration_s": 1830.0005991458893,
+    "completed": 358,
+    "total_input_tokens": 27113689,
+    "total_output_tokens": 336639
+  },
+  "integration_method": "per_device_trapezoidal_with_linear_boundary_interpolation",
+  "power_percentile_method": "time_weighted_synchronized_total_piecewise_linear",
+  "expected_gpu_count": 1,
+  "observed_gpu_count": 4,
+  "observed_gpu_ids": [
+    "0",
+    "1",
+    "2",
+    "3"
+  ],
+  "per_gpu_sample_counts": {
+    "0": 1797,
+    "1": 1797,
+    "2": 1797,
+    "3": 1797
+  },
+  "per_gpu_max_sample_gap_s": {},
+  "per_gpu_energy_j": {},
+  "device_issues": {
+    "0": [
+      "benchmark_window_not_bracketed"
+    ],
+    "1": [
+      "benchmark_window_not_bracketed"
+    ],
+    "2": [
+      "benchmark_window_not_bracketed"
+    ],
+    "3": [
+      "benchmark_window_not_bracketed"
+    ]
+  },
+  "boundary_degenerate_rows": {},
+  "accumulator_check": {
+    "available": true,
+    "accumulator_delta_j": 2082243.9279999882,
+    "integrated_stream_j": 2055594.0,
+    "relative_error": 0.012798658044634408,
+    "within_tolerance": true,
+    "tolerance": 0.05,
+    "per_gpu_delta_j": {
+      "0": 414833.5119999945,
+      "1": 421917.05900000036,
+      "2": 401256.28200000525,
+      "3": 844237.0749999881
+    },
+    "integrated_gpu_ids": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "unmatched_gpus": [],
+    "negative_delta_gpus": [],
+    "stream_span_s": 1861.0
+  },
+  "metrics": {}
+}

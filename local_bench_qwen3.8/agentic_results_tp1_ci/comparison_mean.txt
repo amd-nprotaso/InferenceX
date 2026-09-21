@@ -1,0 +1,71 @@
+
+==================================================================================
+AgentX replay   concurrency 1
+==================================================================================
+workload actually replayed (not a comparison):
+  requests completed             149.0           149.0
+  mean ISL                     97071.9         97072.0
+  mean OSL                       865.5           865.5
+  duration (s)                  1783.5          1780.2
+
+metric                        baseline    aiter/flydsl       delta
+----------------------------------------------------------------------------------
+Output tput (tok/s)              70.47           70.47      +0.00% =
+Request tput (req/s)              0.08            0.08      +0.00% =
+Per-user tput (tok/s)            90.50           92.55      +2.27% +
+TTFT (ms)                      2501.79         2485.20      +0.66% +
+ITL (ms)                         15.05           15.31      -1.72% -
+Request latency (ms)          13275.37        13580.41      -2.30% -
+Decode duration (ms)          10773.61        11095.25      -2.99% -
+
+TTFT p99 (ms)                 27417.38        39800.81     -45.17%
+ITL p99 (ms)                     32.82           35.38      -7.81%
+
+==================================================================================
+AgentX replay   concurrency 4
+==================================================================================
+workload actually replayed (not a comparison):
+  requests completed             361.0           358.0
+  mean ISL                     75661.8         75736.6
+  mean OSL                       958.4           940.3
+  duration (s)                  1804.1          1805.7
+
+metric                        baseline    aiter/flydsl       delta
+----------------------------------------------------------------------------------
+Output tput (tok/s)             188.04          183.96      -2.17% -
+Request tput (req/s)              0.20            0.20      -0.29% =
+Per-user tput (tok/s)            88.57         1829.72   +1965.96% +
+TTFT (ms)                       937.90         1140.57     -21.61% -
+ITL (ms)                         13.42           16.98     -26.52% -
+Request latency (ms)          12168.27        13956.30     -14.69% -
+Decode duration (ms)          11230.42        12815.76     -14.12% -
+
+TTFT p99 (ms)                  2473.27         3027.48     -22.41%
+ITL p99 (ms)                     36.68           40.07      -9.25%
+
+==================================================================================
+AgentX replay   concurrency 8
+==================================================================================
+workload actually replayed (not a comparison):
+  requests completed             725.0           764.0
+  mean ISL                     83998.2         85077.9
+  mean OSL                       744.9           759.6
+  duration (s)                  1816.3          1825.3
+
+metric                        baseline    aiter/flydsl       delta
+----------------------------------------------------------------------------------
+Output tput (tok/s)             295.11          315.38      +6.87% +
+Request tput (req/s)              0.40            0.42      +4.81% +
+Per-user tput (tok/s)           133.89          456.97    +241.30% +
+TTFT (ms)                      1247.23         1236.78      +0.84% +
+ITL (ms)                         15.14           12.52     +17.36% +
+Request latency (ms)          11238.79        10126.68      +9.90% +
+Decode duration (ms)           9991.64         8889.94     +11.03% +
+
+TTFT p99 (ms)                  7826.03         9022.58     -15.29%
+ITL p99 (ms)                     50.19           40.98     +18.34%
+
+==================================================================================
+positive = patched better (throughput up / latency down)
+Totals are omitted on purpose: the run is time-bounded, so a faster arm
+completes more requests rather than the same work sooner.

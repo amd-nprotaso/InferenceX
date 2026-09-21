@@ -1,0 +1,113 @@
+
+====================================================================================
+AgentX replay   concurrency 1
+====================================================================================
+workload actually replayed (not a comparison):
+  requests completed               149.0           149.0
+  mean ISL                       97071.9         97072.0
+  mean OSL                         865.5           865.5
+  duration (s)                    1783.5          1780.2
+  sub-1ms ITL records                  0               0   <- streaming artifacts, excluded from p50/p90/p99
+
+aggregate rate                baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+Output tput (tok/s)              70.47           70.47      +0.00% =
+Request tput (req/s)              0.08            0.08      +0.00% =
+
+p50 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                       898.57          691.69     +23.02% +
+ITL (ms)                          8.76            8.65      +1.30% +
+Request latency (ms)           5167.19         5068.01      +1.92% +
+Decode duration (ms)           3706.99         3873.07      -4.48% -
+
+p90 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                      4156.59         3819.63      +8.11% +
+ITL (ms)                         31.24           33.93      -8.64% -
+Request latency (ms)          26834.13        26121.88      +2.65% +
+Decode duration (ms)          24301.79        24108.02      +0.80% +
+
+p99 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                     17805.18        18212.91      -2.29% -
+ITL (ms)                         32.99           35.40      -7.31% -
+Request latency (ms)         121831.32       125821.90      -3.28% -
+Decode duration (ms)          84550.42        99808.40     -18.05% -
+
+====================================================================================
+AgentX replay   concurrency 4
+====================================================================================
+workload actually replayed (not a comparison):
+  requests completed               361.0           358.0
+  mean ISL                       75661.8         75736.6
+  mean OSL                         958.4           940.3
+  duration (s)                    1804.1          1805.7
+  sub-1ms ITL records                  0               1   <- streaming artifacts, excluded from p50/p90/p99
+
+aggregate rate                baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+Output tput (tok/s)             188.04          183.96      -2.17% -
+Request tput (req/s)              0.20            0.20      -0.29% =
+
+p50 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                       895.78         1024.15     -14.33% -
+ITL (ms)                         10.16            9.47      +6.84% +
+Request latency (ms)           3278.68         4538.90     -38.44% -
+Decode duration (ms)           1822.53         2933.14     -60.94% -
+
+p90 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                      2135.55         2569.07     -20.30% -
+ITL (ms)                         26.29           36.58     -39.14% -
+Request latency (ms)          27119.54        29970.26     -10.51% -
+Decode duration (ms)          25944.58        28377.44      -9.38% -
+
+p99 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                      5044.52         5135.59      -1.81% -
+ITL (ms)                         36.40           39.87      -9.54% -
+Request latency (ms)         110858.89       148068.76     -33.57% -
+Decode duration (ms)         109794.12       146810.47     -33.71% -
+
+====================================================================================
+AgentX replay   concurrency 8
+====================================================================================
+workload actually replayed (not a comparison):
+  requests completed               725.0           764.0
+  mean ISL                       83998.2         85077.9
+  mean OSL                         744.9           759.6
+  duration (s)                    1816.3          1825.3
+  sub-1ms ITL records                  2               3   <- streaming artifacts, excluded from p50/p90/p99
+
+aggregate rate                baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+Output tput (tok/s)             295.11          315.38      +6.87% +
+Request tput (req/s)              0.40            0.42      +4.81% +
+
+p50 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                      1074.48          981.70      +8.64% +
+ITL (ms)                         11.74            9.93     +15.41% +
+Request latency (ms)           5279.78         4558.59     +13.66% +
+Decode duration (ms)           3308.63         2977.09     +10.02% +
+
+p90 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                      2957.62         2842.33      +3.90% +
+ITL (ms)                         23.52           20.98     +10.79% +
+Request latency (ms)          20125.11        20854.98      -3.63% -
+Decode duration (ms)          18870.59        17725.41      +6.07% +
+
+p99 latency                   baseline    aiter/flydsl       delta
+------------------------------------------------------------------------------------
+TTFT (ms)                     11949.61        11501.18      +3.75% +
+ITL (ms)                         51.19           40.91     +20.08% +
+Request latency (ms)          88185.21        77703.38     +11.89% +
+Decode duration (ms)          87236.57        76753.61     +12.02% +
+
+====================================================================================
+positive = patched better (throughput up / latency down)
+Totals are omitted on purpose: the run is time-bounded, so a faster arm
+completes more requests rather than the same work sooner.

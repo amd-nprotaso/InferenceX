@@ -1,0 +1,113 @@
+{
+  "conc1": {
+    "workload_drawn": {
+      "records": 160,
+      "requests_completed": 149.0,
+      "output_tokens_total": 128965,
+      "mean_isl": 97071.92617449665,
+      "mean_osl": 865.4630872483222,
+      "duration_s": 1783.457634304
+    },
+    "aggregate": {
+      "output_token_throughput": 70.46657041241198,
+      "request_throughput": 0.08142065381026867
+    },
+    "percentiles_ms": {
+      "time_to_first_token": {
+        "p50": 898.57,
+        "p90": 4156.59,
+        "p99": 17805.18
+      },
+      "inter_token_latency": {
+        "p50": 8.76,
+        "p90": 31.24,
+        "p99": 32.99
+      },
+      "request_latency": {
+        "p50": 5167.19,
+        "p90": 26834.13,
+        "p99": 121831.32
+      },
+      "full_decode_duration": {
+        "p50": 3706.99,
+        "p90": 24301.79,
+        "p99": 84550.42
+      }
+    },
+    "sub_1ms_itl_records_excluded": 0
+  },
+  "conc4": {
+    "workload_drawn": {
+      "records": 404,
+      "requests_completed": 361.0,
+      "output_tokens_total": 346034,
+      "mean_isl": 75661.783933518,
+      "mean_osl": 958.4238227146815,
+      "duration_s": 1804.108536576
+    },
+    "aggregate": {
+      "output_token_throughput": 188.0384207132869,
+      "request_throughput": 0.19619547871908974
+    },
+    "percentiles_ms": {
+      "time_to_first_token": {
+        "p50": 895.78,
+        "p90": 2135.55,
+        "p99": 5044.52
+      },
+      "inter_token_latency": {
+        "p50": 10.16,
+        "p90": 26.29,
+        "p99": 36.4
+      },
+      "request_latency": {
+        "p50": 3278.68,
+        "p90": 27119.54,
+        "p99": 110858.89
+      },
+      "full_decode_duration": {
+        "p50": 1822.53,
+        "p90": 25944.58,
+        "p99": 109794.12
+      }
+    },
+    "sub_1ms_itl_records_excluded": 0
+  },
+  "conc8": {
+    "workload_drawn": {
+      "records": 812,
+      "requests_completed": 725.0,
+      "output_tokens_total": 540134,
+      "mean_isl": 83998.23448275862,
+      "mean_osl": 744.8924137931034,
+      "duration_s": 1816.3107694080002
+    },
+    "aggregate": {
+      "output_token_throughput": 295.10745174928087,
+      "request_throughput": 0.39617459687439915
+    },
+    "percentiles_ms": {
+      "time_to_first_token": {
+        "p50": 1074.48,
+        "p90": 2957.62,
+        "p99": 11949.61
+      },
+      "inter_token_latency": {
+        "p50": 11.74,
+        "p90": 23.52,
+        "p99": 51.19
+      },
+      "request_latency": {
+        "p50": 5279.78,
+        "p90": 20125.11,
+        "p99": 88185.21
+      },
+      "full_decode_duration": {
+        "p50": 3308.63,
+        "p90": 18870.59,
+        "p99": 87236.57
+      }
+    },
+    "sub_1ms_itl_records_excluded": 2
+  }
+}

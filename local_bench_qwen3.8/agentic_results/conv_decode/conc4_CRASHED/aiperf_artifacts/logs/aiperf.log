@@ -1,0 +1,216 @@
+2026-09-18 19:14:40.357 - aiperf.cli_runner._single_run - INFO - Starting AIPerf System
+2026-09-18 19:14:40.366 - aiperf.common.scenario.validator - INFO - Scenario 'inferencex-agentx-mvp': setting profiling-phase timing_mode=agentic_replay.
+2026-09-18 19:14:40.366 - aiperf.common.scenario.validator - INFO - Scenario 'inferencex-agentx-mvp': injecting extra_inputs.ignore_eos=true (was absent).
+2026-09-18 19:14:40.366 - aiperf.common.scenario.validator - INFO - Scenario 'inferencex-agentx-mvp': auto-set --cache-bust=first_turn_prefix (was at default none).
+2026-09-18 19:14:40.367 - aiperf.common.scenario.validator - INFO - Scenario 'inferencex-agentx-mvp': auto-set --system-idle-gap-cap-seconds=10.0 (was unset).
+2026-09-18 19:14:40.576 - system_controller - INFO - GPU telemetry disabled via --no-gpu-telemetry
+2026-09-18 19:14:40.585 - system_controller - INFO - Registered Worker Manager (id: 'worker_manager')
+2026-09-18 19:14:40.611 - system_controller - INFO - Registered Record Processor (id: 'record_processor_80e19792')
+2026-09-18 19:14:40.613 - server_metrics_manager - INFO - Server Metrics: Discovered 1 endpoints: ['http://localhost:8888/metrics']
+2026-09-18 19:14:40.614 - system_controller - INFO - Registered Server Metrics Manager (id: 'server_metrics_manager')
+2026-09-18 19:14:40.704 - OTelMetricsResultsProcessor_b264b50b - INFO - Telemetry streaming is disabled (set --otel-url and/or --mlflow-tracking-uri to enable)
+2026-09-18 19:14:40.705 - RecordExportJSONLWriter_b6c92a8d - INFO - Record metrics export enabled: /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/agentic_results/conv_decode/conc4/aiperf_artifacts/profile_export.jsonl
+2026-09-18 19:14:40.708 - system_controller - INFO - Registered Records Manager (id: 'records_manager')
+2026-09-18 19:14:40.712 - system_controller - INFO - Registered Timing Manager (id: 'timing_manager')
+2026-09-18 19:14:40.729 - system_controller - INFO - Registered Worker (id: 'worker_cf35b41d')
+2026-09-18 19:14:40.735 - system_controller - INFO - Registered Worker (id: 'worker_d0787804')
+2026-09-18 19:14:40.739 - system_controller - INFO - Registered Worker (id: 'worker_346e193a')
+2026-09-18 19:14:40.749 - system_controller - INFO - Registered Worker (id: 'worker_52e4e02b')
+2026-09-18 19:14:40.784 - system_controller - INFO - Registered Dataset Manager (id: 'dataset_manager')
+2026-09-18 19:14:41.078 - system_controller - INFO - AIPerf System is CONFIGURING
+2026-09-18 19:14:41.078 - system_controller - INFO - Configuring all services to start profiling
+2026-09-18 19:14:41.078 - InferenceResultParser_ed67dfb4 - INFO - Tokenization is disabled for this endpoint, skipping tokenizer configuration
+2026-09-18 19:14:41.078 - timing_manager - INFO - Waiting for dataset to be configured before configuring timing
+2026-09-18 19:14:41.099 - server_metrics_manager - INFO - Server Metrics: Capturing baseline metrics...
+2026-09-18 19:14:41.111 - http://localhost:8888/metrics - WARNING - Dropping non-finite (NaN/Inf) sample(s) from metric 'sglang:fwd_occupancy': 1 in this scrape; affected data will be missing from server_metrics_export. Further occurrences for this metric name will not be logged.
+2026-09-18 19:14:41.112 - system_controller - INFO - Server metrics enabled - 1/1 endpoint(s) reachable.
+2026-09-18 19:14:41.112 - system_controller - INFO - Waiting for result domains: profile, server_metrics
+2026-09-18 19:14:41.116 - dataset_manager - INFO - Memory-mapped dataset cache HIT (key=a82ad0ddc91ed291d65dc291f231bb25); skipping tokenizer + composer.
+2026-09-18 19:14:41.117 - aiperf.dataset.mmap_cache - INFO - Restored mmap cache file dataset.dat via hardlink in 0.000s (2.11 GiB)
+2026-09-18 19:14:41.117 - aiperf.dataset.mmap_cache - INFO - Restored mmap cache file index.dat via hardlink in 0.000s (0.00 GiB)
+2026-09-18 19:14:41.117 - aiperf.dataset.mmap_cache - INFO - Restored mmap cache files in 0.001s via dataset=hardlink index=hardlink (dataset=2.11 GiB, index=0.00 GiB)
+2026-09-18 19:14:41.979 - dataset_manager - INFO - sampling strategy: sequential, unique conversations: 9602, unique turn count: 68266
+2026-09-18 19:14:42.949 - aiperf.timing.trajectory_source - INFO - TrajectorySource: built 4 trajectories from 393 traces
+2026-09-18 19:14:42.949 - aiperf.timing.trajectory_source - INFO -   range cfg=[0.25, 0.75]  observed sample pct: min= 49% median= 55% max= 67%
+2026-09-18 19:14:42.949 - aiperf.timing.trajectory_source - INFO -     lane=00  sample_time= 53%  root_next= 45/61  ( 74% turns)  live=1 ready=1  trace_id=002001296e8a8c38ad9d7cc436d691afc602
+2026-09-18 19:14:42.949 - aiperf.timing.trajectory_source - INFO -     lane=01  sample_time= 49%  root_next=  5/33  ( 15% turns)  live=1 ready=1  trace_id=006c98de37d819e95b0840e25426bb7ca99d
+2026-09-18 19:14:42.949 - aiperf.timing.trajectory_source - INFO -     lane=02  sample_time= 67%  root_next= 24/29  ( 83% turns)  live=1 ready=1  trace_id=00ca01c4aaeccee751ae6285beb54dea262f
+2026-09-18 19:14:42.949 - aiperf.timing.trajectory_source - INFO -     lane=03  sample_time= 56%  root_next=  0/16  (  0% turns)  live=1 ready=1  trace_id=0196085d85d2075a50b74cd8795ffbdcea9a
+2026-09-18 19:14:42.949 - PhaseOrchestrator_abba08b0 - INFO - Initialized 2 phase(s): ['Warmup', 'Profiling']
+2026-09-18 19:14:43.283 - dataset_manager - INFO - Dataset client initialized and freed 0 conversations from memory
+2026-09-18 19:14:43.286 - system_controller - INFO - All services configured in 2.21 seconds
+2026-09-18 19:14:43.286 - system_controller - INFO - AIPerf System is CONFIGURED
+2026-09-18 19:14:43.287 - server_metrics_manager - INFO - Server Metrics: Started 1 collector(s) successfully
+2026-09-18 19:14:43.355 - PhaseRunner - NOTICE - Phase warmup (warmup) started | target: 43 requests
+2026-09-18 19:14:43.355 - AgenticReplayTiming - INFO - WARMUP execute: dispatching 3 trajectory credits
+2026-09-18 19:14:43.356 - AgenticReplayTiming - INFO - WARMUP count budget: 10 additional requests per lane after 3 mandatory snapshot primers
+2026-09-18 19:14:43.356 - AgenticReplayTiming - INFO - WARMUP spread: 0.0s ramp aligning 3 request(s) on t* (earliest fires at 0, last at 0.0s)
+2026-09-18 19:14:44.318 - records_manager - INFO - Credit phase start: warmup
+2026-09-18 19:14:44.318 - system_controller - INFO - All services started profiling successfully
+2026-09-18 19:14:44.319 - system_controller - INFO - AIPerf System is PROFILING
+2026-09-18 19:14:47.119 - records_manager - WARNING - Token usage is reported but no prompt-cache read tokens were seen (usage.prompt_tokens_details.cached_tokens absent). If your server uses prefix/KV caching, enable cache reporting so AIPerf can populate the prompt-cache metrics: vLLM --enable-prompt-tokens-details, SGLang --enable-cache-report (TRT-LLM reports it by default).
+2026-09-18 19:14:47.119 - MetricsAccumulator_df2eef5e - WARNING - Token usage is reported but no prompt-cache read tokens were seen (usage.prompt_tokens_details.cached_tokens absent). If your server uses prefix/KV caching, enable cache reporting so AIPerf can populate the prompt-cache metrics: vLLM --enable-prompt-tokens-details, SGLang --enable-cache-report (TRT-LLM reports it by default).
+2026-09-18 19:15:00.523 - aiperf.timing.replay_dependencies - INFO - Replay interval barriers active: 68266 requests, 34015 gated turns, join-widths={1: 26371, 2: 5215, 3: 1416, 4: 473, 5: 151, 6: 80, 7: 62, 8: 91, 9: 72, 10: 51, 11: 20, 12: 9, 13: 2, 14: 2}
+2026-09-18 19:15:00.523 - AgenticReplayTiming - INFO - WARMUP cache pressure: replaying live trajectories until each lane reaches 10 additional requests with zero idle delay and max_tokens=1
+2026-09-18 19:15:13.357 - PhaseRunner - INFO - Phase warmup progress | returned=17/43 | sent=23 | in_flight=6 | errors=0 | elapsed=30.0s
+2026-09-18 19:15:24.167 - AgenticReplayTiming - INFO - WARMUP cache pressure request budget reached: 10 additional requests on each of 4 lanes; draining requests
+2026-09-18 19:15:24.168 - PhaseRunner - NOTICE - Phase warmup (warmup) sending complete | sent=43, completed=42, in_flight=1 | sessions: sent=5, completed=1
+2026-09-18 19:15:24.869 - PhaseRunner - INFO - All accelerated-warmup wire requests returned; preserving paused DAG work for profiling handoff.
+2026-09-18 19:15:24.870 - PhaseRunner - NOTICE - Phase warmup (warmup) complete | completed=43, cancelled=0, errors=0 | sessions: completed=1, cancelled=0 | elapsed=41.51s
+2026-09-18 19:15:24.870 - AgenticReplayTiming - INFO - Global system-idle cap summary: limit=10s, jumps=0, skipped=0.000s
+2026-09-18 19:15:24.870 - server_metrics_manager - INFO - Server Metrics: Warmup complete, capturing final warmup metrics...
+2026-09-18 19:15:24.870 - AgenticReplayTiming - INFO - WARMUP cache pressure handoff: persisted 10 live streams
+2026-09-18 19:15:24.870 - aiperf.timing.branch_orchestrator - INFO - BranchOrchestrator stats: spawned=7 completed=1 errored=0 suspended=2 resumed=0 parents_failed_due_to_child_error=0 joins_suppressed=0 delayed=0
+2026-09-18 19:15:24.870 - PhaseRunner - INFO - Session-tree slots for phase warmup: peak_open=4 (target concurrency 4); released 4 still-open at teardown; late_events=0
+2026-09-18 19:15:24.971 - aiperf.timing.replay_dependencies - INFO - Replay interval barriers active: 68266 requests, 34015 gated turns, join-widths={1: 26371, 2: 5215, 3: 1416, 4: 473, 5: 151, 6: 80, 7: 62, 8: 91, 9: 72, 10: 51, 11: 20, 12: 9, 13: 2, 14: 2}
+2026-09-18 19:15:24.971 - AgenticReplayTiming - INFO - PROFILING setup: 4 trajectory lanes; recycle draws roots from the dataset sampler
+2026-09-18 19:15:24.971 - AgenticReplayTiming - INFO - PROFILING: 0 rootless + 2 gated-parent lanes of 4 dispatch no root credit at start and hold a lane credit instead (so they still count toward concurrency); rootless lanes recycle into a fresh root once their background subagents drain
+2026-09-18 19:15:24.971 - PhaseRunner - NOTICE - Phase profiling (profiling) started | phase_index=0 | profiling_index=0 | target: 1800.0s duration
+2026-09-18 19:15:24.972 - records_manager - INFO - Credit phase start: profiling
+2026-09-18 19:15:24.973 - PhaseRunner - INFO - Waiting for event 'profiling phase sending' with timeout of 1799.997688303s
+2026-09-18 19:15:24.973 - AgenticReplayTiming - INFO - PROFILING execute: resuming 4 trajectory sessions (spread; first-request spread 36583.3s)
+2026-09-18 19:15:40.744 - records_manager - INFO - [realtime 00:15 profiling]
+2026-09-18 19:15:40.744 - records_manager - INFO -   rps=0.1 (avg 0.1)  tput_in=6,269/s  tput_out=93/s  done=2 ok=2 err=0
+2026-09-18 19:15:40.745 - records_manager - INFO -   ttft    p50=  935ms  p75=1,219ms  p95=1,447ms  p99= 1,493ms
+2026-09-18 19:15:40.745 - records_manager - INFO -   itl     p50=    9ms  p75=    9ms  p95=    9ms  p99=     9ms
+2026-09-18 19:15:40.745 - records_manager - INFO -   e2e     p50=6,779ms  p75=8,443ms  p95=9,775ms  p99=10,041ms
+2026-09-18 19:15:40.745 - records_manager - INFO -   intvty  p50=    116  p75=    120  p95=    123  p99=     124  (1/tpot tok/s)
+2026-09-18 19:15:40.745 - records_manager - INFO -   isl     p50= 44,450  p75= 52,848  p90= 57,888  p99=  60,911  (tokens)
+2026-09-18 19:15:40.745 - records_manager - INFO -   osl     p50=    658  p75=    794  p90=    876  p99=     926  (tokens)
+2026-09-18 19:15:40.745 - records_manager - INFO -   tot     in=88,900  out=1,315
+2026-09-18 19:15:40.745 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=90.0%
+2026-09-18 19:15:40.745 - records_manager - INFO -   srv    prefix_cache_hit=60.8% unique_in_srv=34,884 kv_usage=3.0% queue=1r/0w tput_in_srv=5,675/s tput_out_srv=84/s
+2026-09-18 19:16:10.765 - records_manager - INFO - [realtime 00:45 profiling]
+2026-09-18 19:16:10.765 - records_manager - INFO -   rps=0.1 (avg 0.1)  tput_in=7,784/s  tput_out=60/s  done=5 ok=5 err=0
+2026-09-18 19:16:10.765 - records_manager - INFO -   ttft    p50=  950ms  p75=1,504ms  p95=1,739ms  p99=1,786ms
+2026-09-18 19:16:10.765 - records_manager - INFO -   itl     p50=    9ms  p75=    9ms  p95=    9ms  p99=    9ms
+2026-09-18 19:16:10.765 - records_manager - INFO -   e2e     p50=3,697ms  p75=4,027ms  p95=8,891ms  p99=9,864ms
+2026-09-18 19:16:10.765 - records_manager - INFO -   intvty  p50=    116  p75=    118  p95=    123  p99=    124  (1/tpot tok/s)
+2026-09-18 19:16:10.765 - records_manager - INFO -   isl     p50= 61,247  p75= 62,861  p90= 63,944  p99= 64,594  (tokens)
+2026-09-18 19:16:10.765 - records_manager - INFO -   osl     p50=    346  p75=    384  p90=    712  p99=    909  (tokens)
+2026-09-18 19:16:10.765 - records_manager - INFO -   tot     in=270,234  out=2,100
+2026-09-18 19:16:10.765 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=89.7%
+2026-09-18 19:16:10.765 - records_manager - INFO -   srv    prefix_cache_hit=75.6% unique_in_srv=65,882 kv_usage=8.0% queue=3r/0w tput_in_srv=5,918/s tput_out_srv=46/s
+2026-09-18 19:16:40.778 - records_manager - INFO - [realtime 01:15 profiling]
+2026-09-18 19:16:40.779 - records_manager - INFO -   rps=0.1 (avg 0.1)  tput_in=6,123/s  tput_out=219/s  done=8 ok=8 err=0
+2026-09-18 19:16:40.779 - records_manager - INFO -   ttft    p50=1,227ms  p75= 1,576ms  p95= 1,754ms  p99= 1,789ms
+2026-09-18 19:16:40.779 - records_manager - INFO -   itl     p50=    9ms  p75=     9ms  p95=     9ms  p99=     9ms
+2026-09-18 19:16:40.779 - records_manager - INFO -   e2e     p50=7,067ms  p75=38,027ms  p95=50,183ms  p99=51,556ms
+2026-09-18 19:16:40.779 - records_manager - INFO -   intvty  p50=    113  p75=     117  p95=     122  p99=     124  (1/tpot tok/s)
+2026-09-18 19:16:40.779 - records_manager - INFO -   isl     p50= 62,054  p75=  64,734  p90=  68,989  p99=  77,500  (tokens)
+2026-09-18 19:16:40.779 - records_manager - INFO -   osl     p50=    658  p75=   4,114  p90=   5,147  p99=   5,631  (tokens)
+2026-09-18 19:16:40.779 - records_manager - INFO -   tot     in=462,306  out=16,548
+2026-09-18 19:16:40.779 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=89.0%
+2026-09-18 19:16:40.779 - records_manager - INFO -   srv    prefix_cache_hit=75.5% unique_in_srv=113,186 kv_usage=0.0% queue=0r/0w tput_in_srv=6,109/s tput_out_srv=219/s
+2026-09-18 19:17:10.793 - records_manager - INFO - [realtime 01:45 profiling]
+2026-09-18 19:17:10.793 - records_manager - INFO -   rps=0.0 (avg 0.1)  tput_in=6,123/s  tput_out=219/s  done=8 ok=8 err=0
+2026-09-18 19:17:10.793 - records_manager - INFO -   ttft    p50=1,227ms  p75= 1,576ms  p95= 1,754ms  p99= 1,789ms
+2026-09-18 19:17:10.793 - records_manager - INFO -   itl     p50=    9ms  p75=     9ms  p95=     9ms  p99=     9ms
+2026-09-18 19:17:10.793 - records_manager - INFO -   e2e     p50=7,067ms  p75=38,027ms  p95=50,183ms  p99=51,556ms
+2026-09-18 19:17:10.793 - records_manager - INFO -   intvty  p50=    113  p75=     117  p95=     122  p99=     124  (1/tpot tok/s)
+2026-09-18 19:17:10.793 - records_manager - INFO -   isl     p50= 62,054  p75=  64,734  p90=  68,989  p99=  77,500  (tokens)
+2026-09-18 19:17:10.793 - records_manager - INFO -   osl     p50=    658  p75=   4,114  p90=   5,147  p99=   5,631  (tokens)
+2026-09-18 19:17:10.793 - records_manager - INFO -   tot     in=462,306  out=16,548
+2026-09-18 19:17:10.793 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=89.0%
+2026-09-18 19:17:10.793 - records_manager - INFO -   srv    prefix_cache_hit=75.5% unique_in_srv=113,186 kv_usage=4.0% queue=1r/0w tput_in_srv=4,375/s tput_out_srv=157/s
+2026-09-18 19:17:40.808 - records_manager - INFO - [realtime 02:15 profiling]
+2026-09-18 19:17:40.808 - records_manager - INFO -   rps=0.0 (avg 0.1)  tput_in=4,119/s  tput_out=167/s  done=9 ok=9 err=0
+2026-09-18 19:17:40.808 - records_manager - INFO -   ttft    p50= 1,415ms  p75= 1,544ms  p95= 1,748ms  p99= 1,788ms
+2026-09-18 19:17:40.808 - records_manager - INFO -   itl     p50=     9ms  p75=     9ms  p95=     9ms  p99=     9ms
+2026-09-18 19:17:40.808 - records_manager - INFO -   e2e     p50=10,107ms  p75=45,659ms  p95=49,937ms  p99=51,507ms
+2026-09-18 19:17:40.808 - records_manager - INFO -   intvty  p50=     115  p75=     118  p95=     122  p99=     124  (1/tpot tok/s)
+2026-09-18 19:17:40.808 - records_manager - INFO -   isl     p50=  62,861  p75=  64,936  p90=  78,024  p99=  78,404  (tokens)
+2026-09-18 19:17:40.808 - records_manager - INFO -   osl     p50=     931  p75=   4,917  p90=   5,382  p99=   5,655  (tokens)
+2026-09-18 19:17:40.808 - records_manager - INFO -   tot     in=540,224  out=21,854
+2026-09-18 19:17:40.808 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=88.7%
+2026-09-18 19:17:40.808 - records_manager - INFO -   srv    prefix_cache_hit=74.8% unique_in_srv=136,384 kv_usage=0.0% queue=0r/0w tput_in_srv=3,981/s tput_out_srv=161/s
+2026-09-18 19:18:10.825 - records_manager - INFO - [realtime 02:45 profiling]
+2026-09-18 19:18:10.825 - records_manager - INFO -   rps=0.0 (avg 0.1)  tput_in=4,356/s  tput_out=159/s  done=10 ok=10 err=0
+2026-09-18 19:18:10.825 - records_manager - INFO -   ttft    p50=1,183ms  p75= 1,534ms  p95= 1,741ms  p99= 1,786ms
+2026-09-18 19:18:10.825 - records_manager - INFO -   itl     p50=    9ms  p75=     9ms  p95=     9ms  p99=     9ms
+2026-09-18 19:18:10.825 - records_manager - INFO -   e2e     p50=8,630ms  p75=43,003ms  p95=49,692ms  p99=51,458ms
+2026-09-18 19:18:10.825 - records_manager - INFO -   intvty  p50=    116  p75=     120  p95=     123  p99=     124  (1/tpot tok/s)
+2026-09-18 19:18:10.825 - records_manager - INFO -   isl     p50= 63,764  p75=  74,672  p90=  78,548  p99=  79,372  (tokens)
+2026-09-18 19:18:10.825 - records_manager - INFO -   osl     p50=    866  p75=   4,649  p90=   5,344  p99=   5,651  (tokens)
+2026-09-18 19:18:10.825 - records_manager - INFO -   tot     in=619,688  out=22,655
+2026-09-18 19:18:10.825 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=88.9%
+2026-09-18 19:18:10.825 - records_manager - INFO -   srv    prefix_cache_hit=77.7% unique_in_srv=137,960 kv_usage=7.0% queue=2r/0w tput_in_srv=3,740/s tput_out_srv=137/s
+2026-09-18 19:18:40.847 - records_manager - INFO - [realtime 03:15 profiling]
+2026-09-18 19:18:40.847 - records_manager - INFO -   rps=0.1 (avg 0.1)  tput_in=4,128/s  tput_out=154/s  done=14 ok=14 err=0
+2026-09-18 19:18:40.847 - records_manager - INFO -   ttft    p50=  842ms  p75= 1,482ms  p95= 1,716ms  p99= 1,781ms
+2026-09-18 19:18:40.847 - records_manager - INFO -   itl     p50=    9ms  p75=     9ms  p95=     9ms  p99=     9ms
+2026-09-18 19:18:40.847 - records_manager - INFO -   e2e     p50=8,630ms  p75=35,083ms  p95=48,711ms  p99=51,262ms
+2026-09-18 19:18:40.848 - records_manager - INFO -   intvty  p50=    116  p75=     118  p95=     123  p99=     124  (1/tpot tok/s)
+2026-09-18 19:18:40.848 - records_manager - INFO -   isl     p50= 62,054  p75=  74,672  p90=  79,159  p99=  85,372  (tokens)
+2026-09-18 19:18:40.848 - records_manager - INFO -   osl     p50=    866  p75=   3,986  p90=   5,189  p99=   5,636  (tokens)
+2026-09-18 19:18:40.848 - records_manager - INFO -   tot     in=792,768  out=29,651
+2026-09-18 19:18:40.848 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=88.7%
+2026-09-18 19:18:40.848 - records_manager - INFO -   srv    prefix_cache_hit=79.3% unique_in_srv=164,352 kv_usage=6.0% queue=1r/0w tput_in_srv=4,051/s tput_out_srv=152/s
+2026-09-18 19:19:10.890 - records_manager - INFO - [realtime 03:45 profiling]
+2026-09-18 19:19:10.890 - records_manager - INFO -   rps=0.6 (avg 0.1)  tput_in=5,594/s  tput_out=142/s  done=32 ok=32 err=0
+2026-09-18 19:19:10.890 - records_manager - INFO -   ttft    p50=  796ms  p75=1,048ms  p95= 1,602ms  p99= 1,759ms
+2026-09-18 19:19:10.890 - records_manager - INFO -   itl     p50=    9ms  p75=    9ms  p95=     9ms  p99=     9ms
+2026-09-18 19:19:10.891 - records_manager - INFO -   e2e     p50=2,182ms  p75=4,809ms  p95=46,260ms  p99=50,379ms
+2026-09-18 19:19:10.891 - records_manager - INFO -   intvty  p50=    113  p75=    117  p95=     126  p99=     128  (1/tpot tok/s)
+2026-09-18 19:19:10.891 - records_manager - INFO -   isl     p50= 30,341  p75= 55,667  p90=  76,620  p99=  84,150  (tokens)
+2026-09-18 19:19:10.891 - records_manager - INFO -   osl     p50=    135  p75=    488  p90=   4,014  p99=   5,568  (tokens)
+2026-09-18 19:19:10.891 - records_manager - INFO -   tot     in=1,260,727  out=32,026
+2026-09-18 19:19:10.891 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=88.8%
+2026-09-18 19:19:10.891 - records_manager - INFO -   srv    prefix_cache_hit=82.9% unique_in_srv=215,607 kv_usage=6.0% queue=2r/0w tput_in_srv=5,586/s tput_out_srv=142/s
+2026-09-18 19:19:40.946 - records_manager - INFO - [realtime 04:15 profiling]
+2026-09-18 19:19:40.947 - records_manager - INFO -   rps=0.5 (avg 0.2)  tput_in=7,822/s  tput_out=133/s  done=46 ok=46 err=0
+2026-09-18 19:19:40.947 - records_manager - INFO -   ttft    p50=  846ms  p75=1,042ms  p95= 1,534ms  p99= 1,741ms
+2026-09-18 19:19:40.947 - records_manager - INFO -   itl     p50=    9ms  p75=    9ms  p95=    10ms  p99=    10ms
+2026-09-18 19:19:40.947 - records_manager - INFO -   e2e     p50=2,071ms  p75=3,671ms  p95=43,018ms  p99=49,692ms
+2026-09-18 19:19:40.947 - records_manager - INFO -   intvty  p50=    112  p75=    116  p95=     124  p99=     128  (1/tpot tok/s)
+2026-09-18 19:19:40.947 - records_manager - INFO -   isl     p50= 44,696  p75= 56,734  p90=  64,801  p99=  83,199  (tokens)
+2026-09-18 19:19:40.947 - records_manager - INFO -   osl     p50=    127  p75=    320  p90=   3,282  p99=   5,514  (tokens)
+2026-09-18 19:19:40.947 - records_manager - INFO -   tot     in=1,991,447  out=33,984
+2026-09-18 19:19:40.947 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=89.6%
+2026-09-18 19:19:40.947 - records_manager - INFO -   srv    prefix_cache_hit=87.3% unique_in_srv=253,207 kv_usage=9.0% queue=1r/0w tput_in_srv=7,788/s tput_out_srv=133/s
+2026-09-18 19:20:11.022 - records_manager - INFO - [realtime 04:46 profiling]
+2026-09-18 19:20:11.023 - records_manager - INFO -   rps=0.6 (avg 0.2)  tput_in=11,009/s  tput_out=160/s  done=64 ok=64 err=0
+2026-09-18 19:20:11.023 - records_manager - INFO -   ttft    p50=  780ms  p75=  962ms  p95= 1,538ms  p99= 1,806ms
+2026-09-18 19:20:11.023 - records_manager - INFO -   itl     p50=    9ms  p75=    9ms  p95=    11ms  p99=    15ms
+2026-09-18 19:20:11.023 - records_manager - INFO -   e2e     p50=2,053ms  p75=3,092ms  p95=44,075ms  p99=68,363ms
+2026-09-18 19:20:11.023 - records_manager - INFO -   intvty  p50=    112  p75=    115  p95=     121  p99=     128  (1/tpot tok/s)
+2026-09-18 19:20:11.023 - records_manager - INFO -   isl     p50= 53,512  p75= 63,016  p90=  72,076  p99=  92,602  (tokens)
+2026-09-18 19:20:11.023 - records_manager - INFO -   osl     p50=    128  p75=    206  p90=   2,183  p99=   7,112  (tokens)
+2026-09-18 19:20:11.023 - records_manager - INFO -   tot     in=3,145,802  out=45,769
+2026-09-18 19:20:11.023 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=90.5%
+2026-09-18 19:20:11.023 - records_manager - INFO -   srv    prefix_cache_hit=90.4% unique_in_srv=296,796 kv_usage=6.0% queue=2r/0w tput_in_srv=10,842/s tput_out_srv=160/s
+2026-09-18 19:20:24.974 - aiperf.timing.replay_dependencies - INFO - Per-trace idle cap advanced replay root e9e40b1d-5101-4b52-9066-b065114d7081 by 36216.807s
+2026-09-18 19:20:24.974 - aiperf.timing.replay_dependencies - INFO - Per-trace idle cap advanced replay root 839e07cf-98c6-4033-91c7-2f7879a4b8bf by 1267.698s
+2026-09-18 19:20:41.109 - records_manager - INFO - [realtime 05:16 profiling]
+2026-09-18 19:20:41.109 - records_manager - INFO -   rps=0.3 (avg 0.2)  tput_in=11,534/s  tput_out=150/s  done=72 ok=72 err=0
+2026-09-18 19:20:41.109 - records_manager - INFO -   ttft    p50=  800ms  p75=  977ms  p95= 1,635ms  p99= 2,225ms
+2026-09-18 19:20:41.109 - records_manager - INFO -   itl     p50=    9ms  p75=    9ms  p95=    19ms  p99=    41ms
+2026-09-18 19:20:41.109 - records_manager - INFO -   e2e     p50=2,071ms  p75=3,619ms  p95=39,850ms  p99=64,803ms
+2026-09-18 19:20:41.109 - records_manager - INFO -   intvty  p50=    112  p75=    115  p95=     121  p99=     128  (1/tpot tok/s)
+2026-09-18 19:20:41.109 - records_manager - INFO -   isl     p50= 53,846  p75= 64,734  p90=  75,379  p99=  91,230  (tokens)
+2026-09-18 19:20:41.109 - records_manager - INFO -   osl     p50=    128  p75=    222  p90=     918  p99=   6,804  (tokens)
+2026-09-18 19:20:41.109 - records_manager - INFO -   tot     in=3,639,310  out=47,260
+2026-09-18 19:20:41.109 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=90.6%
+2026-09-18 19:20:41.109 - records_manager - INFO -   srv    prefix_cache_hit=90.1% unique_in_srv=360,398 kv_usage=18.0% queue=7r/0w tput_in_srv=11,527/s tput_out_srv=150/s
+2026-09-18 19:21:11.248 - records_manager - INFO - [realtime 05:46 profiling]
+2026-09-18 19:21:11.249 - records_manager - INFO -   rps=0.6 (avg 0.3)  tput_in=13,586/s  tput_out=153/s  done=90 ok=90 err=0
+2026-09-18 19:21:11.249 - records_manager - INFO -   ttft    p50=  821ms  p75=1,049ms  p95= 1,809ms  p99= 3,239ms
+2026-09-18 19:21:11.249 - records_manager - INFO -   itl     p50=    9ms  p75=   13ms  p95=    36ms  p99=    41ms
+2026-09-18 19:21:11.249 - records_manager - INFO -   e2e     p50=2,381ms  p75=4,765ms  p95=35,071ms  p99=56,794ms
+2026-09-18 19:21:11.249 - records_manager - INFO -   intvty  p50=    110  p75=    114  p95=     119  p99=     128  (1/tpot tok/s)
+2026-09-18 19:21:11.249 - records_manager - INFO -   isl     p50= 53,114  p75= 65,884  p90=  77,939  p99=  88,142  (tokens)
+2026-09-18 19:21:11.249 - records_manager - INFO -   osl     p50=    130  p75=    274  p90=     733  p99=   6,109  (tokens)
+2026-09-18 19:21:11.249 - records_manager - INFO -   tot     in=4,636,202  out=52,219
+2026-09-18 19:21:11.249 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=91.1%
+2026-09-18 19:21:11.249 - records_manager - INFO -   srv    prefix_cache_hit=90.9% unique_in_srv=420,458 kv_usage=16.0% queue=5r/0w tput_in_srv=13,398/s tput_out_srv=151/s
+2026-09-18 19:21:41.366 - records_manager - INFO - [realtime 06:16 profiling]
+2026-09-18 19:21:41.366 - records_manager - INFO -   rps=0.4 (avg 0.3)  tput_in=14,013/s  tput_out=158/s  done=101 ok=101 err=0
+2026-09-18 19:21:41.366 - records_manager - INFO -   ttft    p50=  830ms  p75=1,081ms  p95= 1,819ms  p99= 3,219ms
+2026-09-18 19:21:41.366 - records_manager - INFO -   itl     p50=    9ms  p75=   22ms  p95=    37ms  p99=    42ms
+2026-09-18 19:21:41.366 - records_manager - INFO -   e2e     p50=3,030ms  p75=6,583ms  p95=35,098ms  p99=75,501ms
+2026-09-18 19:21:41.366 - records_manager - INFO -   intvty  p50=    109  p75=    113  p95=     118  p99=     128  (1/tpot tok/s)
+2026-09-18 19:21:41.366 - records_manager - INFO -   isl     p50= 52,999  p75= 64,936  p90=  78,124  p99=  87,891  (tokens)
+2026-09-18 19:21:41.366 - records_manager - INFO -   osl     p50=    132  p75=    320  p90=     725  p99=   5,685  (tokens)
+2026-09-18 19:21:41.366 - records_manager - INFO -   tot     in=5,250,659  out=59,079
+2026-09-18 19:21:41.366 - records_manager - INFO -   trace  theoretical_prefix_cache_hit=91.5%
+2026-09-18 19:21:41.366 - records_manager - INFO -   srv    prefix_cache_hit=91.7% unique_in_srv=437,603 kv_usage=15.0% queue=3r/0w tput_in_srv=13,963/s tput_out_srv=157/s

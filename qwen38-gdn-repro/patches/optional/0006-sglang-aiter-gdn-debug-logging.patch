@@ -1,0 +1,87 @@
+diff --git a/python/sglang/srt/layers/attention/linear/gdn_backend.py b/python/sglang/srt/layers/attention/linear/gdn_backend.py
+index c123181..3c63c20 100644
+--- a/python/sglang/srt/layers/attention/linear/gdn_backend.py
++++ b/python/sglang/srt/layers/attention/linear/gdn_backend.py
+@@ -128,6 +128,19 @@ def _validate_gdn_linear_attn_backends(backends: LinearAttnBackends) -> None:
+ 
+ _AITER_GDN_CONV_UNAVAILABLE = False
+ 
++# See the matching block in kernels/gdn_triton.py: resolved once at import, one
++# report per process, so the dispatch path pays nothing when it is off.
++_AITER_GDN_DEBUG = get_bool_env_var("SGLANG_AITER_GDN_DEBUG")
++_AITER_GDN_CONV_REPORTED = False
++
++
++def _report_gdn_conv_once(msg, *args):
++    global _AITER_GDN_CONV_REPORTED
++    if _AITER_GDN_CONV_REPORTED:
++        return
++    _AITER_GDN_CONV_REPORTED = True
++    logger.info("[aiter-gdn] prefill conv: " + msg, *args)
++
+ 
+ def _aiter_gdn_prefill_conv():
+     """AITER's FlyDSL prefill causal conv, or None if it cannot be used.
+@@ -168,9 +181,16 @@ def _prefill_causal_conv1d(*args, **kwargs):
+     fn = _aiter_gdn_prefill_conv()
+     if fn is not None:
+         try:
+-            return fn(*args, **kwargs)
++            out = fn(*args, **kwargs)
++            if _AITER_GDN_DEBUG:
++                _report_gdn_conv_once("ACTIVE (AITER FlyDSL kernel accepted the batch)")
++            return out
+         except ValueError as exc:
++            if _AITER_GDN_DEBUG:
++                _report_gdn_conv_once("FELL BACK to Triton -- kernel declined: %s", exc)
+             logger.debug("aiter FlyDSL prefill conv declined this batch: %s", exc)
++    elif _AITER_GDN_DEBUG:
++        _report_gdn_conv_once("OFF (env gate closed or aiter import failed)")
+     return causal_conv1d_fn(*args, **kwargs)
+ 
+ 
+diff --git a/python/sglang/srt/layers/attention/linear/kernels/gdn_triton.py b/python/sglang/srt/layers/attention/linear/kernels/gdn_triton.py
+index 0cce2e3..8f4184d 100644
+--- a/python/sglang/srt/layers/attention/linear/kernels/gdn_triton.py
++++ b/python/sglang/srt/layers/attention/linear/kernels/gdn_triton.py
+@@ -45,6 +45,21 @@ elif is_xpu():
+ 
+ _AITER_GDN_DECODE_UNAVAILABLE = False
+ 
++# Diagnostics for "is the AITER kernel actually running?". Resolved once at
++# import so the dispatch hot path is a single already-False global lookup when
++# it is off; with it on, each outcome is reported once per process rather than
++# once per layer per step.
++_AITER_GDN_DEBUG = get_bool_env_var("SGLANG_AITER_GDN_DEBUG")
++_AITER_GDN_DECODE_REPORTED = False
++
++
++def _report_gdn_decode_once(msg, *args):
++    global _AITER_GDN_DECODE_REPORTED
++    if _AITER_GDN_DECODE_REPORTED:
++        return
++    _AITER_GDN_DECODE_REPORTED = True
++    logger.info("[aiter-gdn] decode: " + msg, *args)
++
+ 
+ def _aiter_gdn_decode_varlen():
+     """AITER's FlyDSL packed-decode recurrence, or None if it cannot be used.
+@@ -79,10 +94,17 @@ def _try_aiter_gdn_decode(**kw):
+     """
+     fn = _aiter_gdn_decode_varlen()
+     if fn is None:
++        if _AITER_GDN_DEBUG:
++            _report_gdn_decode_once("OFF (env gate closed or aiter import failed)")
+         return None
+     try:
+-        return fn(**kw)
++        out = fn(**kw)
++        if _AITER_GDN_DEBUG:
++            _report_gdn_decode_once("ACTIVE (AITER FlyDSL kernel accepted the batch)")
++        return out
+     except ValueError as exc:
++        if _AITER_GDN_DEBUG:
++            _report_gdn_decode_once("FELL BACK to Triton -- kernel declined: %s", exc)
+         logger.debug("aiter FlyDSL GDN decode declined this batch: %s", exc)
+         return None
+ 
