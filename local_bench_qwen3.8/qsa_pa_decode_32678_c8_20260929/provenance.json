@@ -1,0 +1,13 @@
+{
+  "sglang": {
+    "repo": "/var/home/my_sglang/sglang",
+    "head": "d69bb2d43a3ee8f76aa6326b9bb709861bc5228f",
+    "diff": "diff --git a/python/sglang/srt/layers/hyperconnection.py b/python/sglang/srt/layers/hyperconnection.py\nindex a7b71858e..f34770e2f 100644\n--- a/python/sglang/srt/layers/hyperconnection.py\n+++ b/python/sglang/srt/layers/hyperconnection.py\n@@ -5,6 +5,7 @@ import torch\n import torch.nn as nn\n import torch.nn.functional as F\n \n+from sglang.srt.environ import envs\n from sglang.srt.layers.hc_mix_flydsl import flydsl_hc_mix_supported, weight_cache_key\n from sglang.srt.layers.hc_mix_triton import fused_hc_mix, fused_hc_mix_supported\n \n@@ -182,6 +183,11 @@ class GatedResidual(HyperConnectionBase):\n                 self._jit_combine_ok\n                 and vecs % (8 * 160) == 0\n                 and (self.hidden_size // 8) % (vecs // 8) == 0\n+                # A fused CTA moves only (2 + hc_count) * hc_count * hidden_size\n+                # bytes -- 145KB for 4x2560 -- so one CU streams a row well\n+                # inside a single dispatch, and the split's extra launch is pure\n+                # overhead wherever launches are expensive. See the env's docs.\n+                and envs.SGLANG_HC_COMBINE_SPLIT.get()\n             )\n \n         def _mix_compute(\n"
+  },
+  "aiter": {
+    "repo": "/var/home/my_aiter/aiter",
+    "head": "12f1b0acbef4a84621e433cb88db499eef589d1c",
+    "diff": ""
+  },
+  "hc_mix_sha256": "f57562a967b72176b7aa8e5d332229f062529c9a4b3afa3fd05cc08fb7ec67b4"
+}

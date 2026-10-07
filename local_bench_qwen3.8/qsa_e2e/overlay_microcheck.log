@@ -1,0 +1,4 @@
+[aiter] import [module_aiter_core] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/tuned_jit/module_aiter_core.so
+[aiter] import [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/tuned_jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so
+decode C= 1 rows= 1 context=32679 KV=2051..2051 median=114.891 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32679 KV=2048..2051 median=120.191 us symbol_match=unprofiled

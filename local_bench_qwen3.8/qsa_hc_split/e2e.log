@@ -1,0 +1,14 @@
+START unset pid=294860
+DONE unset {"e2e_s": 255.21519785141572, "tpot_ms": 7.757362512622698, "output_throughput_tok_s": 128.39355714230572}
+DONE unset_repeat {"e2e_s": 196.99007629510015, "tpot_ms": 5.980350400132204, "output_throughput_tok_s": 166.3432778107934}
+STOPPED unset
+START enabled pid=308516
+STOPPED enabled
+Traceback (most recent call last):
+  File "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_hc_split/e2e.py", line 60, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_hc_split/e2e.py", line 52, in main
+    assert procenv.get('SGLANG_HC_COMBINE_SPLIT')==env.get('SGLANG_HC_COMBINE_SPLIT')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

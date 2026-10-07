@@ -1,0 +1,84 @@
+[
+  {
+    "name": "baseline",
+    "status": "pass",
+    "config": {},
+    "decode": 128.18426191806793,
+    "verify": 147.98189997673035,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 2160.335585474968
+  },
+  {
+    "name": "n128",
+    "status": "pass",
+    "config": {
+      "n": 128
+    },
+    "decode": 107.05765187740326,
+    "verify": 113.88468742370605,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 1687.7892047166824
+  },
+  {
+    "name": "n256",
+    "status": "pass",
+    "config": {
+      "n": 256
+    },
+    "decode": 158.81993770599365,
+    "verify": 171.08253836631775,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 2529.450273513794
+  },
+  {
+    "name": "n512",
+    "status": "pass",
+    "config": {
+      "n": 512
+    },
+    "decode": 187.7021074295044,
+    "verify": 238.60048651695251,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 3426.3121604919434
+  },
+  {
+    "name": "m64_n256",
+    "status": "pass",
+    "config": {
+      "m": 64,
+      "n": 256,
+      "warp": 16
+    },
+    "decode": 111.82313859462738,
+    "verify": 119.61667537689209,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 1770.8695203065872
+  },
+  {
+    "name": "m32_n256",
+    "status": "pass",
+    "config": {
+      "m": 32,
+      "n": 256,
+      "waves": 1
+    },
+    "decode": 226.08031034469604,
+    "verify": 246.7204511165619,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 3638.886344432831
+  },
+  {
+    "name": "m16_n256",
+    "status": "pass",
+    "config": {
+      "m": 16,
+      "n": 256,
+      "waves": 1,
+      "warp": 16
+    },
+    "decode": 127.29674875736237,
+    "verify": 134.87379848957062,
+    "max_abs_error": 0.0009373128414154053,
+    "selection_score_us": 2000.3758281469345
+  }
+]

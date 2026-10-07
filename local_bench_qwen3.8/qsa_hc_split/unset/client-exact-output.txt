@@ -1,0 +1,8210 @@
+We need answer user's request. User repeated many times: "Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery." Need provide comprehensive explanation. Need final answer. Need likely address design and performance, replication, indexing, transactions, recovery. Could structure with sections. Need maybe mention CAP, consistency models, partitioning/sharding, replication strategies, indexes distributed, transactions 2PC, concurrency control, recovery WAL, checkpoints, consensus, failure handling, performance tradeoffs. Need be thorough. No need mention repetition. Ensure final in English.
+</think>
+
+## Distributed Database Design and Performance
+
+A **distributed database** stores data across multiple physical nodes connected by a network, while presenting a unified logical database to applications. Its design must balance **scalability, availability, consistency, latency, throughput, fault tolerance, and operational complexity**.
+
+The main design goals are:
+
+1. **Scalability** — handle more data and more requests by adding nodes.
+2. **Availability** — continue operating despite node or network failures.
+3. **Consistency** — ensure users see correct and predictable data.
+4. **Performance** — minimize latency and maximize throughput.
+5. **Fault tolerance** — survive failures without data loss or downtime.
+6. **Transparency** — hide distribution details from applications as much as possible.
+
+A distributed database may be:
+
+- **Homogeneous**: all nodes run the same DBMS software.
+- **Heterogeneous**: nodes may use different DBMSs or data models.
+- **Centralized control**: one node coordinates transactions and metadata.
+- **Decentralized control**: nodes coordinate using protocols such as consensus or distributed locking.
+
+---
+
+# 1. Core Design Concepts
+
+## 1.1 Data Distribution Models
+
+Distributed databases distribute data using several models.
+
+### A. Fragmentation
+
+Data is divided into smaller pieces.
+
+#### Horizontal fragmentation
+
+Rows are split across nodes.
+
+Example:
+
+```text
+Node 1: customers in North America
+Node 2: customers in Europe
+Node 3: customers in Asia
+```
+
+This is common in sharded databases.
+
+#### Vertical fragmentation
+
+Columns are split across nodes.
+
+Example:
+
+```text
+Node 1: customer_id, name, email
+Node 2: customer_id, address, phone
+```
+
+This can reduce network traffic if queries usually access only some columns, but it can increase join costs.
+
+#### Mixed fragmentation
+
+Data is split both horizontally and vertically.
+
+---
+
+### B. Replication
+
+The same data is stored on multiple nodes.
+
+Example:
+
+```text
+Primary node: handles writes
+Replica nodes: handle reads
+```
+
+Replication improves availability and read performance but increases write cost and consistency complexity.
+
+---
+
+### C. Partitioning / Sharding
+
+Data is divided across nodes based on a key.
+
+Example:
+
+```text
+Shard 1: user_id 0–9999
+Shard 2: user_id 10000–19999
+Shard 3: user_id 20000–29999
+```
+
+Sharding improves scalability but makes transactions and joins more complex.
+
+---
+
+## 1.2 Architecture Patterns
+
+### Shared-nothing architecture
+
+Each node has its own CPU, memory, storage, and network connection.
+
+This is the most common architecture for scalable distributed databases.
+
+Examples:
+
+- Cassandra
+- CockroachDB
+- TiDB
+- Google Spanner
+- MongoDB sharded clusters
+
+Advantages:
+
+- High scalability
+- No shared storage bottleneck
+- Fault isolation
+
+Disadvantages:
+
+- More complex coordination
+- Network latency matters
+- Rebalancing and failure handling are harder
+
+---
+
+### Shared-disk architecture
+
+Nodes share storage but have separate processors and memory.
+
+Advantages:
+
+- Easier consistency
+- Less data duplication
+
+Disadvantages:
+
+- Shared storage can become a bottleneck
+- Less geographically scalable
+
+---
+
+### Shared-memory architecture
+
+Nodes share memory and storage.
+
+This is more common in tightly coupled systems and less common in large-scale distributed databases.
+
+---
+
+# 2. Replication
+
+Replication is one of the most important features of a distributed database. It stores copies of data on multiple nodes to improve availability, durability, and performance.
+
+---
+
+## 2.1 Why Replicate?
+
+Replication provides:
+
+1. **High availability**
+   - If one node fails, another can serve requests.
+
+2. **Fault tolerance**
+   - Data survives disk or machine failure.
+
+3. **Read scalability**
+   - Read requests can be distributed across replicas.
+
+4. **Geographic locality**
+   - Users can read from nearby data centers.
+
+5. **Disaster recovery**
+   - Remote replicas can restore service after regional failure.
+
+---
+
+## 2.2 Replication Models
+
+### A. Primary-backup replication
+
+One node is the primary or leader.
+
+- Writes go to the primary.
+- The primary sends changes to backups.
+- Backups may serve reads.
+
+Example:
+
+```text
+Client write → Primary → Replicas
+Client read  → Primary or Replica
+```
+
+Advantages:
+
+- Simple consistency model
+- Easy to reason about
+- Strong consistency possible
+
+Disadvantages:
+
+- Primary can become a bottleneck
+- Failover requires coordination
+- Backup lag can cause stale reads
+
+---
+
+### B. Multi-primary replication
+
+Multiple nodes can accept writes.
+
+Example:
+
+```text
+Client write → Node A or Node B
+Node A and Node B exchange updates
+```
+
+Advantages:
+
+- Better write availability
+- Useful for multi-data-center deployments
+
+Disadvantages:
+
+- Conflict resolution is complex
+- Strong consistency is difficult
+- May require CRDTs, vector clocks, or application-level conflict handling
+
+---
+
+### C. Peer-to-peer replication
+
+All nodes are equal and can accept writes.
+
+This is common in eventually consistent systems.
+
+Advantages:
+
+- No single primary
+- High availability
+
+Disadvantages:
+
+- Hard to guarantee consistency
+- Conflict resolution is complex
+- Debugging is harder
+
+---
+
+## 2.3 Synchronous vs Asynchronous Replication
+
+### Synchronous replication
+
+The primary waits for replicas to acknowledge the write before returning success.
+
+```text
+Write → Primary → Replica ACK → Client success
+```
+
+Advantages:
+
+- Strong durability
+- Little or no data loss if primary fails
+
+Disadvantages:
+
+- Higher write latency
+- Availability depends on replica health
+
+Example:
+
+```text
+If 2 replicas must acknowledge, write latency increases.
+```
+
+---
+
+### Asynchronous replication
+
+The primary returns success before replicas apply the write.
+
+```text
+Write → Primary ACK → Client success
+Replica applies later
+```
+
+Advantages:
+
+- Lower write latency
+- Better availability
+
+Disadvantages:
+
+- Replica may lag
+- Data loss possible if primary fails before replication
+
+---
+
+### Semi-synchronous replication
+
+The primary waits for at least one replica to acknowledge receipt of the log, but not necessarily application of the change.
+
+This is a compromise between synchronous and asynchronous replication.
+
+---
+
+## 2.4 Replication and Consistency
+
+Replication introduces a major tradeoff: **consistency vs availability vs latency**.
+
+This is often discussed using the **CAP theorem**:
+
+- **Consistency**: every read sees the latest write.
+- **Availability**: every request receives a response.
+- **Partition tolerance**: the system continues despite network partitions.
+
+In distributed systems, network partitions are unavoidable, so systems usually choose between consistency and availability during partitions.
+
+---
+
+### Strong consistency
+
+All replicas agree on the same data at the same time.
+
+Example:
+
+```text
+Write succeeds only if a majority of replicas acknowledge.
+```
+
+Used by:
+
+- Spanner
+- CockroachDB
+- Raft-based systems
+- Paxos-based systems
+
+Advantages:
+
+- Predictable behavior
+- Easier application logic
+
+Disadvantages:
+
+- Higher latency
+- Less available during partitions
+
+---
+
+### Eventual consistency
+
+Replicas may temporarily differ, but eventually converge.
+
+Example:
+
+```text
+Write succeeds locally.
+Other replicas update later.
+```
+
+Used by:
+
+- DynamoDB
+- Cassandra
+- Riak
+- Some multi-region NoSQL systems
+
+Advantages:
+
+- Low latency
+- High availability
+
+Disadvantages:
+
+- Stale reads
+- Complex conflict resolution
+- Harder application reasoning
+
+---
+
+## 2.5 Replication Performance Considerations
+
+Replication affects performance in several ways.
+
+### Write amplification
+
+If data is replicated to 3 nodes, one logical write may become 3 physical writes.
+
+```text
+1 client write → 3 node writes
+```
+
+This increases storage I/O and network traffic.
+
+---
+
+### Read scalability
+
+Reads can be distributed across replicas.
+
+```text
+1000 reads/sec → spread across 5 replicas
+```
+
+This can greatly improve read throughput.
+
+---
+
+### Network latency
+
+Replication requires network communication.
+
+In geographically distributed systems, latency can be significant.
+
+Example:
+
+```text
+New York → London: ~70–100 ms
+```
+
+Synchronous replication across continents can slow writes dramatically.
+
+---
+
+### Replica lag
+
+Asynchronous replicas may fall behind.
+
+This can cause:
+
+- Stale reads
+- Inconsistent application behavior
+- Failed failover if lag is too high
+
+---
+
+### Quorum reads and writes
+
+Some systems use quorum-based replication.
+
+Example:
+
+```text
+N = 3 replicas
+W = 2 writes must succeed
+R = 2 reads must succeed
+W + R > N
+```
+
+This provides strong consistency without requiring all replicas to respond.
+
+---
+
+## 2.6 Replication Strategies
+
+### Leader-based replication
+
+One leader handles writes.
+
+Common in:
+
+- MySQL
+- PostgreSQL
+- MongoDB
+- CockroachDB
+- TiDB
+
+---
+
+### Consensus-based replication
+
+Replicas use protocols such as Raft or Paxos to agree on the log.
+
+Common in:
+
+- CockroachDB
+- TiDB
+- etcd
+- Spanner-like systems
+
+---
+
+### Gossip-based replication
+
+Nodes exchange state periodically.
+
+Common in:
+
+- Cassandra
+- DynamoDB-like systems
+
+Advantages:
+
+- Scalable
+- Fault tolerant
+
+Disadvantages:
+
+- Eventual consistency
+- Harder to reason about
+
+---
+
+# 3. Indexing in Distributed Databases
+
+Indexes improve query performance by avoiding full scans. In distributed databases, indexing is more complex because data is spread across multiple nodes.
+
+---
+
+## 3.1 Why Indexes Matter
+
+Without indexes, queries may require scanning large amounts of data.
+
+Example:
+
+```sql
+SELECT * FROM users WHERE email = 'alice@example.com';
+```
+
+Without an index:
+
+```text
+Scan all users on all shards
+```
+
+With an index:
+
+```text
+Find matching row directly
+```
+
+Indexes reduce:
+
+- CPU usage
+- I/O
+- network traffic
+- query latency
+
+---
+
+## 3.2 Types of Distributed Indexes
+
+### A. Local indexes
+
+Each node indexes only its own data.
+
+Example:
+
+```text
+Shard 1 has index for users 0–9999
+Shard 2 has index for users 10000–19999
+```
+
+Advantages:
+
+- Simple
+- Low coordination
+- Good for queries that include the shard key
+
+Disadvantages:
+
+- Queries without shard key may scan all shards
+- Global uniqueness is harder
+
+---
+
+### B. Global indexes
+
+An index spans multiple shards.
+
+Example:
+
+```text
+Global index on email maps email values to shard locations
+```
+
+Advantages:
+
+- Efficient queries on non-shard keys
+- Can enforce global uniqueness
+
+Disadvantages:
+
+- More complex
+- Requires cross-node coordination
+- Can become a bottleneck
+- Harder to maintain during rebalancing
+
+---
+
+### C. Secondary indexes
+
+Indexes on non-primary columns.
+
+Example:
+
+```sql
+CREATE INDEX idx_email ON users(email);
+```
+
+In distributed systems, secondary indexes may be:
+
+- Local
+- Global
+- Partitioned
+- Replicated
+
+---
+
+### D. Composite indexes
+
+Indexes on multiple columns.
+
+Example:
+
+```sql
+CREATE INDEX idx_user_date ON orders(user_id, order_date);
+```
+
+Useful for queries like:
+
+```sql
+SELECT * FROM orders
+WHERE user_id = 123
+AND order_date > '2024-01-01';
+```
+
+---
+
+### E. Covering indexes
+
+An index contains all columns needed by a query.
+
+Example:
+
+```sql
+SELECT user_id, email FROM users WHERE email = 'alice@example.com';
+```
+
+If the index contains `email`, `user_id`, and `email`, the database may avoid accessing the main table.
+
+This reduces I/O and improves performance.
+
+---
+
+## 3.3 Index Structures
+
+### B-tree indexes
+
+Common in relational databases.
+
+Good for:
+
+- Equality
+- Range queries
+- Sorting
+
+Example:
+
+```sql
+WHERE age BETWEEN 20 AND 30
+```
+
+---
+
+### Hash indexes
+
+Good for equality queries.
+
+Example:
+
+```sql
+WHERE email = 'alice@example.com'
+```
+
+Not good for range queries.
+
+---
+
+### LSM-tree indexes
+
+Common in distributed NoSQL databases.
+
+Examples:
+
+- Cassandra
+- RocksDB
+- HBase
+- TiKV
+
+Advantages:
+
+- High write throughput
+- Good for append-heavy workloads
+
+Disadvantages:
+
+- Compaction overhead
+- Read amplification
+- More complex maintenance
+
+---
+
+### Inverted indexes
+
+Used for full-text search.
+
+Example:
+
+```text
+"database" → documents 10, 25, 88
+```
+
+Common in:
+
+- Elasticsearch
+- OpenSearch
+- Lucene-based systems
+
+---
+
+### Bitmap indexes
+
+Useful for low-cardinality columns.
+
+Example:
+
+```text
+gender = male
+gender = female
+```
+
+More common in analytical systems than transactional distributed databases.
+
+---
+
+## 3.4 Distributed Index Challenges
+
+### Shard key selection
+
+If queries do not include the shard key, the database may need to query all shards.
+
+Example:
+
+```sql
+SELECT * FROM users WHERE email = 'alice@example.com';
+```
+
+If the database is sharded by `user_id`, this query may fan out to all shards.
+
+This is called a **scatter-gather query**.
+
+---
+
+### Global uniqueness
+
+Enforcing uniqueness across shards is difficult.
+
+Example:
+
+```sql
+UNIQUE(email)
+```
+
+If two users register simultaneously on different shards, the database must coordinate to prevent duplicates.
+
+---
+
+### Rebalancing
+
+When shards move between nodes, indexes must also move or be rebuilt.
+
+This can cause:
+
+- Temporary performance degradation
+- Increased I/O
+- Network traffic
+- Locking or coordination overhead
+
+---
+
+### Index maintenance cost
+
+Every write may update multiple indexes.
+
+Example:
+
+```text
+Insert row → update primary key index
+           → update secondary index
+           → update global index
+           → replicate to replicas
+```
+
+This increases write latency.
+
+---
+
+## 3.5 Index Performance Tradeoffs
+
+### Read-heavy workloads
+
+More indexes can improve read performance.
+
+### Write-heavy workloads
+
+Too many indexes can slow writes.
+
+### Network-heavy workloads
+
+Global indexes may require cross-node communication.
+
+### Storage cost
+
+Indexes consume disk and memory.
+
+### Cache efficiency
+
+Indexes that fit in memory are much faster than indexes on disk.
+
+---
+
+# 4. Transactions in Distributed Databases
+
+A transaction is a logical unit of work that must satisfy the **ACID** properties:
+
+- **Atomicity**: all or nothing.
+- **Consistency**: database moves from one valid state to another.
+- **Isolation**: concurrent transactions do not interfere incorrectly.
+- **Durability**: committed changes survive failures.
+
+In distributed databases, transactions may span multiple nodes, making coordination necessary.
+
+---
+
+## 4.1 Local vs Distributed Transactions
+
+### Local transaction
+
+All data is on one node.
+
+Example:
+
+```sql
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+```
+
+If both rows are on the same node, this is local.
+
+---
+
+### Distributed transaction
+
+Data is on multiple nodes.
+
+Example:
+
+```text
+Node A: account 1
+Node B: account 2
+```
+
+A transfer requires coordination between nodes.
+
+---
+
+## 4.2 Two-Phase Commit, 2PC
+
+The classic protocol for distributed transactions is **Two-Phase Commit**.
+
+### Phase 1: Prepare
+
+Coordinator asks all participants:
+
+```text
+Can you commit?
+```
+
+Each participant:
+
+- Locks resources
+- Writes undo/redo logs
+- Responds yes or no
+
+---
+
+### Phase 2: Commit or Abort
+
+If all participants vote yes:
+
+```text
+Coordinator sends COMMIT
+```
+
+If any participant votes no:
+
+```text
+Coordinator sends ABORT
+```
+
+---
+
+### Advantages of 2PC
+
+- Provides atomicity across nodes
+- Supports strong consistency
+- Familiar to relational databases
+
+---
+
+### Disadvantages of 2PC
+
+- Blocking behavior
+- Coordinator failure can stall transactions
+- High latency
+- Poor availability during partitions
+- Locks may be held for long periods
+
+---
+
+## 4.3 Three-Phase Commit, 3PC
+
+Three-phase commit adds an extra phase to reduce blocking.
+
+Phases:
+
+1. Can commit?
+2. Pre-commit
+3. Commit
+
+It improves availability in some failure scenarios but is complex and still not perfect.
+
+---
+
+## 4.4 Consensus-Based Transactions
+
+Modern distributed databases often use consensus protocols such as:
+
+- **Raft**
+- **Paxos**
+- **Multi-Paxos**
+- **Raft with leases**
+- **Percolator-style transaction protocols**
+
+These protocols replicate a transaction log across a majority of nodes.
+
+Example:
+
+```text
+Transaction log replicated to majority before commit
+```
+
+This provides durability and consistency.
+
+---
+
+## 4.5 Optimistic vs Pessimistic Concurrency Control
+
+### Pessimistic concurrency control
+
+Locks are acquired before writing.
+
+Example:
+
+```text
+Transaction locks row before update
+```
+
+Advantages:
+
+- Prevents conflicts early
+- Easier to reason about
+
+Disadvantages:
+
+- Lock contention
+- Deadlocks
+- Reduced throughput
+
+---
+
+### Optimistic concurrency control
+
+Transactions proceed without locks and validate at commit time.
+
+Example:
+
+```text
+Read version
+Modify data
+Commit only if version unchanged
+```
+
+Advantages:
+
+- Better throughput when conflicts are rare
+- Less blocking
+
+Disadvantages:
+
+- More retries under contention
+- Complex conflict detection
+
+---
+
+## 4.6 Isolation Levels
+
+Distributed databases support isolation levels similar to relational databases.
+
+### Read uncommitted
+
+Transactions may read uncommitted data.
+
+Rarely used.
+
+---
+
+### Read committed
+
+Transactions see only committed data.
+
+May allow non-repeatable reads.
+
+---
+
+### Repeatable read
+
+A transaction sees the same data throughout its execution.
+
+May allow phantom reads.
+
+---
+
+### Serializable
+
+Transactions behave as if executed one at a time.
+
+Strongest isolation.
+
+Implementation methods:
+
+- Locking
+- Optimistic concurrency control
+- Snapshot isolation
+- Serializability checks
+- Conflict detection
+
+---
+
+### Snapshot isolation
+
+Each transaction sees a consistent snapshot of the database.
+
+Common in:
+
+- PostgreSQL
+- CockroachDB
+- TiDB
+- Spanner-like systems
+
+It prevents many anomalies but may allow write skew unless enhanced.
+
+---
+
+## 4.7 Distributed Transaction Performance
+
+Distributed transactions are slower than local transactions because they require:
+
+- Network round trips
+- Coordination
+- Locking across nodes
+- Log replication
+- Failure detection
+- Conflict resolution
+
+Performance depends on:
+
+- Number of nodes involved
+- Network latency
+- Consistency requirements
+- Lock contention
+- Replication factor
+- Transaction size
+- Retry rate
+
+---
+
+## 4.8 Transaction Design Best Practices
+
+### Minimize cross-node transactions
+
+If possible, place related data on the same shard.
+
+Example:
+
+```text
+Shard by customer_id
+Store customer, orders, and payments by customer_id
+```
+
+This reduces distributed joins and transactions.
+
+---
+
+### Use idempotent operations
+
+If a transaction may be retried, operations should be safe to repeat.
+
+Example:
+
+```text
+Use unique request IDs
+Use conditional updates
+Use versioned writes
+```
+
+---
+
+### Keep transactions short
+
+Long transactions hold locks and increase contention.
+
+---
+
+### Avoid hot shards
+
+If many transactions access the same shard, that shard becomes a bottleneck.
+
+Example:
+
+```text
+All users updating the same counter
+```
+
+Better design:
+
+```text
+Shard counters by user or time bucket
+```
+
+---
+
+### Use batch operations carefully
+
+Batching can improve throughput but may increase lock time and memory usage.
+
+---
+
+# 5. Recovery in Distributed Databases
+
+Recovery ensures that the database can survive failures and restore a consistent state.
+
+Failures may include:
+
+- Process crash
+- Disk failure
+- Node failure
+- Network partition
+- Data center failure
+- Software bug
+- Human error
+
+---
+
+## 5.1 Recovery Goals
+
+A distributed database recovery system should provide:
+
+1. **Durability**
+   - Committed transactions survive failure.
+
+2. **Atomicity**
+   - Partially completed transactions are undone.
+
+3. **Consistency**
+   - Recovery restores a valid database state.
+
+4. **Availability**
+   - Failed nodes can be replaced or bypassed.
+
+5. **Fast recovery**
+   - Minimize downtime.
+
+6. **Minimal data loss**
+   - Especially important for synchronous replication.
+
+---
+
+## 5.2 Write-Ahead Logging, WAL
+
+Most databases use **write-ahead logging**.
+
+Before modifying data, the database writes the change to a log.
+
+```text
+Write log record → apply change to memory → later flush to disk
+```
+
+Log records include:
+
+- Transaction ID
+- Before image
+- After image
+- Commit/abort record
+- Timestamp or LSN
+
+---
+
+## 5.3 Undo and Redo
+
+### Undo
+
+If a transaction fails before commit, its changes are undone.
+
+```text
+Transaction started but did not commit → undo changes
+```
+
+---
+
+### Redo
+
+If committed changes were not yet written to disk, they are redone from the log.
+
+```text
+Committed transaction → redo changes after crash
+```
+
+---
+
+## 5.4 Checkpointing
+
+A checkpoint records the state of the database and log.
+
+During recovery, the database does not need to replay the entire log.
+
+```text
+Start from last checkpoint → replay later log records
+```
+
+Checkpoints reduce recovery time.
+
+---
+
+## 5.5 Recovery in Replicated Systems
+
+In replicated databases, recovery may involve:
+
+1. Detecting failed node.
+2. Choosing a new leader if needed.
+3. Replaying missing log entries.
+4. Rebuilding replicas.
+5. Rebalancing data.
+6. Restoring consistency.
+
+---
+
+## 5.6 Leader Election
+
+If the primary fails, replicas may elect a new leader.
+
+Common protocols:
+
+- Raft
+- Paxos
+- ZooKeeper
+- etcd
+- Consul
+
+Leader election must ensure:
+
+- Only one leader is active
+- The new leader has the latest committed data
+- Old leaders cannot interfere
+
+---
+
+## 5.7 Fencing
+
+A failed leader may still be alive but temporarily disconnected.
+
+If it resumes, it could cause corruption.
+
+Fencing prevents old leaders from writing.
+
+Example:
+
+```text
+New leader gets higher epoch number
+Old leader writes are rejected
+```
+
+---
+
+## 5.8 Log Replication and Recovery
+
+Replicas recover by replaying logs.
+
+Example:
+
+```text
+Replica restarts
+Reads log from last known position
+Applies missing entries
+Catches up to leader
+```
+
+If logs are missing or corrupted, the replica may need:
+
+- Snapshot restore
+- Full rebuild
+- Peer repair
+- Backup restore
+
+---
+
+## 5.9 Backup and Restore
+
+Distributed databases also rely on backups.
+
+### Full backup
+
+A complete snapshot of the database.
+
+### Incremental backup
+
+Only changes since the last backup.
+
+### Point-in-time recovery
+
+Restore to a specific timestamp.
+
+Example:
+
+```text
+Restore database to 2024-06-01 10:00:00
+```
+
+This is useful for recovering from accidental deletes or bad deployments.
+
+---
+
+## 5.10 Recovery Performance
+
+Recovery performance depends on:
+
+- Amount of log to replay
+- Checkpoint frequency
+- Disk speed
+- Network speed
+- Data size
+- Number of replicas
+- Consistency protocol
+- Whether snapshot restore is needed
+
+Frequent checkpoints reduce recovery time but add overhead.
+
+---
+
+# 6. Performance Considerations
+
+Distributed database performance depends on many factors.
+
+---
+
+## 6.1 Network Latency
+
+Network latency is often the biggest performance factor.
+
+Local node access:
+
+```text
+microseconds
+```
+
+Same data center:
+
+```text
+hundreds of microseconds to milliseconds
+```
+
+Different regions:
+
+```text
+tens to hundreds of milliseconds
+```
+
+Strong consistency across regions can be expensive.
+
+---
+
+## 6.2 Throughput
+
+Throughput is the number of operations per second.
+
+It depends on:
+
+- CPU
+- Memory
+- Disk I/O
+- Network bandwidth
+- Lock contention
+- Replication factor
+- Index maintenance
+- Query complexity
+
+---
+
+## 6.3 Latency
+
+Latency is the time to complete an operation.
+
+Important metrics:
+
+- p50 latency
+- p95 latency
+- p99 latency
+- p999 latency
+
+Distributed systems often have long tail latency due to:
+
+- Garbage collection
+- Network jitter
+- Disk stalls
+- Leader election
+- Retry storms
+- Hot shards
+
+---
+
+## 6.4 Scalability
+
+A distributed database should scale by adding nodes.
+
+### Vertical scaling
+
+Add more CPU, memory, or disk to one node.
+
+### Horizontal scaling
+
+Add more nodes.
+
+Distributed databases usually rely on horizontal scaling.
+
+---
+
+## 6.5 Load Balancing
+
+Requests should be distributed evenly.
+
+Poor load balancing causes hot nodes.
+
+Example:
+
+```text
+One shard receives 80% of traffic
+```
+
+This creates a bottleneck.
+
+---
+
+## 6.6 Caching
+
+Caching improves performance by serving data from memory.
+
+Types:
+
+- Client cache
+- Application cache
+- Database buffer cache
+- Distributed cache
+- Query result cache
+
+Caching must consider invalidation and consistency.
+
+---
+
+## 6.7 Query Optimization
+
+Distributed query optimizers must consider:
+
+- Data location
+- Network cost
+- Join order
+- Index availability
+- Shard distribution
+- Statistics
+- Replication state
+
+A good optimizer avoids unnecessary data movement.
+
+---
+
+## 6.8 Join Performance
+
+Distributed joins can be expensive.
+
+### Broadcast join
+
+Small table is sent to all nodes.
+
+```text
+Small table → all nodes
+```
+
+Good when one table is small.
+
+---
+
+### Shuffle join
+
+Data is redistributed by join key.
+
+```text
+Large table A → nodes by key
+Large table B → nodes by key
+```
+
+Can be expensive due to network transfer.
+
+---
+
+### Collocated join
+
+Both tables are partitioned by the same key and stored on the same nodes.
+
+This is the most efficient distributed join.
+
+---
+
+## 6.9 Partitioning and Hotspots
+
+Poor partitioning can create hotspots.
+
+Example:
+
+```text
+Shard by date
+All writes go to today's shard
+```
+
+Better:
+
+```text
+Shard by customer_id
+```
+
+or use hashing to spread load.
+
+---
+
+## 6.10 Storage Engine Performance
+
+Different storage engines have different performance characteristics.
+
+### B-tree engines
+
+Good for:
+
+- Random reads
+- Range scans
+- Updates
+
+Examples:
+
+- PostgreSQL
+- MySQL InnoDB
+
+---
+
+### LSM-tree engines
+
+Good for:
+
+- High write throughput
+- Append-heavy workloads
+
+Examples:
+
+- RocksDB
+- Cassandra
+- HBase
+
+---
+
+### Columnar engines
+
+Good for analytics.
+
+Examples:
+
+- ClickHouse
+- Snowflake
+- BigQuery
+- Redshift
+
+---
+
+# 7. Consistency Models
+
+Distributed databases offer different consistency guarantees.
+
+---
+
+## 7.1 Strong Consistency
+
+Reads always see the latest committed write.
+
+Example:
+
+```text
+Write succeeds after majority acknowledgment
+Read sees latest value
+```
+
+Used for financial transactions and critical systems.
+
+---
+
+## 7.2 Linearizability
+
+The strongest single-object consistency model.
+
+Operations appear to occur atomically at a single point in time.
+
+Example:
+
+```text
+If write completes before read starts, read sees the write
+```
+
+---
+
+## 7.3 Sequential Consistency
+
+Operations appear in the order issued by each process, but not necessarily real-time order.
+
+---
+
+## 7.4 Causal Consistency
+
+Writes that are causally related are seen in order.
+
+Example:
+
+```text
+Create post → comment on post
+```
+
+If a user sees the comment, they should also see the post.
+
+---
+
+## 7.5 Eventual Consistency
+
+Replicas eventually converge, but may temporarily differ.
+
+Example:
+
+```text
+Write succeeds locally
+Other replicas update later
+```
+
+---
+
+## 7.6 Read-your-writes Consistency
+
+A user always sees their own writes.
+
+Example:
+
+```text
+User writes profile
+User immediately reads profile
+```
+
+This is important for user-facing applications.
+
+---
+
+# 8. Failure Handling
+
+Distributed databases must handle failures gracefully.
+
+---
+
+## 8.1 Failure Detection
+
+Systems detect failures using:
+
+- Heartbeats
+- Timeouts
+- Lease expiration
+- Gossip protocols
+- Consensus leader election
+
+---
+
+## 8.2 Failover
+
+If a leader fails, a new leader is elected.
+
+Failover should be:
+
+- Fast
+- Safe
+- Automatic
+- Observable
+
+---
+
+## 8.3 Graceful Degradation
+
+If consistency cannot be guaranteed, the system may:
+
+- Reject writes
+- Serve stale reads
+- Queue operations
+- Use fallback replicas
+- Return errors
+
+---
+
+## 8.4 Partial Failure
+
+Distributed systems often experience partial failure.
+
+Example:
+
+```text
+Node A can reach Node B
+Node A cannot reach Node C
+```
+
+This is harder than total failure.
+
+---
+
+# 9. Security and Operational Concerns
+
+Although not the main focus, distributed database design also involves:
+
+- Authentication
+- Authorization
+- Encryption in transit
+- Encryption at rest
+- Audit logging
+- Backup encryption
+- Network segmentation
+- Monitoring
+- Alerting
+- Metrics
+- Tracing
+- Capacity planning
+- Upgrade strategy
+- Disaster recovery drills
+
+---
+
+# 10. Example Design: E-Commerce Distributed Database
+
+Suppose we design a distributed database for an e-commerce platform.
+
+## Data model
+
+Tables:
+
+```text
+users
+orders
+order_items
+payments
+inventory
+```
+
+## Sharding strategy
+
+Shard by `customer_id`.
+
+```text
+users.customer_id
+orders.customer_id
+order_items.customer_id
+payments.customer_id
+```
+
+This allows most customer queries to be local.
+
+---
+
+## Replication
+
+Each shard has 3 replicas.
+
+```text
+Leader in primary region
+Followers in same region
+One remote follower in secondary region
+```
+
+Writes use majority acknowledgment for durability.
+
+---
+
+## Indexing
+
+Local indexes:
+
+```sql
+CREATE INDEX idx_orders_customer ON orders(customer_id);
+```
+
+Global index:
+
+```sql
+CREATE INDEX idx_orders_status ON orders(status);
+```
+
+Global index is used for admin queries but may be more expensive.
+
+---
+
+## Transactions
+
+Order creation may involve:
+
+```text
+Insert order
+Insert order_items
+Update inventory
+Create payment record
+```
+
+If all data is on the same shard, the transaction is local.
+
+If inventory is on another shard, a distributed transaction is required.
+
+---
+
+## Recovery
+
+Use:
+
+- WAL
+- Checkpoints
+- Replication
+- Leader election
+- Point-in-time recovery
+- Backups
+
+---
+
+# 11. Performance Tuning Checklist
+
+## Replication
+
+- Choose replication factor carefully.
+- Use synchronous replication only where needed.
+- Monitor replica lag.
+- Avoid unnecessary cross-region synchronous writes.
+- Use quorum reads and writes when appropriate.
+
+## Indexing
+
+- Index frequently queried columns.
+- Avoid too many indexes on write-heavy tables.
+- Prefer local indexes when queries include shard key.
+- Use covering indexes to reduce table lookups.
+- Monitor index size and hit rate.
+
+## Transactions
+
+- Keep transactions short.
+- Avoid cross-shard transactions when possible.
+- Use idempotent operations.
+- Detect and handle retries.
+- Monitor lock contention and deadlocks.
+
+## Recovery
+
+- Use WAL and checkpoints.
+- Test failover regularly.
+- Monitor backup success.
+- Use point-in-time recovery.
+- Validate replica consistency.
+
+## Performance
+
+- Monitor p95 and p99 latency.
+- Identify hot shards.
+- Balance load across nodes.
+- Use caching carefully.
+- Optimize joins and data placement.
+- Track network bandwidth and disk I/O.
+
+---
+
+# 12. Summary
+
+A distributed database is designed to store and process data across multiple nodes while providing a coherent database service. Its performance and reliability depend heavily on four major areas:
+
+## Replication
+
+Replication improves availability, durability, and read scalability, but increases write cost, network traffic, and consistency complexity. Synchronous replication provides stronger guarantees but higher latency. Asynchronous replication improves performance but can cause stale reads and data loss.
+
+## Indexing
+
+Indexes reduce query cost, but in distributed systems they must account for data placement. Local indexes are efficient when queries include the shard key. Global indexes support queries on non-shard keys but require more coordination and maintenance.
+
+## Transactions
+
+Distributed transactions require coordination across nodes. Two-phase commit provides atomicity but can be slow and blocking. Modern systems often use consensus protocols, optimistic concurrency control, and snapshot isolation. Performance improves when related data is placed on the same shard and transactions are kept short.
+
+## Recovery
+
+Recovery relies on write-ahead logging, checkpoints, replication, leader election, backups, and point-in-time recovery. A good recovery design ensures durability, atomicity, and fast restoration after failures.
+
+The best distributed database design depends on workload requirements. Systems that need strong consistency and transactional correctness usually accept higher latency and coordination cost. Systems that need high availability and low latency may use eventual consistency and conflict resolution. The key is to align data distribution, replication, indexing, transaction protocols, and recovery mechanisms with the application’s consistency, latency, throughput, and availability requirements.
+
+user
+继续
+assistant
+<think>
+We need respond to user "继续" meaning continue. We already gave long answer. Need continue likely expand further. Need maybe provide deeper discussion, examples, protocols, performance formulas, design patterns, comparison, implementation details. Need ensure not too repetitive. User likely wants continuation of explanation. We can continue with more advanced topics: distributed query processing, consistency protocols, performance modeling, case studies, tuning, monitoring, capacity planning, anti-patterns, interview-style summary. Need maybe in Chinese? User said 继续 Chinese. Could answer in Chinese? Original prompt English but repeated. "继续" Chinese means continue. We can respond in Chinese or English? Probably Chinese to match. But maybe they expect continuation in same language? The prior answer was English. Could continue in Chinese? To be safe, maybe bilingual? The user likely Chinese. We can say "继续如下" and provide deeper content in Chinese. Need final only.
+
+Need think about content. We can continue from previous answer with more depth:
+- Distributed query processing and optimization
+- Data placement and rebalancing
+- Consistency protocols: quorum, vector clocks, CRDTs, leases, clocks (NTP, TrueTime, HLC)
+- Transactions: Percolator, 2PC vs consensus, isolation anomalies, write skew, serialization tests
+- Recovery: group commit, fsync, log structured, snapshot isolation recovery, MVCC GC, backup consistency, quorum repair
+- Performance: latency budget, Little's law, tail latency, batching, pipelining, hedged reads, request coalescing, backpressure
+- Monitoring metrics
+- Design examples: OLTP vs OLAP vs KV
+- Tradeoff matrix
+- Checklist.
+
+Need maybe include formulas:
+Throughput = concurrency / latency (Little's law: L = λW)
+Quorum: W+R>N
+Replication factor RF, consistency level CL.
+Write amplification.
+Network cost.
+
+Need maybe discuss indexing more: distributed index maintenance, global index as separate table, index sharding, secondary index fan-out, index rebuild, bloom filters, sparse indexes, LSM compaction, vector indexes? Could mention vector search? Maybe not necessary.
+
+Need maybe discuss recovery in distributed systems: Raft log recovery, majority commit, snapshot transfer, log truncation, MVCC GC, tombstones, repair, anti-entropy, Merkle trees.
+
+Need maybe discuss performance of replication: leader-based vs quorum, multi-region, latency, synchronous vs async, half-sync, group commit, pipelining, batch replication, compression, network topology, rack awareness.
+
+Need maybe discuss transactions: distributed deadlock detection, wait-for graph, timeouts, priority, retry, idempotency, saga pattern, outbox pattern, event sourcing, eventual consistency workflows.
+
+Need maybe discuss design: metadata management, catalog, schema registry, placement driver, rebalancer, failure detector, lease, fencing token.
+
+Need maybe discuss security? Not asked but can mention briefly.
+
+Need maybe include "继续" as continuation. Could structure:
+"下面继续深入..."
+
+Need ensure no false claims. Use examples: Spanner TrueTime, CockroachDB HLC, TiDB PD, Cassandra gossip, DynamoDB quorum, MongoDB replica set, PostgreSQL streaming replication.
+
+Need maybe include diagrams in text.
+
+Need final answer with high detail. Since desired oververbosity 9. Need maybe not too long but thorough. Could be 5000 words? We have token budget. Need produce final. Let's craft in Chinese with technical terms English.
+
+Potential outline:
+1. 继续：从工程实现角度深入
+2. 数据分布与放置
+   - shard key selection, partitioning methods: range, hash, directory, consistent hashing
+   - rebalancing, split/merge, placement constraints, rack awareness
+   - metadata and placement driver
+3. 复制协议深入
+   - leader-based, quorum, majority, Raft/Paxos, log replication, commit index, term, fencing
+   - sync/async, group commit, pipelining, batch, compression
+   - multi-region, latency, read from follower, bounded staleness, read-your-writes
+   - conflict resolution: vector clocks, version vectors, CRDTs, last-write-wins
+4. 索引深入
+   - local/global secondary index, index-as-table, index sharding, global uniqueness, index maintenance, fan-out, scatter-gather, covering, sparse, bloom filters, LSM, compaction, vector indexes
+   - performance issues: write amplification, index rebuild, rebalancing
+5. 事务深入
+   - 2PC, 3PC, consensus transaction, Percolator model, MVCC, snapshot isolation, serializable, anomalies, write skew, deadlock detection, retry, idempotency, saga/outbox
+   - cross-region transaction latency, clock synchronization, TrueTime/HLC
+6. 恢复深入
+   - WAL, fsync, group commit, checkpoint, MVCC GC, tombstones, log truncation, snapshot, backup consistency, quorum repair, anti-entropy, Merkle trees, leader election, fencing, point-in-time recovery, disaster recovery
+7. 性能模型与调优
+   - Little's law, latency budget, tail latency, hedged reads, request coalescing, backpressure, batching, caching, connection pooling, network topology, disk, CPU, GC
+   - metrics: p99, replica lag, lock wait, retry, compaction, rebalance, hot shard
+8. 设计模式与反模式
+   - collocate related data, avoid hot shards, avoid global indexes unless needed, avoid cross-region sync writes, use idempotency, use bounded staleness, use leases
+9. 场景示例
+   - OLTP multi-region, analytics, KV cache, financial ledger
+10. 总结 tradeoff matrix
+
+Need maybe include tables.
+
+Need answer in Chinese. Let's craft.
+
+Need be careful: "继续" could mean continue previous answer exactly. We can say "下面继续深入". Good.
+
+Let's produce final with detailed content.
+</think>
+
+下面继续深入，从**工程实现、协议细节、性能模型、调优方法和典型场景**几个角度，把分布式数据库的设计与性能讲得更完整。
+
+---
+
+# 一、继续深入：数据分布与放置
+
+前面提到分布式数据库会通过分片、复制、索引和事务协议来支撑扩展。实际系统中，最关键的问题之一是：**数据应该放在哪里？**
+
+数据放置策略直接影响：
+
+- 查询延迟
+- 网络流量
+- 事务是否跨节点
+- 热点是否出现
+- 故障恢复速度
+- 扩缩容成本
+
+---
+
+## 1. 常见分片方式
+
+### 1.1 Range Partitioning，范围分片
+
+按某个键的范围划分数据。
+
+例如：
+
+```text
+Shard 1: user_id 0–9999
+Shard 2: user_id 10000–19999
+Shard 3: user_id 20000–29999
+```
+
+适合场景：
+
+- 范围查询较多
+- 时间序列数据
+- 需要按顺序扫描
+
+例如：
+
+```sql
+SELECT * FROM orders
+WHERE order_time BETWEEN '2024-01-01' AND '2024-01-31';
+```
+
+如果按时间范围分片，这个查询可能只访问少数几个分片。
+
+优点：
+
+- 范围查询友好
+- 数据局部性好
+- 便于按时间归档
+
+缺点：
+
+- 容易产生热点
+- 新数据可能集中写入最新分片
+- 分片分裂和合并复杂
+
+例如按日期分片：
+
+```text
+2024-06-01
+2024-06-02
+2024-06-03
+```
+
+所有写入都打到最新日期分片，导致该分片成为热点。
+
+---
+
+### 1.2 Hash Partitioning，哈希分片
+
+对分片键做哈希，然后映射到节点。
+
+例如：
+
+```text
+shard = hash(customer_id) % N
+```
+
+优点：
+
+- 数据分布更均匀
+- 避免范围分片热点
+- 适合高并发写入
+
+缺点：
+
+- 范围查询可能访问多个分片
+- 数据迁移和 rebalance 更复杂
+- 对查询键要求严格
+
+例如：
+
+```sql
+SELECT * FROM orders
+WHERE order_time BETWEEN '2024-01-01' AND '2024-01-31';
+```
+
+如果数据库按 `customer_id` 哈希分片，这个查询可能需要访问所有分片。
+
+---
+
+### 1.3 Directory Partitioning，目录分片
+
+通过一个元数据服务记录每个数据块在哪个节点。
+
+例如：
+
+```text
+customer_id = 12345 → Node 7
+customer_id = 67890 → Node 12
+```
+
+优点：
+
+- 灵活
+- 可以动态迁移数据
+- 可以结合负载、容量、故障状态做放置决策
+
+缺点：
+
+- 元数据服务可能成为瓶颈
+- 需要高可用元数据系统
+- 查询前需要查目录
+
+典型系统：
+
+- MongoDB Config Server
+- TiDB Placement Driver
+- HDFS NameNode
+- 一些自研分布式 KV 系统
+
+---
+
+### 1.4 Consistent Hashing，一致性哈希
+
+常用于缓存、对象存储、P2P 系统。
+
+节点和数据被映射到一个哈希环上。
+
+优点：
+
+- 节点增减时迁移数据较少
+- 适合动态集群
+
+缺点：
+
+- 数据分布可能不均
+- 需要虚拟节点
+- 对复杂查询支持有限
+
+典型场景：
+
+- Redis Cluster
+- DynamoDB-like systems
+- Cassandra token ring
+- CDN cache
+
+---
+
+## 2. 分片键选择
+
+分片键选择是分布式数据库设计中最重要的一步。
+
+好的分片键应该满足：
+
+1. **高基数**
+   - 例如 `user_id`、`order_id`
+   - 避免 `gender`、`status` 这种低基数字段
+
+2. **访问均匀**
+   - 避免大量请求集中到某个值
+
+3. **与主要查询匹配**
+   - 高频查询最好带上分片键
+
+4. **与事务边界匹配**
+   - 经常一起更新的数据最好落在同一分片
+
+5. **避免热点**
+   - 例如 `date`、`country`、`tenant_id` 可能产生热点
+
+---
+
+## 3. 热点分片问题
+
+热点分片是分布式数据库常见性能问题。
+
+例如：
+
+```text
+所有用户都访问同一个商品详情页
+```
+
+如果商品数据按 `product_id` 分片，某个爆款商品所在分片会承受大量请求。
+
+解决方案包括：
+
+### 3.1 拆分热点键
+
+例如把一个大计数器拆成多个子计数器：
+
+```text
+counter:1001
+counter:1001:0
+counter:1001:1
+counter:1001:2
+```
+
+读取时求和。
+
+---
+
+### 3.2 使用缓存
+
+热点数据放到内存缓存中：
+
+```text
+Redis / Memcached / local cache
+```
+
+但要注意缓存一致性和击穿问题。
+
+---
+
+### 3.3 读写分离
+
+热点读请求分散到多个副本。
+
+```text
+Write → Leader
+Read  → Followers
+```
+
+---
+
+### 3.4 请求合并
+
+多个相同请求合并为一次后端查询。
+
+例如：
+
+```text
+100 个请求查询同一个商品
+→ 合并成 1 次数据库查询
+```
+
+---
+
+### 3.5 预计算
+
+把热点查询结果预先计算好。
+
+例如：
+
+```text
+商品详情页聚合数据
+排行榜
+统计摘要
+```
+
+---
+
+## 4. 数据重平衡
+
+当集群增加节点、删除节点、节点故障或负载不均时，需要重新平衡数据。
+
+重平衡可能带来：
+
+- 网络带宽压力
+- 磁盘 I/O 压力
+- 查询延迟上升
+- 副本临时不可用
+- 索引重建成本
+
+设计时应考虑：
+
+1. **限速迁移**
+   - 避免影响在线业务
+
+2. **优先迁移冷数据**
+
+3. **保持副本数**
+   - 迁移过程中不能降低冗余度
+
+4. **分阶段切换**
+   - 先复制，再追日志，再切换流量
+
+5. **可暂停和回滚**
+
+6. **监控迁移进度和延迟**
+
+---
+
+# 二、继续深入：复制协议与一致性实现
+
+复制是分布式数据库的核心。不同系统对复制的实现差异很大。
+
+---
+
+## 1. Leader-based Replication
+
+这是最常见的复制模型。
+
+```text
+Client Write → Leader
+Leader → Followers
+Client Read  → Leader or Follower
+```
+
+Leader 负责：
+
+- 接收写请求
+- 写本地日志
+- 将日志复制到 follower
+- 决定提交
+- 处理故障转移
+
+Follower 负责：
+
+- 接收日志
+- 应用日志
+- 提供读服务
+- 参与选举
+
+---
+
+## 2. Raft 复制协议
+
+Raft 是现代分布式数据库常用的共识协议。
+
+核心概念：
+
+### Term
+
+任期号，用于区分不同选举周期。
+
+```text
+Term 1
+Term 2
+Term 3
+```
+
+### Leader
+
+Leader 负责复制日志。
+
+### Follower
+
+Follower 接收日志并投票。
+
+### Candidate
+
+Leader 失联时，Follower 可能成为 Candidate 发起选举。
+
+### Log
+
+所有状态变更都通过日志复制。
+
+Raft 保证：
+
+- 一个 term 内最多一个 leader
+- 日志必须被多数节点接受才算 committed
+- follower 日志不能比 leader 更新
+- 旧 leader 不能继续写入
+
+---
+
+## 3. Majority Quorum
+
+多数派机制是强一致复制的基础。
+
+例如：
+
+```text
+Replication Factor = 3
+Majority = 2
+```
+
+写入成功条件：
+
+```text
+Leader + 1 Follower 写入日志成功
+```
+
+读取成功条件：
+
+```text
+至少读取多数派
+```
+
+如果：
+
+```text
+W + R > N
+```
+
+则读写集合必然相交，可以避免读到旧值。
+
+例如：
+
+```text
+N = 3
+W = 2
+R = 2
+```
+
+任意写集合和读集合至少有一个公共节点。
+
+---
+
+## 4. 同步复制与异步复制的工程细节
+
+### 同步复制
+
+Leader 等待 follower 确认后才返回客户端。
+
+```text
+Write → Leader log → Follower ACK → Client ACK
+```
+
+优点：
+
+- 数据丢失概率低
+- failover 后数据完整
+
+缺点：
+
+- 延迟高
+- follower 故障会影响写入
+
+---
+
+### 异步复制
+
+Leader 本地写入成功即返回。
+
+```text
+Write → Leader log → Client ACK
+Follower later
+```
+
+优点：
+
+- 延迟低
+- 写入吞吐高
+
+缺点：
+
+- failover 可能丢数据
+- follower 可能落后
+
+---
+
+### 半同步复制
+
+Leader 等待至少一个 follower 收到日志，但不一定等待日志应用完成。
+
+```text
+Write → Leader log → Follower receive ACK → Client ACK
+```
+
+这是折中方案。
+
+---
+
+### Group Commit
+
+多个事务合并成一次日志刷盘或网络发送。
+
+例如：
+
+```text
+100 个事务 → 一次 fsync
+```
+
+优点：
+
+- 提高吞吐
+- 降低磁盘 IOPS
+
+缺点：
+
+- 可能增加单个请求延迟
+- 需要控制 batch 大小和超时
+
+---
+
+### Pipelined Replication
+
+Leader 不等前一个日志完全确认，就继续发送后续日志。
+
+```text
+Log 1 → Follower
+Log 2 → Follower
+Log 3 → Follower
+```
+
+优点：
+
+- 提高网络利用率
+- 提高吞吐
+
+缺点：
+
+- 实现复杂
+- 需要处理乱序和确认窗口
+
+---
+
+## 5. 多区域复制
+
+多区域部署常见于全球业务。
+
+例如：
+
+```text
+Region A: 用户写入
+Region B: 用户读取
+Region C: 灾备
+```
+
+跨区域复制面临高延迟。
+
+例如：
+
+```text
+北京 → 新加坡：约 50–100 ms
+北京 → 美国：约 150–250 ms
+```
+
+如果强同步复制跨大洲，写入延迟会很高。
+
+常见策略：
+
+### 5.1 区域内强一致，区域间异步复制
+
+```text
+Region A 内多数派确认
+Region B 异步追赶
+```
+
+优点：
+
+- 写入延迟低
+- 区域内强一致
+
+缺点：
+
+- 跨区域读可能看到旧数据
+
+---
+
+### 5.2 跨区域多数派
+
+```text
+Region A + Region B + Region C
+写入需要两个区域确认
+```
+
+优点：
+
+- 区域级容灾
+- 数据更持久
+
+缺点：
+
+- 写入延迟高
+
+---
+
+### 5.3 就近读写
+
+用户请求路由到最近区域。
+
+```text
+Asia user → Asia DB
+EU user → EU DB
+```
+
+优点：
+
+- 延迟低
+
+缺点：
+
+- 跨区域一致性复杂
+- 冲突处理复杂
+
+---
+
+## 6. 读一致性问题
+
+在复制系统中，读请求可能落到 follower。
+
+如果 follower 落后，用户可能读到旧数据。
+
+例如：
+
+```text
+用户写入个人资料
+立即刷新页面
+看到旧资料
+```
+
+解决方案：
+
+### 6.1 读 leader
+
+```text
+Read → Leader
+```
+
+优点：
+
+- 强一致
+
+缺点：
+
+- leader 压力大
+
+---
+
+### 6.2 Read-your-writes
+
+系统保证用户至少能看到自己的写入。
+
+实现方式：
+
+- 写后一段时间内读 leader
+- 使用 session token
+- 使用版本号
+- 使用 read index / read barrier
+
+---
+
+### 6.3 Bounded Staleness
+
+允许读请求最多落后某个时间或版本。
+
+例如：
+
+```text
+最多落后 1 秒
+最多落后 100 个版本
+```
+
+适合对实时性要求不是极端严格的场景。
+
+---
+
+### 6.4 Quorum Read
+
+读取多数派节点，选择最新版本。
+
+```text
+Read from 2 of 3 replicas
+```
+
+优点：
+
+- 强一致
+
+缺点：
+
+- 延迟取决于最慢节点
+- 可能触发 hedged read
+
+---
+
+## 7. Hedged Reads
+
+为了降低尾延迟，系统可以同时向多个副本发起读请求，取最快返回的结果。
+
+例如：
+
+```text
+同时请求 Replica A 和 Replica B
+谁先返回用谁
+```
+
+优点：
+
+- 降低 p99 延迟
+
+缺点：
+
+- 增加请求量
+- 可能放大负载
+- 需要处理重复请求
+
+---
+
+# 三、继续深入：索引实现与性能
+
+索引在分布式数据库中不仅是查询优化问题，还涉及数据放置、复制、事务和 rebalance。
+
+---
+
+## 1. Local Index
+
+Local index 只索引本节点数据。
+
+例如：
+
+```text
+Shard 1 有本地索引
+Shard 2 有本地索引
+```
+
+查询：
+
+```sql
+SELECT * FROM users
+WHERE user_id = 123;
+```
+
+如果 `user_id` 是分片键，数据库可以直接定位 shard，再查本地索引。
+
+优点：
+
+- 维护简单
+- 不需要跨节点协调
+- 写入成本低
+
+缺点：
+
+- 查询不带分片键时可能 fan-out
+- 无法直接保证全局唯一
+
+---
+
+## 2. Global Index
+
+Global index 跨多个 shard。
+
+例如：
+
+```sql
+CREATE INDEX idx_email ON users(email);
+```
+
+数据库可能把索引单独存成一个分布式表：
+
+```text
+email → shard_id, row_id
+```
+
+查询：
+
+```sql
+SELECT * FROM users
+WHERE email = 'alice@example.com';
+```
+
+流程：
+
+```text
+1. 查询 global index
+2. 得到 row 所在 shard
+3. 到对应 shard 查询完整数据
+```
+
+优点：
+
+- 支持非分片键查询
+- 可支持全局唯一约束
+
+缺点：
+
+- 写入需要维护跨 shard 索引
+- 查询可能多一次网络跳转
+- rebalance 时索引迁移复杂
+- 可能成为瓶颈
+
+---
+
+## 3. 全局唯一约束
+
+全局唯一约束在分布式系统中很难。
+
+例如：
+
+```sql
+UNIQUE(email)
+```
+
+两个并发注册请求可能落在不同 shard：
+
+```text
+Request A: alice@example.com → Shard 1
+Request B: alice@example.com → Shard 2
+```
+
+如果没有协调，可能插入重复数据。
+
+解决方案：
+
+### 3.1 全局唯一索引表
+
+所有唯一键写入一个专门的索引表。
+
+```text
+email → user_id
+```
+
+写入前检查并插入唯一索引。
+
+缺点：
+
+- 索引表可能成为热点
+- 需要分布式事务
+
+---
+
+### 3.2 分片键与唯一键一致
+
+如果唯一键就是分片键，则唯一性可以在本地 shard 内保证。
+
+例如：
+
+```text
+shard key = email
+```
+
+但这样可能影响其他查询性能。
+
+---
+
+### 3.3 异步校验
+
+先写入，后台检测重复。
+
+适合对强唯一性要求不高的场景。
+
+---
+
+## 4. 二级索引写入成本
+
+每次插入或更新可能维护多个索引。
+
+例如：
+
+```sql
+INSERT INTO users(user_id, email, name, city)
+VALUES(...);
+```
+
+如果有索引：
+
+```text
+idx_email
+idx_city
+idx_name_city
+```
+
+一次插入可能需要：
+
+```text
+1 次主表写入
+1 次 idx_email 写入
+1 次 idx_city 写入
+1 次 idx_name_city 写入
+1 次复制
+```
+
+这会带来：
+
+- 写放大
+- 日志膨胀
+- compaction 压力
+- 索引空间占用
+- 事务延迟
+
+因此写密集系统要谨慎建索引。
+
+---
+
+## 5. LSM-tree 索引
+
+很多分布式 KV 和 NoSQL 使用 LSM-tree。
+
+写入流程：
+
+```text
+Write → WAL
+      → MemTable
+      → Flush to SSTable
+      → Compaction
+```
+
+优点：
+
+- 顺序写
+- 高写入吞吐
+- 适合 SSD 和对象存储
+
+缺点：
+
+- 读放大
+- compaction 消耗 CPU 和 I/O
+- 删除需要 tombstone
+- 空间放大
+
+---
+
+## 6. Bloom Filter
+
+Bloom filter 用于快速判断某个 key 是否可能存在。
+
+在 LSM-tree 中非常常见。
+
+例如：
+
+```text
+查询 key = user:123
+Bloom filter 判断该 SSTable 不可能包含
+→ 跳过该文件
+```
+
+优点：
+
+- 大幅减少磁盘查找
+- 降低读放大
+
+缺点：
+
+- 可能误判存在
+- 不能删除元素
+- 需要维护多个文件
+
+---
+
+## 7. Sparse Index
+
+稀疏索引不是每个 key 都建索引，而是每隔一段建一个索引项。
+
+例如：
+
+```text
+key 00000001 → offset 0
+key 00001000 → offset 10000
+key 00002000 → offset 20000
+```
+
+适合：
+
+- 有序数据
+- 范围扫描
+- 日志型存储
+
+优点：
+
+- 索引小
+- 内存占用低
+
+缺点：
+
+- 需要扫描索引项之间的数据块
+
+---
+
+## 8. 向量索引
+
+现代数据库越来越多支持向量检索，用于语义搜索、推荐、RAG。
+
+常见索引：
+
+- HNSW
+- IVF
+- PQ
+- ScaNN
+
+分布式向量索引需要考虑：
+
+- 向量维度高
+- 内存占用大
+- 构建索引耗时
+- 查询计算密集
+- 分片召回率
+- 索引副本
+
+例如：
+
+```text
+1000 万条 768 维向量
+```
+
+如果每个向量 4 字节：
+
+```text
+10,000,000 × 768 × 4 ≈ 30 GB
+```
+
+如果副本数为 3：
+
+```text
+≈ 90 GB
+```
+
+所以向量索引对内存和成本影响很大。
+
+---
+
+# 四、继续深入：事务协议与并发控制
+
+分布式事务的核心难点是：**多个节点如何原子地提交或回滚。**
+
+---
+
+## 1. Two-Phase Commit 的工程问题
+
+2PC 简单直观，但问题很多。
+
+### 1.1 Coordinator 单点
+
+如果 coordinator 崩溃，参与者可能卡在 prepared 状态。
+
+```text
+Participant A: prepared
+Participant B: prepared
+Coordinator: dead
+```
+
+此时参与者不能自行提交，因为不知道其他参与者是否也 prepared。
+
+---
+
+### 1.2 长时间锁
+
+参与者 prepare 后可能持有锁，直到 coordinator 恢复。
+
+这会降低并发。
+
+---
+
+### 1.3 网络分区
+
+如果 coordinator 和某个 participant 网络断开，事务可能阻塞。
+
+---
+
+### 1.4 延迟高
+
+一次分布式事务至少需要：
+
+```text
+Prepare round trip
+Commit round trip
+```
+
+跨节点、跨区域时延迟明显。
+
+---
+
+## 2. Consensus-based Transaction
+
+现代系统常用共识日志替代传统 2PC。
+
+例如：
+
+```text
+Transaction log replicated to majority
+Commit decision is part of replicated log
+```
+
+如果多数派记录了 commit，则事务视为提交。
+
+优点：
+
+- 避免 coordinator 单点
+- 日志持久化
+- 可自动恢复
+- 与复制系统统一
+
+缺点：
+
+- 实现复杂
+- 需要处理事务状态、锁、MVCC、GC
+
+---
+
+## 3. Percolator 风格事务
+
+Percolator 是 Google 提出的分布式事务模型，影响了很多系统。
+
+核心思想：
+
+- 使用分布式 KV 存储
+- 使用 primary lock 和 secondary lock
+- 使用 timestamp 做 MVCC
+- 使用 transaction status 记录提交状态
+- 使用 Paxos 或共识协议保证元数据一致
+
+简化流程：
+
+```text
+1. 分配 start timestamp
+2. 读取数据版本
+3. 写 primary lock
+4. 写 secondary locks
+5. 写 data
+6. commit primary
+7. 异步清理 secondary locks
+```
+
+优点：
+
+- 支持大事务
+- 支持跨分片事务
+- 与 KV 存储结合好
+
+缺点：
+
+- 锁管理复杂
+- 需要后台清理
+- 对延迟敏感
+
+---
+
+## 4. MVCC
+
+MVCC，Multi-Version Concurrency Control，多版本并发控制。
+
+每次修改不直接覆盖旧数据，而是生成新版本。
+
+例如：
+
+```text
+row v1
+row v2
+row v3
+```
+
+事务读取时根据 snapshot timestamp 选择可见版本。
+
+优点：
+
+- 读写不互相阻塞
+- 支持快照读
+- 适合高并发
+
+缺点：
+
+- 需要垃圾回收
+- 版本链可能变长
+- 长事务导致旧版本无法清理
+- 存储成本增加
+
+---
+
+## 5. 垃圾回收
+
+MVCC 系统需要 GC 旧版本。
+
+GC 条件：
+
+```text
+没有任何活跃事务需要该版本
+```
+
+如果存在长事务：
+
+```text
+Transaction started at T1
+Still running
+```
+
+则 T1 之后的旧版本可能都不能删除。
+
+这会导致：
+
+- 存储膨胀
+- 读放大
+- compaction 压力
+
+因此分布式数据库通常限制事务时长。
+
+---
+
+## 6. 隔离级别与异常
+
+### Dirty Read
+
+读到未提交数据。
+
+```text
+T1 update
+T2 read uncommitted
+T1 rollback
+```
+
+---
+
+### Non-repeatable Read
+
+同一事务内两次读取同一行结果不同。
+
+```text
+T1 read x = 10
+T2 update x = 20
+T1 read x = 20
+```
+
+---
+
+### Phantom Read
+
+同一事务内两次范围查询结果集不同。
+
+```text
+T1 count rows where age > 20 = 10
+T2 insert row age = 30
+T1 count rows where age > 20 = 11
+```
+
+---
+
+### Write Skew
+
+两个事务读取相同数据，然后基于读取结果分别写入不同数据，导致业务约束被破坏。
+
+经典例子：
+
+```text
+医生值班规则：至少一个医生值班
+```
+
+事务 A：
+
+```text
+读取：医生 A 值班，医生 B 值班
+判断：可以休息
+更新：医生 A 不值班
+```
+
+事务 B：
+
+```text
+读取：医生 A 值班，医生 B 值班
+判断：可以休息
+更新：医生 B 不值班
+```
+
+结果：
+
+```text
+没有医生值班
+```
+
+Snapshot isolation 可能允许 write skew。
+
+解决：
+
+- Serializable isolation
+- 显式锁
+- 条件更新
+- 唯一约束
+- 业务层校验
+
+---
+
+## 7. 死锁处理
+
+分布式事务可能跨节点形成死锁。
+
+例如：
+
+```text
+T1 locks row A on Node 1, wants row B on Node 2
+T2 locks row B on Node 2, wants row A on Node 1
+```
+
+处理方式：
+
+### 7.1 Wait-for Graph
+
+构建等待图，检测环。
+
+缺点：
+
+- 分布式 wait-for graph 复杂
+- 信息可能不完整
+
+---
+
+### 7.2 Timeout
+
+最简单：
+
+```text
+等待超过阈值 → abort
+```
+
+优点：
+
+- 简单
+- 避免永久阻塞
+
+缺点：
+
+- 可能误杀正常事务
+- 阈值难调
+
+---
+
+### 7.3 Priority / Victim Selection
+
+选择代价较小的事务回滚。
+
+例如：
+
+- 回滚持有锁最少的事务
+- 回滚运行时间最短的事务
+- 回滚优先级低的事务
+
+---
+
+## 8. 重试与幂等
+
+分布式事务经常因为冲突、超时、网络抖动而失败。
+
+应用必须处理重试。
+
+但重试要求操作幂等。
+
+例如：
+
+```text
+扣款 100 元
+```
+
+如果重试两次，可能扣两次。
+
+解决方案：
+
+### 8.1 请求 ID
+
+```text
+request_id = unique
+```
+
+数据库记录已处理请求。
+
+---
+
+### 8.2 条件更新
+
+```sql
+UPDATE accounts
+SET balance = balance - 100
+WHERE id = 1
+AND version = 12;
+```
+
+如果版本变化，更新失败。
+
+---
+
+### 8.3 状态机
+
+```text
+INIT → PROCESSING → SUCCESS
+```
+
+重复请求只推进状态。
+
+---
+
+## 9. Saga 模式
+
+对于长事务，分布式数据库不一定适合传统 ACID 事务。
+
+Saga 将长事务拆成多个本地事务，并定义补偿操作。
+
+例如：
+
+```text
+1. 创建订单
+2. 扣库存
+3. 扣款
+4. 发货
+```
+
+如果扣款失败：
+
+```text
+补偿：恢复库存
+补偿：取消订单
+```
+
+优点：
+
+- 避免长时间锁
+- 适合跨服务流程
+
+缺点：
+
+- 中间状态可见
+- 补偿逻辑复杂
+- 需要幂等和重试
+
+---
+
+## 10. Outbox Pattern
+
+在事务中同时写业务表和消息表。
+
+```text
+BEGIN
+  INSERT order
+  INSERT outbox_message
+COMMIT
+```
+
+后台进程读取 outbox 并发送消息。
+
+优点：
+
+- 保证数据库状态和消息发送一致性
+- 避免双写不一致
+
+缺点：
+
+- 需要后台投递
+- 消息可能重复，需要幂等消费
+
+---
+
+# 五、继续深入：恢复机制的工程细节
+
+恢复不仅要处理单机崩溃，还要处理分布式环境中的日志、副本、选举和一致性。
+
+---
+
+## 1. WAL 与 fsync
+
+Write-Ahead Log 是恢复基础。
+
+写入顺序：
+
+```text
+1. 写 WAL
+2. fsync WAL
+3. 修改内存
+4. 后台 flush data page
+```
+
+如果系统崩溃：
+
+```text
+已 fsync 的 WAL 可恢复
+未 fsync 的 WAL 可能丢失
+```
+
+---
+
+## 2. Group Commit
+
+多个事务共享一次 fsync。
+
+例如：
+
+```text
+事务 A
+事务 B
+事务 C
+事务 D
+```
+
+合并为：
+
+```text
+一次 fsync
+```
+
+优点：
+
+- 提高吞吐
+- 降低磁盘压力
+
+缺点：
+
+- 可能增加延迟
+- 需要控制 batch 大小和超时
+
+---
+
+## 3. Checkpoint
+
+Checkpoint 将脏页写入磁盘，并记录日志位置。
+
+恢复时：
+
+```text
+从 checkpoint 开始 replay WAL
+```
+
+没有 checkpoint：
+
+```text
+可能要从很久以前 replay
+```
+
+checkpoint 太频繁：
+
+```text
+增加 I/O
+```
+
+checkpoint 太少：
+
+```text
+恢复时间变长
+```
+
+---
+
+## 4. Log Truncation
+
+日志不能无限增长。
+
+日志截断条件：
+
+```text
+所有副本都已应用
+所有快照都不再依赖
+所有事务都已结束
+```
+
+如果某个 follower 落后：
+
+```text
+日志不能过早截断
+```
+
+否则 follower 无法追赶。
+
+---
+
+## 5. Snapshot Transfer
+
+当新节点加入或 follower 落后太多时，需要传输快照。
+
+流程：
+
+```text
+1. 创建 leader snapshot
+2. 传输 snapshot 到 follower
+3. follower 加载 snapshot
+4. 从 snapshot 对应日志位置继续追增量
+```
+
+注意：
+
+- snapshot 可能很大
+- 传输会占用网络
+- 加载会占用 CPU 和磁盘
+- 需要限速
+
+---
+
+## 6. Anti-entropy Repair
+
+副本之间可能因为网络问题出现数据差异。
+
+Anti-entropy 用于修复副本差异。
+
+常见方法：
+
+### 6.1 Merkle Tree
+
+把数据分块计算哈希，形成 Merkle tree。
+
+比较两个副本的 Merkle tree，可以快速发现差异块。
+
+优点：
+
+- 不需要全量比较
+- 适合大数据集
+
+缺点：
+
+- 计算开销
+- 实现复杂
+
+---
+
+### 6.2 Hash Set Reconciliation
+
+比较两个集合差异。
+
+适合 key 集合修复。
+
+---
+
+### 6.3 Full Scan Repair
+
+全量扫描比较。
+
+简单但成本高。
+
+---
+
+## 7. Tombstone
+
+删除数据时，系统通常不会立即物理删除，而是写 tombstone。
+
+例如：
+
+```text
+DELETE key
+→ write tombstone
+```
+
+原因：
+
+- 副本可能还没收到删除
+- 需要传播删除事件
+- 需要防止旧副本复活数据
+
+问题：
+
+- tombstone 会占用空间
+- 大量删除后读性能下降
+- compaction 需要清理 tombstone
+
+---
+
+## 8. Leader Election 与 Fencing
+
+Leader 故障后需要选举新 leader。
+
+但旧 leader 可能只是网络分区，并未真正死亡。
+
+如果旧 leader 恢复，可能继续写入，导致脑裂。
+
+解决方案：
+
+### 8.1 Fencing Token
+
+每次选举生成递增 token。
+
+```text
+old leader token = 10
+new leader token = 11
+```
+
+存储层拒绝旧 token 的写入。
+
+---
+
+### 8.2 Lease
+
+Leader 获得租约。
+
+```text
+Lease expires at T
+```
+
+如果 leader 不能续约，就不能继续写入。
+
+---
+
+### 8.3 Epoch / Term
+
+Raft 使用 term 防止旧 leader 写入。
+
+---
+
+## 9. Point-in-Time Recovery
+
+PITR 允许恢复到某个时间点。
+
+实现方式：
+
+```text
+Full backup + WAL archive
+```
+
+恢复：
+
+```text
+1. 恢复 full backup
+2. replay WAL 到指定时间
+```
+
+适合：
+
+- 误删数据
+- 错误发布
+- 数据污染
+- 审计恢复
+
+注意：
+
+- WAL 归档必须完整
+- 需要保留足够日志
+- 恢复大数据库可能很慢
+- 需要定期演练
+
+---
+
+## 10. 备份一致性
+
+分布式数据库备份不能简单复制每个节点文件，否则可能得到不一致状态。
+
+方法：
+
+### 10.1 全局一致性快照
+
+通过事务时间戳创建快照。
+
+```text
+所有节点在 timestamp T 的状态
+```
+
+---
+
+### 10.2 分布式一致性协议
+
+使用共识日志确定备份点。
+
+---
+
+### 10.3 应用层一致性
+
+先暂停写入，再备份。
+
+简单但影响可用性。
+
+---
+
+# 六、继续深入：性能模型
+
+分布式数据库性能不能只看单机 QPS，要看端到端延迟、吞吐、尾延迟和资源利用率。
+
+---
+
+## 1. Little’s Law
+
+Little’s Law：
+
+```text
+并发数 = 吞吐 × 延迟
+```
+
+即：
+
+```text
+L = λ × W
+```
+
+其中：
+
+- `L`：系统中并发请求数
+- `λ`：吞吐
+- `W`：平均延迟
+
+例如：
+
+```text
+延迟 = 10 ms
+并发 = 1000
+```
+
+理论吞吐：
+
+```text
+1000 / 0.01 = 100,000 ops/sec
+```
+
+如果延迟变成 50 ms：
+
+```text
+1000 / 0.05 = 20,000 ops/sec
+```
+
+所以降低延迟可以直接提升吞吐。
+
+---
+
+## 2. 延迟预算
+
+设计系统时要给每个阶段分配延迟预算。
+
+例如目标：
+
+```text
+端到端 p99 < 50 ms
+```
+
+预算：
+
+```text
+Client → Gateway: 2 ms
+Gateway → DB: 3 ms
+DB local: 10 ms
+Replication: 15 ms
+Network return: 3 ms
+Buffer: 17 ms
+```
+
+如果 replication 超过预算，就要优化：
+
+- 减少同步副本数
+- 使用本地多数派
+- 使用异步跨区域复制
+- 使用 group commit
+- 使用 SSD
+- 优化网络路径
+
+---
+
+## 3. 尾延迟
+
+平均延迟可能很好，但 p99 很差。
+
+尾延迟来源：
+
+- GC pause
+- 磁盘抖动
+- 网络重传
+- 锁等待
+- compaction
+- rebalance
+- leader election
+- retry storm
+- 热点分片
+- 慢查询
+- 连接池耗尽
+
+优化尾延迟的方法：
+
+### 3.1 Hedged Requests
+
+同时请求多个副本。
+
+---
+
+### 3.2 Request Coalescing
+
+合并相同请求。
+
+---
+
+### 3.3 Backpressure
+
+过载时拒绝或排队，避免系统雪崩。
+
+---
+
+### 3.4 Circuit Breaker
+
+快速失败，避免持续等待。
+
+---
+
+### 3.5 Timeout
+
+每个阶段设置超时。
+
+---
+
+### 3.6 Retry with Backoff
+
+指数退避重试。
+
+```text
+100ms, 200ms, 400ms, 800ms
+```
+
+避免重试风暴。
+
+---
+
+## 4. 吞吐瓶颈
+
+常见瓶颈：
+
+### CPU
+
+- SQL 解析
+- 查询优化
+- 加密
+- 压缩
+- compaction
+- 序列化
+
+---
+
+### 内存
+
+- buffer pool
+- index cache
+- row cache
+- connection memory
+- transaction memory
+
+---
+
+### 磁盘
+
+- WAL fsync
+- data page flush
+- compaction
+- backup
+- index rebuild
+
+---
+
+### 网络
+
+- replication
+- distributed query
+- cross-region traffic
+- client connection
+
+---
+
+### 锁
+
+- row lock
+- table lock
+- global lock
+- index lock
+- metadata lock
+
+---
+
+## 5. 写性能优化
+
+### 5.1 批量写入
+
+```text
+100 rows → one batch
+```
+
+---
+
+### 5.2 异步复制
+
+降低写延迟。
+
+---
+
+### 5.3 Group Commit
+
+减少 fsync。
+
+---
+
+### 5.4 减少索引
+
+每个索引都会增加写成本。
+
+---
+
+### 5.5 使用 LSM-tree
+
+适合高写入。
+
+---
+
+### 5.6 压缩日志
+
+减少网络带宽。
+
+---
+
+### 5.7 避免热点
+
+分散写入。
+
+---
+
+## 6. 读性能优化
+
+### 6.1 缓存
+
+```text
+Redis / Memcached / local cache
+```
+
+---
+
+### 6.2 读副本
+
+读写分离。
+
+---
+
+### 6.3 覆盖索引
+
+避免回表。
+
+---
+
+### 6.4 预聚合
+
+减少复杂查询。
+
+---
+
+### 6.5 列式存储
+
+适合分析查询。
+
+---
+
+### 6.6 并行扫描
+
+多节点并行处理。
+
+---
+
+## 7. 查询性能优化
+
+### 7.1 避免 scatter-gather
+
+查询尽量带分片键。
+
+---
+
+### 7.2 避免跨分片 join
+
+尽量 collocate 数据。
+
+---
+
+### 7.3 使用局部索引
+
+减少网络。
+
+---
+
+### 7.4 限制返回行数
+
+```sql
+LIMIT
+```
+
+---
+
+### 7.5 避免 SELECT *
+
+减少网络传输。
+
+---
+
+### 7.6 使用分页游标
+
+避免大 offset。
+
+例如：
+
+```sql
+WHERE id > last_seen_id
+ORDER BY id
+LIMIT 100
+```
+
+比：
+
+```sql
+LIMIT 100 OFFSET 100000
+```
+
+更高效。
+
+---
+
+# 七、继续深入：分布式查询处理
+
+分布式查询优化器需要决定：
+
+- 数据在哪里
+- 在哪里执行过滤
+- 在哪里 join
+- 如何移动数据
+- 如何并行执行
+- 如何估算成本
+
+---
+
+## 1. 查询下推
+
+尽量把过滤条件推到数据所在节点。
+
+例如：
+
+```sql
+SELECT * FROM orders
+WHERE customer_id = 123;
+```
+
+如果按 `customer_id` 分片：
+
+```text
+只查询对应 shard
+```
+
+而不是把所有数据拉到协调节点再过滤。
+
+---
+
+## 2. 投影下推
+
+只返回需要的列。
+
+例如：
+
+```sql
+SELECT user_id, email FROM users;
+```
+
+数据库只传输：
+
+```text
+user_id, email
+```
+
+而不是整行。
+
+---
+
+## 3. 聚合下推
+
+在数据节点先做局部聚合。
+
+例如：
+
+```sql
+SELECT city, COUNT(*)
+FROM users
+GROUP BY city;
+```
+
+流程：
+
+```text
+每个 shard 先统计本地 city count
+协调节点合并结果
+```
+
+比把所有行拉到协调节点更高效。
+
+---
+
+## 4. Join 策略
+
+### 4.1 Broadcast Join
+
+小表广播到所有节点。
+
+```text
+small table → all nodes
+large table stays local
+```
+
+适合小表。
+
+---
+
+### 4.2 Shuffle Join
+
+按 join key 重新分布数据。
+
+```text
+left table shuffle by key
+right table shuffle by key
+```
+
+适合大表 join，但网络成本高。
+
+---
+
+### 4.3 Collocated Join
+
+两个表按相同 key 分片，数据在同一节点。
+
+```text
+orders.customer_id
+order_items.customer_id
+```
+
+join 可以本地完成。
+
+这是最理想方式。
+
+---
+
+### 4.4 Index Join
+
+通过索引定位少量数据，再回表。
+
+适合高选择性查询。
+
+---
+
+## 5. 统计信息
+
+优化器依赖统计信息：
+
+- 行数
+- 列基数
+- 数据分布
+- 直方图
+- null 比例
+- 索引选择率
+
+分布式系统中统计信息可能过期，导致错误执行计划。
+
+需要：
+
+- 定期 analyze
+- 自动采样
+- 监控慢查询
+- 支持 hint
+- 支持执行计划缓存
+
+---
+
+# 八、继续深入：一致性模型与时间
+
+分布式系统的一致性离不开时间。
+
+---
+
+## 1. 物理时钟问题
+
+普通服务器依赖 NTP。
+
+NTP 误差可能达到几十毫秒。
+
+如果系统依赖时间戳判断先后，可能出错。
+
+例如：
+
+```text
+Node A timestamp = 100
+Node B timestamp = 99
+```
+
+但实际 Node B 的写入可能发生在 Node A 之后。
+
+---
+
+## 2. Logical Clock
+
+逻辑时钟不关心真实时间，只关心事件顺序。
+
+### Lamport Clock
+
+规则：
+
+```text
+本地事件：clock++
+发送消息：携带 clock
+接收消息：clock = max(local, received) + 1
+```
+
+优点：
+
+- 简单
+- 能表示因果顺序
+
+缺点：
+
+- 不能表示真实时间
+- 并发事件顺序可能任意
+
+---
+
+### Vector Clock
+
+每个节点维护自己的计数器。
+
+例如：
+
+```text
+A: 3
+B: 1
+C: 2
+```
+
+可以判断：
+
+- 事件 A 在事件 B 之前
+- 事件 A 和事件 B 并发
+
+优点：
+
+- 能表达因果关系
+
+缺点：
+
+- 元数据大
+- 比较复杂
+
+---
+
+## 3. Hybrid Logical Clock，HLC
+
+HLC 结合物理时钟和逻辑时钟。
+
+用于：
+
+- CockroachDB
+- TiDB
+- 一些分布式数据库
+
+目标：
+
+- 接近真实时间
+- 保证因果顺序
+- 容忍 NTP 误差
+
+---
+
+## 4. TrueTime
+
+Google Spanner 使用 TrueTime。
+
+TrueTime 基于 GPS 和原子钟，返回：
+
+```text
+[t1, t2]
+```
+
+表示真实时间在这个区间内。
+
+Spanner 使用 commit wait：
+
+```text
+等待到 t2 之后
+```
+
+保证外部一致性。
+
+优点：
+
+- 强一致
+- 全球事务
+
+缺点：
+
+- 需要特殊基础设施
+- 延迟高
+- 成本高
+
+---
+
+# 九、继续深入：典型架构对比
+
+---
+
+## 1. 主从复制型分布式数据库
+
+代表：
+
+- MySQL Group Replication
+- PostgreSQL streaming replication
+- MongoDB replica set
+- Redis replication
+
+特点：
+
+- 一个 leader 写
+- 多个 follower 读
+- 实现相对简单
+
+适合：
+
+- 读多写少
+- 中等规模
+- 对跨区域强一致要求不高
+
+风险：
+
+- leader 瓶颈
+- failover 丢数据
+- follower 延迟
+
+---
+
+## 2. 共识型分布式数据库
+
+代表：
+
+- CockroachDB
+- TiDB
+- Spanner
+- FoundationDB
+
+特点：
+
+- 使用 Raft/Paxos
+- 强一致
+- 支持分布式事务
+- 自动故障转移
+
+适合：
+
+- 金融、订单、库存
+- 强一致 OLTP
+- 多副本容灾
+
+风险：
+
+- 延迟高
+- 运维复杂
+- 跨地域成本高
+
+---
+
+## 3. 最终一致型分布式数据库
+
+代表：
+
+- Cassandra
+- DynamoDB
+- Riak
+- CouchDB
+
+特点：
+
+- 高可用
+- 低延迟
+- 多主或无主
+- 最终一致
+
+适合：
+
+- 日志
+- 指标
+- 用户行为
+- 高吞吐 KV
+- 可容忍短暂不一致
+
+风险：
+
+- 冲突处理复杂
+- 应用逻辑复杂
+- 不适合强一致业务
+
+---
+
+## 4. 分析型分布式数据库
+
+代表：
+
+- ClickHouse
+- BigQuery
+- Snowflake
+- Redshift
+- Presto/Trino + Hive
+
+特点：
+
+- 列式存储
+- 并行扫描
+- 聚合查询
+- 数据压缩
+
+适合：
+
+- BI
+- 报表
+- 日志分析
+- 数据仓库
+
+风险：
+
+- 不适合高频小事务
+- 更新删除成本高
+- 小查询延迟可能高
+
+---
+
+# 十、继续深入：设计原则与反模式
+
+---
+
+## 1. 设计原则
+
+### 1.1 数据局部性优先
+
+经常一起访问的数据放一起。
+
+例如：
+
+```text
+customer_id
+orders.customer_id
+order_items.customer_id
+payments.customer_id
+```
+
+这样大部分查询和事务可以本地完成。
+
+---
+
+### 1.2 避免跨分片事务
+
+跨分片事务慢且复杂。
+
+如果业务必须跨分片，考虑：
+
+- 重新设计分片键
+- 使用 saga
+- 使用异步一致性
+- 使用 outbox
+
+---
+
+### 1.3 避免全局热点
+
+例如：
+
+```text
+全局计数器
+热门商品
+热门排行榜
+```
+
+需要拆分、缓存、预计算。
+
+---
+
+### 1.4 明确一致性需求
+
+不是所有数据都需要强一致。
+
+例如：
+
+```text
+订单状态：强一致
+用户点赞数：最终一致
+搜索索引：异步更新
+推荐结果：可容忍延迟
+```
+
+---
+
+### 1.5 为失败设计
+
+分布式系统必须假设：
+
+- 网络会断
+- 节点会挂
+- 磁盘会坏
+- 时钟会漂移
+- 请求会重复
+- 副本会落后
+
+---
+
+### 1.6 可观测性优先
+
+没有监控就无法运维。
+
+必须监控：
+
+- 延迟
+- 吞吐
+- 错误率
+- 副本延迟
+- 锁等待
+- 重试次数
+- GC
+- compaction
+- rebalance
+- 磁盘空间
+- 网络带宽
+
+---
+
+## 2. 常见反模式
+
+### 2.1 用分布式数据库做所有事
+
+有些场景单机数据库更简单。
+
+例如：
+
+- 小数据量
+- 低并发
+- 简单 CRUD
+- 强事务但无扩展需求
+
+---
+
+### 2.2 分片键选错
+
+导致大量 scatter-gather 查询。
+
+例如：
+
+```text
+按 user_id 分片
+但大量查询按 email
+```
+
+---
+
+### 2.3 大量全局索引
+
+全局索引可能成为瓶颈。
+
+---
+
+### 2.4 长事务
+
+导致：
+
+- 锁持有时间长
+- MVCC 版本膨胀
+- GC 无法清理
+- 恢复变慢
+
+---
+
+### 2.5 跨地域同步写
+
+延迟高，容易受网络影响。
+
+---
+
+### 2.6 没有幂等设计
+
+重试导致重复扣款、重复发货。
+
+---
+
+### 2.7 没有故障演练
+
+真正故障时才发现：
+
+- 备份不可用
+- failover 很慢
+- 监控缺失
+- 应用不会重试
+- 连接池配置错误
+
+---
+
+# 十一、继续深入：监控指标
+
+一个分布式数据库至少应该监控以下指标。
+
+---
+
+## 1. 请求指标
+
+```text
+QPS
+TPS
+Read QPS
+Write QPS
+Error rate
+Timeout rate
+Retry rate
+```
+
+---
+
+## 2. 延迟指标
+
+```text
+p50
+p95
+p99
+p999
+max latency
+```
+
+要分阶段看：
+
+```text
+client latency
+gateway latency
+db latency
+replication latency
+lock wait latency
+```
+
+---
+
+## 3. 复制指标
+
+```text
+replica lag
+replication backlog
+log transfer rate
+commit index
+leader term
+election count
+```
+
+---
+
+## 4. 事务指标
+
+```text
+transaction duration
+transaction abort rate
+retry rate
+lock wait time
+deadlock count
+distributed transaction count
+cross-shard transaction count
+```
+
+---
+
+## 5. 存储指标
+
+```text
+disk usage
+disk IOPS
+disk throughput
+fsync latency
+cache hit ratio
+buffer pool hit ratio
+```
+
+---
+
+## 6. 索引指标
+
+```text
+index size
+index hit ratio
+index rebuild time
+index write amplification
+```
+
+---
+
+## 7. Compaction 指标
+
+LSM 系统尤其重要：
+
+```text
+compaction backlog
+compaction throughput
+compaction latency
+space amplification
+read amplification
+```
+
+---
+
+## 8. 集群指标
+
+```text
+node count
+leader count
+follower count
+unhealthy shards
+hot shards
+rebalance progress
+network bandwidth
+CPU
+memory
+GC pause
+```
+
+---
+
+# 十二、继续深入：容量规划
+
+容量规划要估算：
+
+- 数据量
+- 请求量
+- 副本数
+- 索引大小
+- 日志大小
+- 网络带宽
+- 磁盘 IOPS
+- 内存
+- CPU
+
+---
+
+## 1. 数据量估算
+
+例如：
+
+```text
+1 亿用户
+每用户平均 10 条订单
+每条订单 1 KB
+```
+
+订单数据：
+
+```text
+100,000,000 × 10 × 1 KB = 1 TB
+```
+
+如果副本数 3：
+
+```text
+3 TB
+```
+
+如果索引占 50%：
+
+```text
+4.5 TB
+```
+
+如果日志和临时空间占 30%：
+
+```text
+约 6 TB
+```
+
+---
+
+## 2. 请求量估算
+
+例如：
+
+```text
+峰值 100,000 QPS
+读写比 8:2
+```
+
+写请求：
+
+```text
+20,000 QPS
+```
+
+如果每个写请求复制 3 份：
+
+```text
+60,000 次内部写
+```
+
+还要考虑：
+
+- 索引写
+- WAL
+- compaction
+- 查询 fan-out
+
+---
+
+## 3. 网络带宽估算
+
+例如：
+
+```text
+平均写请求 1 KB
+20,000 QPS
+```
+
+基础写入：
+
+```text
+20 MB/s
+```
+
+如果复制 3 份：
+
+```text
+60 MB/s
+```
+
+如果查询 fan-out 到 10 个 shard：
+
+```text
+查询网络流量可能更高
+```
+
+---
+
+## 4. 磁盘 IOPS 估算
+
+如果每个事务需要：
+
+```text
+1 次 WAL fsync
+1 次 data page write
+1 次 index write
+```
+
+那么：
+
+```text
+20,000 TPS → 可能超过 60,000 IOPS
+```
+
+使用 group commit 可以显著降低。
+
+---
+
+# 十三、继续深入：典型场景设计
+
+---
+
+## 场景一：金融账户系统
+
+需求：
+
+- 强一致
+- 不丢钱
+- 支持转账
+- 高可用
+
+设计：
+
+```text
+按 account_id 分片
+每个 shard 3 副本
+Raft 多数派提交
+同步区域内复制
+跨区域异步灾备
+```
+
+转账：
+
+```text
+如果两个账户在同一 shard：本地事务
+如果不同 shard：分布式事务
+```
+
+优化：
+
+- 尽量把关联账户放同一 shard
+- 使用幂等转账 ID
+- 使用条件更新
+- 监控锁等待和重试
+
+---
+
+## 场景二：电商订单系统
+
+需求：
+
+- 高并发下单
+- 库存扣减
+- 订单查询
+- 支付状态
+
+设计：
+
+```text
+按 customer_id 分片
+订单、订单项、支付记录同分片
+库存单独设计
+```
+
+库存热点：
+
+```text
+热门商品库存可能成为热点
+```
+
+解决：
+
+- 库存分桶
+- 预扣库存
+- 异步扣减
+- 缓存库存
+- 限流
+
+---
+
+## 场景三：用户行为日志
+
+需求：
+
+- 高写入
+- 高吞吐
+- 可容忍最终一致
+- 后续分析
+
+设计：
+
+```text
+按 user_id 或 event_time 分片
+LSM-tree
+批量写入
+压缩
+对象存储
+```
+
+查询：
+
+```text
+实时查询走 KV
+分析查询走列式仓库
+```
+
+---
+
+## 场景四：全球 SaaS 多租户
+
+需求：
+
+- 多租户隔离
+- 数据合规
+- 就近访问
+- 高可用
+
+设计：
+
+```text
+按 tenant_id 分片
+租户数据放同一区域
+跨区域灾备
+```
+
+问题：
+
+- 大客户可能成为热点
+- 小租户浪费资源
+
+解决：
+
+- 动态分片
+- 租户合并
+- 租户拆分
+- 资源隔离
+- 多租户索引
+
+---
+
+## 场景五：搜索与推荐
+
+需求：
+
+- 低延迟
+- 高并发
+- 向量检索
+- 倒排索引
+
+设计：
+
+```text
+搜索索引独立集群
+数据库作为 source of truth
+异步构建索引
+```
+
+流程：
+
+```text
+DB write → CDC → Search Index
+```
+
+优点：
+
+- 不影响主库
+- 可独立扩展
+
+缺点：
+
+- 索引延迟
+- 需要处理重复和乱序
+
+---
+
+# 十四、继续深入：性能调优流程
+
+一个实用的调优流程如下。
+
+---
+
+## 第一步：确定目标
+
+例如：
+
+```text
+p99 < 30 ms
+峰值 50,000 QPS
+错误率 < 0.1%
+```
+
+---
+
+## 第二步：观察指标
+
+看：
+
+```text
+CPU
+内存
+磁盘
+网络
+锁
+副本延迟
+重试
+GC
+compaction
+```
+
+---
+
+## 第三步：定位瓶颈
+
+常见判断：
+
+### CPU 高
+
+- SQL 复杂
+- 解析开销
+- 加密
+- compaction
+- GC
+
+---
+
+### 磁盘高
+
+- WAL fsync
+- compaction
+- index rebuild
+- backup
+
+---
+
+### 网络高
+
+- replication
+- distributed query
+- cross-region traffic
+- fan-out
+
+---
+
+### 锁高
+
+- 热点行
+- 长事务
+- 跨分片事务
+- 全局锁
+
+---
+
+### 副本延迟高
+
+- follower 慢
+- 网络慢
+- 写入突发
+- compaction 抢占资源
+
+---
+
+## 第四步：小步优化
+
+不要一次改很多。
+
+例如：
+
+1. 加索引
+2. 改查询
+3. 改分片键
+4. 改复制策略
+5. 改事务隔离级别
+6. 改缓存策略
+
+---
+
+## 第五步：压测验证
+
+使用真实数据分布。
+
+注意：
+
+- 热点
+- 长尾
+- 并发
+- 故障注入
+- 数据倾斜
+- 网络延迟
+
+---
+
+## 第六步：灰度上线
+
+先小流量。
+
+观察：
+
+- 延迟
+- 错误
+- 副本延迟
+- 锁等待
+- 磁盘空间
+
+---
+
+# 十五、继续深入：故障注入测试
+
+分布式数据库必须做故障演练。
+
+常见故障：
+
+```text
+kill leader
+kill follower
+network delay
+packet loss
+partition
+disk full
+slow disk
+clock skew
+GC pause
+process crash
+```
+
+观察：
+
+- 是否自动选主
+- 是否丢数据
+- 是否重复提交
+- 是否长时间不可用
+- 客户端是否正确重试
+- 监控是否报警
+
+---
+
+# 十六、继续深入：设计权衡矩阵
+
+| 需求 | 推荐设计 | 代价 |
+|---|---|---|
+| 强一致 | Raft/Paxos，多数派提交 | 延迟高，可用性下降 |
+| 高可用 | 多副本，异步复制，最终一致 | 可能读到旧数据 |
+| 低延迟 | 本地副本，缓存，异步复制 | 一致性弱 |
+| 高写入 | LSM，批量写，group commit | compaction 压力 |
+| 高读取 | 读副本，缓存，覆盖索引 | 副本延迟 |
+| 跨地域 | 区域异步复制 | 跨区域一致性复杂 |
+| 强事务 | 分布式事务，2PC/Percolator | 锁和延迟 |
+| 高并发热点 | 分桶，缓存，预计算 | 实现复杂 |
+| 分析查询 | 列式存储，并行扫描 | 不适合小事务 |
+| 快速恢复 | checkpoint，WAL，快照 | 存储和 I/O 成本 |
+
+---
+
+# 十七、继续深入：面试或考试式总结
+
+如果要把分布式数据库设计讲清楚，可以按这个框架回答：
+
+## 1. 数据如何分布
+
+- 分片
+- 复制
+- 索引
+- 元数据
+- 重平衡
+
+## 2. 如何保证一致性
+
+- 强一致
+- 最终一致
+- quorum
+- consensus
+- 时间戳
+- MVCC
+
+## 3. 如何保证事务
+
+- 2PC
+- 3PC
+- consensus transaction
+- optimistic concurrency
+- isolation level
+- retry and idempotency
+
+## 4. 如何保证恢复
+
+- WAL
+- checkpoint
+- backup
+- snapshot
+- leader election
+- fencing
+- anti-entropy
+- PITR
+
+## 5. 如何优化性能
+
+- 数据局部性
+- 索引
+- 缓存
+- 批量
+- 并行
+- 读写分离
+- 避免热点
+- 控制网络
+- 监控尾延迟
+
+---
+
+# 十八、最终总结
+
+分布式数据库的设计本质上是在多个目标之间做权衡：
+
+- **一致性**
+- **可用性**
+- **延迟**
+- **吞吐**
+- **持久性**
+- **成本**
+- **复杂度**
+
+复制决定数据在哪里、是否安全、读是否快；  
+索引决定查询是否高效，但会增加写入和维护成本；  
+事务决定跨节点操作是否原子和隔离，但会引入协调和锁；  
+恢复决定系统崩溃后能否回到正确状态，是生产系统的底线。
+
+一个优秀的分布式数据库设计通常遵循以下原则：
+
+1. **让相关数据靠近。**
+2. **让查询命中分片键。**
+3. **让事务尽量本地化。**
+4. **让复制策略匹配一致性需求。**
+5. **让索引服务真实查询，而不是盲目创建。**
+6. **让恢复机制经过演练。**
+7. **让监控覆盖延迟、锁、复制、热点和故障。**
+8. **让应用具备重试、幂等和降级能力。**
+
+最终，分布式数据库的性能不是单纯靠某个组件优化出来的，而是由**数据分布、复制协议、索引结构、事务模型、恢复机制和运维体系**共同决定的。
+
+user
+
+assistant
+<think>
+We need respond to user's latest: ""? Actually user message appears to be a control character? It shows "" maybe accidental. Need handle gracefully. We should ask clarification or continue? The previous conversation: user asked repeated prompt, assistant answered, user said 继续, assistant continued, user now sent "" likely artifact. We need respond helpfully. Could say "看起来消息不完整，请告诉我你想继续哪部分..." But maybe they expect continuation? The user message is empty-ish. We should not ignore. Need final in Chinese likely. Keep concise but helpful. Maybe: "你的上一条消息似乎不完整（只包含一个控制字符）。如果你希望继续，我可以从以下方向展开..." Provide options. Since desired oververbosity 9, but user message unclear. We can offer next topics. Need not overdo.
+
+Need ensure final answer only.
+</think>
+
+你的上一条消息似乎不完整，只包含了一个控制字符 ``。
+
+如果你是想让我**继续**，我可以从下面几个方向继续展开：
+
+1. **分布式数据库的事务协议深入**
+   - 2PC / 3PC
+   - Raft / Paxos 事务
+   - Percolator 事务模型
+   - MVCC、快照隔离、可串行化
+   - 分布式死锁与重试
+
+2. **复制与一致性模型深入**
+   - Leader-Follower
+   - Quorum
+   - 同步 / 异步 / 半同步复制
+   - 最终一致性
+   - 向量时钟 / HLC / TrueTime
+
+3. **索引与查询优化深入**
+   - 本地索引 / 全局索引
+   - 分片键选择
+   - 二级索引写放大
+   - LSM-tree / B-tree
+   - 分布式 join 与查询下推
+
+4. **恢复与容灾深入**
+   - WAL
+   - Checkpoint
+   - Snapshot
+   - Leader election
+   - Fencing
+   - Point-in-time recovery
+   - 备份一致性
+
+5. **性能调优与容量规划**
+   - 延迟预算
+   - 尾延迟优化
+   - 热点分片处理
+   - 读写分离
+   - 缓存策略
+   - 监控指标
+   - 容量估算
+
+6. **典型系统设计案例**
+   - 金融账户系统
+   - 电商订单系统
+   - 多租户 SaaS
+   - 全球分布式数据库
+   - 日志与指标系统
+   - 搜索推荐系统
+
+你可以直接回复：
+
+```text
+继续
+```
+
+或者指定：
+
+```text
+继续讲事务
+```
+
+```text
+继续讲复制
+```
+
+```text
+继续讲索引
+```
+
+```text
+继续讲恢复
+```
+
+```text
+继续讲性能调优
+```
+
+```text
+继续讲系统设计案例
+```
+
+user
+
+assistant
+<think>
+User again sent "" control token. Need respond helpfully. Maybe they are pasting from model output accidentally. Need not repeat too much. Could say message appears incomplete; ask what they want. But maybe they expect continuation of previous topic? The previous assistant gave options. User again sent control char. We should handle gracefully, maybe provide a default continuation? Since they said 继续 earlier, and now control char, maybe they want continue but input corrupted. We can proactively continue with a useful next section, perhaps "继续：事务协议深入" because likely next. But if user message is invalid, asking clarification is safer. However repeated invalid messages may indicate they want us to continue automatically. We can say "看起来仍是控制字符；如果你没有特别指定，我默认继续讲事务协议深入" and then provide content. That satisfies helpfulness. Need final in Chinese. Could be moderate length. Need not be too long but useful.
+
+Let's craft: acknowledge incomplete, then default continue with transactions deep dive. Include 2PC, 3PC, consensus, Percolator, MVCC, isolation, deadlock, idempotency, saga, performance. Maybe also ask if they want another topic. Since desired oververbosity 9, but user message unclear; provide substantial default continuation.
+
+Need ensure no analysis in final.
+</think>
+
+看起来你的消息仍然不完整，只包含了一个控制字符 ``。  
+如果你没有特别指定方向，我默认**继续深入讲分布式数据库中的事务设计**。
+
+---
+
+# 分布式数据库事务设计深入
+
+事务是分布式数据库中最复杂的部分之一。  
+在单机数据库中，事务主要依赖本地日志、锁和 MVCC；但在分布式数据库中，一次事务可能涉及多个节点、多个分片、多个副本，因此必须解决：
+
+1. **原子性**：多个节点要么全部提交，要么全部回滚。
+2. **一致性**：事务执行后数据库仍然满足业务约束。
+3. **隔离性**：并发事务不能互相破坏。
+4. **持久性**：提交后的数据不能因为故障丢失。
+5. **可用性**：部分节点故障时系统仍能继续工作。
+6. **性能**：不能因为协调成本导致延迟过高。
+
+---
+
+## 一、本地事务与分布式事务的区别
+
+### 1. 本地事务
+
+所有数据都在同一个节点上。
+
+例如：
+
+```sql
+BEGIN;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE id = 2;
+
+COMMIT;
+```
+
+如果 `account 1` 和 `account 2` 都在同一个节点，那么这就是本地事务。
+
+本地事务通常只需要：
+
+```text
+WAL
+锁
+MVCC
+commit record
+```
+
+性能较好。
+
+---
+
+### 2. 分布式事务
+
+数据分布在多个节点上。
+
+例如：
+
+```text
+account 1 在 Node A
+account 2 在 Node B
+```
+
+转账事务需要同时修改两个节点：
+
+```text
+Node A: balance - 100
+Node B: balance + 100
+```
+
+这时必须保证：
+
+```text
+Node A 成功，Node B 失败 → 整体回滚
+Node A 失败，Node B 成功 → 整体回滚
+Node A 成功，Node B 成功 → 整体提交
+```
+
+这就是分布式事务的核心难点。
+
+---
+
+# 二、Two-Phase Commit，2PC
+
+Two-Phase Commit，即两阶段提交，是经典分布式事务协议。
+
+它通常有一个协调者：
+
+```text
+Coordinator
+```
+
+以及多个参与者：
+
+```text
+Participant A
+Participant B
+Participant C
+```
+
+---
+
+## 1. 第一阶段：Prepare
+
+协调者询问所有参与者：
+
+```text
+你们是否可以提交？
+```
+
+参与者需要：
+
+1. 检查本地事务是否可以提交。
+2. 获取必要锁。
+3. 写入 prepare 日志。
+4. 返回 yes 或 no。
+
+例如：
+
+```text
+Coordinator → Participant A: prepare?
+Coordinator → Participant B: prepare?
+```
+
+参与者回答：
+
+```text
+Participant A: yes
+Participant B: yes
+```
+
+---
+
+## 2. 第二阶段：Commit / Abort
+
+如果所有参与者都回答 yes：
+
+```text
+Coordinator → Participant A: commit
+Coordinator → Participant B: commit
+```
+
+如果任何一个参与者回答 no：
+
+```text
+Coordinator → Participant A: abort
+Coordinator → Participant B: abort
+```
+
+---
+
+## 3. 2PC 的优点
+
+2PC 的优点是：
+
+1. **概念简单**
+   - 容易理解。
+
+2. **支持强原子性**
+   - 所有节点要么提交，要么回滚。
+
+3. **兼容传统关系型数据库**
+   - XA 事务就是基于类似思想。
+
+4. **适合跨数据库事务**
+   - 例如多个 MySQL 实例之间的事务。
+
+---
+
+## 4. 2PC 的缺点
+
+2PC 的问题也很明显。
+
+### 4.1 协调者单点故障
+
+如果协调者在 prepare 之后崩溃：
+
+```text
+Participant A: prepared
+Participant B: prepared
+Coordinator: dead
+```
+
+参与者不知道应该提交还是回滚。
+
+它们不能自行提交，因为不知道其他参与者是否也成功 prepare。
+
+这会导致事务阻塞。
+
+---
+
+### 4.2 长时间持有锁
+
+参与者进入 prepared 状态后，可能仍然持有锁。
+
+如果协调者迟迟不恢复：
+
+```text
+锁一直被占用
+```
+
+这会影响其他事务。
+
+---
+
+### 4.3 网络分区问题
+
+如果协调者和某个参与者网络断开：
+
+```text
+Coordinator ↔ Participant A
+```
+
+事务可能无法完成。
+
+---
+
+### 4.4 延迟高
+
+一次 2PC 至少需要：
+
+```text
+Prepare 请求
+Prepare 响应
+Commit 请求
+Commit 响应
+```
+
+如果跨节点、跨机房、跨地域，延迟会非常明显。
+
+---
+
+### 4.5 可用性差
+
+2PC 在分区期间可能阻塞，不符合高可用系统的设计目标。
+
+---
+
+# 三、Three-Phase Commit，3PC
+
+Three-Phase Commit 试图减少 2PC 的阻塞问题。
+
+它把流程拆成三个阶段：
+
+```text
+CanCommit
+PreCommit
+DoCommit
+```
+
+---
+
+## 1. CanCommit
+
+协调者询问参与者：
+
+```text
+你们是否可以开始提交？
+```
+
+参与者检查资源是否足够，例如：
+
+- 锁是否可以获取
+- 磁盘是否足够
+- 日志是否可以写入
+
+然后回答 yes/no。
+
+---
+
+## 2. PreCommit
+
+如果所有参与者都同意，协调者发送：
+
+```text
+PreCommit
+```
+
+参与者写入日志并准备提交。
+
+---
+
+## 3. DoCommit
+
+协调者发送：
+
+```text
+DoCommit
+```
+
+参与者正式提交。
+
+---
+
+## 4. 3PC 的改进
+
+3PC 相比 2PC 多了一个阶段，可以在某些网络分区场景下减少阻塞。
+
+例如：
+
+```text
+协调者发送 PreCommit 后崩溃
+```
+
+参与者可以根据超时和状态判断是否继续提交。
+
+---
+
+## 5. 3PC 的问题
+
+3PC 仍然不完美。
+
+它可能：
+
+1. 实现复杂。
+2. 仍然依赖网络假设。
+3. 在某些分区下仍可能不一致。
+4. 实际生产系统很少使用。
+
+因此现代分布式数据库更常用：
+
+```text
+Raft
+Paxos
+Percolator-style transaction
+```
+
+而不是传统 3PC。
+
+---
+
+# 四、基于共识日志的分布式事务
+
+现代分布式数据库通常不会把 2PC 作为唯一核心机制，而是把事务日志纳入共识日志。
+
+例如：
+
+```text
+Transaction log replicated to majority
+```
+
+事务提交不再依赖单个协调者，而是依赖多数派日志。
+
+---
+
+## 1. 基本思想
+
+事务状态被写入复制日志：
+
+```text
+begin
+write
+prepare
+commit
+```
+
+只要多数派节点记录了 commit，事务就被认为提交。
+
+例如：
+
+```text
+Replica 1: commit
+Replica 2: commit
+Replica 3: not yet
+```
+
+如果多数派已经记录 commit：
+
+```text
+事务提交
+```
+
+即使某个副本暂时落后，也不会影响提交判断。
+
+---
+
+## 2. 优点
+
+相比传统 2PC，共识日志事务有这些优点：
+
+1. **没有单点协调者**
+   - 由多数派决定。
+
+2. **日志持久化**
+   - 提交记录被复制到多个节点。
+
+3. **自动恢复**
+   - leader 故障后可以重新选举。
+
+4. **与复制系统统一**
+   - 数据复制和事务提交使用同一套日志机制。
+
+---
+
+## 3. 缺点
+
+缺点是实现复杂：
+
+- 需要处理事务状态。
+- 需要处理锁。
+- 需要处理 MVCC。
+- 需要处理垃圾回收。
+- 需要处理跨分片事务。
+- 需要处理副本落后。
+- 需要处理 leader 切换。
+
+---
+
+# 五、Percolator 风格事务
+
+Percolator 是 Google 提出的分布式事务模型，对很多现代分布式数据库影响很大。
+
+它通常运行在一个分布式 KV 存储之上。
+
+---
+
+## 1. 核心组件
+
+Percolator 风格事务通常包含：
+
+```text
+Data
+Lock
+Write
+Transaction Status
+Timestamp
+```
+
+---
+
+## 2. Primary Lock 与 Secondary Lock
+
+Percolator 使用锁记录来保护事务正在修改的数据。
+
+一个事务会选择一个 primary lock：
+
+```text
+Primary Lock
+```
+
+其他锁称为 secondary locks：
+
+```text
+Secondary Locks
+```
+
+Primary lock 很重要，因为事务状态通常记录在 primary lock 上。
+
+---
+
+## 3. 事务流程简化版
+
+一个事务可能这样执行：
+
+```text
+1. 分配 start timestamp
+2. 读取数据
+3. 写 primary lock
+4. 写 secondary locks
+5. 写数据
+6. commit primary lock
+7. 异步清理 secondary locks
+```
+
+---
+
+## 4. 为什么需要 primary lock？
+
+因为事务状态需要有一个权威位置。
+
+如果事务提交状态记录在 primary lock 上：
+
+```text
+Primary Lock = committed
+```
+
+那么其他事务可以查询 primary lock 判断该事务是否提交。
+
+---
+
+## 5. 为什么 secondary locks 可以异步清理？
+
+因为事务状态已经由 primary lock 决定。
+
+secondary locks 只是用于阻止其他事务修改相关数据。
+
+一旦 primary lock 提交，其他事务可以通过 primary lock 判断事务状态，因此 secondary locks 可以后续清理。
+
+---
+
+## 6. Percolator 的优点
+
+1. 支持跨分片事务。
+2. 支持大事务。
+3. 与分布式 KV 存储结合良好。
+4. 支持 MVCC。
+5. 支持快照读。
+
+---
+
+## 7. Percolator 的缺点
+
+1. 锁管理复杂。
+2. 需要后台清理。
+3. 对延迟敏感。
+4. 需要处理锁冲突和重试。
+5. 需要处理事务状态查询。
+
+---
+
+# 六、MVCC 与事务
+
+MVCC，Multi-Version Concurrency Control，多版本并发控制，是现代分布式数据库事务的重要基础。
+
+---
+
+## 1. 基本思想
+
+每次修改数据时，不直接覆盖旧数据，而是创建新版本。
+
+例如：
+
+```text
+row version 1
+row version 2
+row version 3
+```
+
+事务读取时，根据事务时间戳选择可见版本。
+
+---
+
+## 2. 示例
+
+假设事务时间戳：
+
+```text
+T1 = 100
+T2 = 105
+T3 = 110
+```
+
+数据版本：
+
+```text
+v1: created at 90
+v2: created at 103
+v3: created at 108
+```
+
+事务 T1 可能看到：
+
+```text
+v1
+```
+
+事务 T2 可能看到：
+
+```text
+v2
+```
+
+事务 T3 可能看到：
+
+```text
+v3
+```
+
+---
+
+## 3. MVCC 的优点
+
+1. **读写不阻塞**
+   - 读事务不需要等待写事务。
+
+2. **支持快照读**
+   - 事务看到一致快照。
+
+3. **提高并发**
+   - 适合高并发 OLTP。
+
+4. **支持时间点恢复**
+   - 可以读取历史版本。
+
+---
+
+## 4. MVCC 的缺点
+
+1. **版本膨胀**
+   - 数据会保存多个版本。
+
+2. **垃圾回收复杂**
+   - 需要判断哪些版本不再被使用。
+
+3. **长事务影响 GC**
+   - 长事务会阻止旧版本清理。
+
+4. **读放大**
+   - 读取时可能需要遍历版本链。
+
+5. **存储成本增加**
+   - 历史版本占用空间。
+
+---
+
+# 七、事务隔离级别
+
+分布式数据库通常支持不同隔离级别。
+
+---
+
+## 1. Read Uncommitted
+
+可以读取未提交数据。
+
+```text
+T1 update
+T2 read uncommitted
+T1 rollback
+```
+
+T2 可能读到脏数据。
+
+实际系统中很少使用。
+
+---
+
+## 2. Read Committed
+
+只能读取已提交数据。
+
+优点：
+
+- 避免脏读。
+
+缺点：
+
+- 可能非重复读。
+
+例如：
+
+```text
+T1 read x = 10
+T2 update x = 20
+T1 read x = 20
+```
+
+---
+
+## 3. Repeatable Read
+
+同一事务内多次读取同一数据结果一致。
+
+优点：
+
+- 避免非重复读。
+
+缺点：
+
+- 可能幻读。
+
+例如：
+
+```text
+T1 count rows where age > 20 = 10
+T2 insert row age = 30
+T1 count rows where age > 20 = 11
+```
+
+---
+
+## 4. Snapshot Isolation
+
+事务读取一个一致性快照。
+
+这是很多现代数据库使用的模型。
+
+例如：
+
+```text
+PostgreSQL
+CockroachDB
+TiDB
+Oracle
+```
+
+优点：
+
+- 读写不阻塞
+- 并发高
+- 避免很多异常
+
+缺点：
+
+- 可能允许 write skew
+- 不一定等价于 serializable
+
+---
+
+## 5. Serializable
+
+事务结果等价于某种串行执行顺序。
+
+这是最强隔离级别。
+
+优点：
+
+- 最安全
+- 应用最容易推理
+
+缺点：
+
+- 性能较低
+- 冲突时可能 abort
+- 实现复杂
+
+---
+
+# 八、Write Skew 问题
+
+Write skew 是 snapshot isolation 下常见异常。
+
+---
+
+## 1. 例子
+
+业务规则：
+
+```text
+至少有一个医生值班
+```
+
+初始状态：
+
+```text
+Doctor A: on duty
+Doctor B: on duty
+```
+
+事务 1：
+
+```text
+读取：A on duty, B on duty
+判断：可以休息
+更新：A off duty
+```
+
+事务 2：
+
+```text
+读取：A on duty, B on duty
+判断：可以休息
+更新：B off duty
+```
+
+最终：
+
+```text
+A off duty
+B off duty
+```
+
+违反规则。
+
+---
+
+## 2. 为什么 snapshot isolation 可能允许？
+
+因为两个事务读取的是同一个快照。
+
+它们没有直接修改同一行，所以可能不冲突。
+
+---
+
+## 3. 解决方法
+
+### 方法一：使用 Serializable
+
+强制事务串行化。
+
+---
+
+### 方法二：显式锁
+
+```sql
+SELECT * FROM doctors
+WHERE status = 'on_duty'
+FOR UPDATE;
+```
+
+---
+
+### 方法三：条件更新
+
+```sql
+UPDATE doctors
+SET status = 'off_duty'
+WHERE id = 1
+AND on_duty_count > 1;
+```
+
+---
+
+### 方法四：唯一约束或计数约束
+
+用数据库约束保证业务规则。
+
+---
+
+# 九、分布式死锁
+
+分布式事务可能跨节点形成死锁。
+
+---
+
+## 1. 示例
+
+事务 T1：
+
+```text
+锁住 Node A 的 row 1
+等待 Node B 的 row 2
+```
+
+事务 T2：
+
+```text
+锁住 Node B 的 row 2
+等待 Node A 的 row 1
+```
+
+形成死锁：
+
+```text
+T1 → T2
+T2 → T1
+```
+
+---
+
+## 2. 单机死锁检测
+
+单机数据库可以维护 wait-for graph：
+
+```text
+T1 waits for T2
+T2 waits for T1
+```
+
+发现环后回滚一个事务。
+
+---
+
+## 3. 分布式死锁检测难点
+
+在分布式系统中，每个节点只知道本地锁信息。
+
+例如：
+
+```text
+Node A 知道 T1 等待 Node B
+Node B 知道 T2 等待 Node A
+```
+
+要构建全局 wait-for graph 很复杂。
+
+---
+
+## 4. 常见处理方式
+
+### 4.1 Timeout
+
+最简单：
+
+```text
+等待超过阈值 → abort
+```
+
+优点：
+
+- 简单
+- 避免永久阻塞
+
+缺点：
+
+- 可能误杀正常事务
+- 阈值难调
+
+---
+
+### 4.2 全局 Wait-for Graph
+
+收集各节点锁信息，构建全局图。
+
+缺点：
+
+- 开销大
+- 信息可能不一致
+- 实现复杂
+
+---
+
+### 4.3 优先级策略
+
+选择代价较小的事务回滚。
+
+例如：
+
+- 回滚持有锁最少的事务
+- 回滚运行时间最短的事务
+- 回滚优先级最低的事务
+
+---
+
+### 4.4 避免死锁
+
+通过固定加锁顺序减少死锁。
+
+例如：
+
+```text
+总是按 row_id 升序加锁
+```
+
+---
+
+# 十、事务重试与幂等
+
+分布式事务经常失败，因此应用必须能安全重试。
+
+---
+
+## 1. 为什么需要幂等？
+
+假设用户点击支付：
+
+```text
+扣款 100 元
+```
+
+如果请求超时，客户端重试：
+
+```text
+第一次请求可能已经成功
+第二次请求又执行一次
+```
+
+结果可能扣款两次。
+
+因此操作必须幂等。
+
+---
+
+## 2. 幂等实现方式
+
+### 2.1 请求 ID
+
+```text
+request_id = unique
+```
+
+数据库记录已处理请求。
+
+重复请求直接返回原结果。
+
+---
+
+### 2.2 条件更新
+
+```sql
+UPDATE accounts
+SET balance = balance - 100,
+    version = version + 1
+WHERE id = 1
+AND version = 12;
+```
+
+如果版本变化，更新失败。
+
+---
+
+### 2.3 状态机
+
+```text
+INIT → PROCESSING → SUCCESS
+```
+
+重复请求不能把 SUCCESS 改回 PROCESSING。
+
+---
+
+### 2.4 唯一约束
+
+```sql
+INSERT INTO payments(request_id, amount)
+VALUES('abc', 100);
+```
+
+如果 request_id 唯一，重复插入会失败。
+
+---
+
+# 十一、长事务与 Saga
+
+传统 ACID 事务适合短事务。  
+但很多业务流程很长，例如：
+
+```text
+创建订单
+扣库存
+扣款
+发货
+通知
+```
+
+如果全部使用一个分布式事务，会长时间锁资源。
+
+---
+
+## 1. Saga 模式
+
+Saga 把长事务拆成多个本地事务。
+
+每个本地事务都有补偿操作。
+
+例如：
+
+```text
+1. 创建订单
+   补偿：取消订单
+
+2. 扣库存
+   补偿：恢复库存
+
+3. 扣款
+   补偿：退款
+
+4. 发货
+   补偿：取消发货
+```
+
+如果第 3 步失败：
+
+```text
+执行补偿：
+恢复库存
+取消订单
+```
+
+---
+
+## 2. Saga 的优点
+
+1. 避免长时间锁。
+2. 适合跨服务流程。
+3. 提高系统可用性。
+4. 可以异步执行。
+
+---
+
+## 3. Saga 的缺点
+
+1. 中间状态可能可见。
+2. 补偿逻辑复杂。
+3. 需要幂等。
+4. 需要处理重试。
+5. 需要处理补偿失败。
+
+---
+
+# 十二、Outbox Pattern
+
+在分布式系统中，经常需要同时：
+
+```text
+写数据库
+发消息
+```
+
+例如：
+
+```text
+订单创建成功后发送 MQ 消息
+```
+
+如果直接：
+
+```text
+写数据库
+发消息
+```
+
+可能出现问题：
+
+```text
+数据库成功，消息失败
+数据库失败，消息成功
+```
+
+这会导致不一致。
+
+---
+
+## 1. Outbox 思想
+
+把消息写入数据库事务中。
+
+```sql
+BEGIN;
+
+INSERT INTO orders(...);
+
+INSERT INTO outbox(...);
+
+COMMIT;
+```
+
+然后后台进程读取 outbox 并发送消息。
+
+---
+
+## 2. 优点
+
+1. 数据库状态和消息记录一致。
+2. 避免双写不一致。
+3. 支持重试。
+4. 可以审计。
+
+---
+
+## 3. 缺点
+
+1. 消息可能重复发送。
+2. 消费端必须幂等。
+3. 需要后台投递进程。
+4. 消息延迟增加。
+
+---
+
+# 十三、分布式事务性能优化
+
+分布式事务性能优化核心是：
+
+```text
+减少跨节点事务
+减少锁等待
+减少网络往返
+减少重试
+减少长事务
+```
+
+---
+
+## 1. 数据共置
+
+把经常一起更新的数据放在同一分片。
+
+例如：
+
+```text
+orders.customer_id
+order_items.customer_id
+payments.customer_id
+```
+
+这样订单相关事务可以本地完成。
+
+---
+
+## 2. 避免跨分片事务
+
+如果业务允许，重新设计分片键。
+
+例如：
+
+```text
+按 customer_id 分片
+```
+
+比：
+
+```text
+按 order_id 分片
+```
+
+更适合订单查询和事务。
+
+---
+
+## 3. 使用乐观并发控制
+
+冲突少时，乐观并发控制吞吐更高。
+
+例如：
+
+```sql
+UPDATE accounts
+SET balance = 100
+WHERE id = 1
+AND version = 12;
+```
+
+如果失败，再重试。
+
+---
+
+## 4. 使用悲观锁处理热点
+
+热点数据冲突严重时，乐观重试可能浪费资源。
+
+例如：
+
+```text
+库存扣减
+计数器更新
+```
+
+可以使用：
+
+```text
+SELECT FOR UPDATE
+```
+
+或者专用锁服务。
+
+---
+
+## 5. 控制事务大小
+
+大事务会：
+
+- 锁更多数据
+- 增加回滚成本
+- 增加 MVCC 版本
+- 增加恢复时间
+
+建议：
+
+```text
+事务尽量短
+事务尽量小
+```
+
+---
+
+## 6. 避免全局锁
+
+全局锁会限制扩展。
+
+例如：
+
+```text
+全局唯一索引
+全局计数器
+全局元数据锁
+```
+
+需要拆分或缓存。
+
+---
+
+## 7. 使用批量事务
+
+多个小操作合并成一个事务。
+
+例如：
+
+```text
+100 个更新 → 一个事务
+```
+
+但要注意事务不能过大。
+
+---
+
+## 8. 使用异步一致性
+
+不是所有业务都需要强一致。
+
+例如：
+
+```text
+订单状态：强一致
+积分发放：最终一致
+搜索索引：异步更新
+推荐结果：可延迟
+```
+
+---
+
+# 十四、事务监控指标
+
+生产系统必须监控事务指标。
+
+---
+
+## 1. 事务延迟
+
+```text
+p50
+p95
+p99
+max
+```
+
+要区分：
+
+```text
+本地事务延迟
+分布式事务延迟
+```
+
+---
+
+## 2. 事务吞吐
+
+```text
+TPS
+commit rate
+abort rate
+```
+
+---
+
+## 3. 重试率
+
+```text
+retry count
+retry rate
+```
+
+重试率高通常意味着：
+
+- 冲突严重
+- 热点
+- 锁竞争
+- 网络不稳定
+- 事务设计不合理
+
+---
+
+## 4. 锁等待
+
+```text
+lock wait time
+lock timeout count
+deadlock count
+```
+
+---
+
+## 5. 跨分片事务比例
+
+```text
+cross-shard transaction rate
+```
+
+如果比例过高，说明分片键设计可能有问题。
+
+---
+
+## 6. 长事务
+
+```text
+long-running transaction count
+oldest transaction age
+```
+
+长事务会影响：
+
+- GC
+- 锁
+- 副本延迟
+- 恢复
+
+---
+
+## 7. MVCC 版本
+
+```text
+version count
+row chain length
+GC lag
+```
+
+---
+
+# 十五、事务设计最佳实践
+
+---
+
+## 1. 尽量让事务本地化
+
+这是最重要的原则。
+
+```text
+相关数据放同一分片
+```
+
+---
+
+## 2. 分片键要匹配事务边界
+
+如果经常一起更新的数据被分到不同 shard，就会增加分布式事务。
+
+---
+
+## 3. 保持事务短小
+
+避免：
+
+```text
+BEGIN
+  复杂计算
+  外部 HTTP 调用
+  等待用户输入
+COMMIT
+```
+
+---
+
+## 4. 所有写操作考虑幂等
+
+尤其是：
+
+```text
+支付
+扣库存
+发货
+退款
+积分
+优惠券
+```
+
+---
+
+## 5. 明确隔离级别
+
+不要默认所有数据都需要 Serializable。
+
+根据业务选择：
+
+```text
+Read Committed
+Snapshot Isolation
+Serializable
+```
+
+---
+
+## 6. 对热点使用专用设计
+
+热点行不要简单用普通事务硬扛。
+
+可以使用：
+
+```text
+分桶
+缓存
+预扣
+异步扣减
+限流
+```
+
+---
+
+## 7. 使用补偿流程处理长流程
+
+长业务流程优先考虑：
+
+```text
+Saga
+Outbox
+Event Sourcing
+```
+
+---
+
+# 十六、总结
+
+分布式事务的核心不是“能不能实现”，而是“如何以可接受的延迟和复杂度实现”。
+
+主要设计选择包括：
+
+| 方案 | 适用场景 | 优点 | 缺点 |
+|---|---|---|---|
+| 本地事务 | 数据在同一节点 | 快、简单 | 不能跨节点 |
+| 2PC | 传统跨库事务 | 强原子性 | 阻塞、单点、慢 |
+| 3PC | 理论改进 | 减少阻塞 | 复杂、少用 |
+| Raft/Paxos 事务 | 现代分布式数据库 | 高可靠、自动恢复 | 实现复杂 |
+| Percolator | 大规模 KV + 事务 | 支持跨分片事务 | 锁和状态复杂 |
+| MVCC | 高并发 OLTP | 读写不阻塞 | GC 和版本管理复杂 |
+| Saga | 长业务流程 | 避免长锁 | 补偿复杂 |
+| Outbox | 数据库 + 消息 | 避免双写不一致 | 需要幂等消费 |
+
+如果你希望我继续，我可以接着讲：
+
+```text
+继续讲复制
+```
+
+```text
+继续讲索引
+```
+
+```text
+继续讲恢复
+```
+
+```text
+继续讲性能调优
+```
+
+```text
+继续讲系统设计案例
+```
+
+user
+assistant
+<think>
+User again sent "" control token. Need respond. Could be accidental. Need maybe continue default topic? We already did transactions. Could continue with replication deep dive. But repeated control char may mean they want continue. We can acknowledge and default continue with replication. Need final in Chinese. Provide detailed continuation. Ensure not too repetitive. Maybe start: "看起来消息仍不完整；我默认继续讲复制与一致性深入". Then content.
+
+Need maybe include: replication protocols, leader election, quorum, consistency, read/write paths, multi-region, conflict resolution, CRDTs, vector clocks, performance tuning, failure scenarios, monitoring, examples.
+
+Let's craft thorough but not absurd. Since previous answer long, can be long. Desired oververbosity 9. Use headings.
+
+Need ensure no analysis.
+</think>
+
+看起来你的消息仍然不完整，只包含了一个控制字符 ``。  
+如果你没有特别指定，我默认**继续深入讲分布式数据库中的复制与一致性设计**。
+
+---
+
+# 分布式数据库复制与一致性深入
+
+复制是分布式数据库的基础能力之一。  
+它解决的核心问题是：
+
+```text
+同一份数据存在多个副本时，如何保证可用性、持久性、一致性和性能？
+```
+
+复制系统通常要处理几个关键问题：
+
+1. **写请求应该发给谁？**
+2. **写请求如何传播到其他副本？**
+3. **什么时候认为写入成功？**
+4. **读请求应该从哪里读？**
+5. **副本落后时怎么办？**
+6. **Leader 故障时怎么办？**
+7. **网络分区时怎么办？**
+8. **多个副本同时写入时如何合并？**
+9. **如何保证提交后的数据不丢？**
+10. **如何降低延迟并提高吞吐？**
+
+---
+
+# 一、复制的基本模型
+
+---
+
+## 1. 主从复制 / Leader-Follower
+
+这是最常见的复制模型。
+
+```text
+Client Write → Leader
+Leader → Followers
+Client Read  → Leader or Followers
+```
+
+Leader 负责：
+
+- 接收写请求
+- 写本地日志
+- 将日志复制到 follower
+- 决定事务提交
+- 处理故障转移
+
+Follower 负责：
+
+- 接收日志
+- 应用日志
+- 提供读服务
+- 参与 leader 选举
+
+---
+
+## 2. 多主复制 / Multi-Leader
+
+多个节点都可以接收写请求。
+
+```text
+Client Write → Leader A or Leader B
+Leader A ↔ Leader B
+```
+
+适合多数据中心写入场景。
+
+优点：
+
+- 写入可用性高
+- 用户可就近写入
+
+缺点：
+
+- 冲突处理复杂
+- 强一致困难
+- 需要版本合并或 CRDT
+
+---
+
+## 3. 无主复制 / Leaderless
+
+所有节点地位相同，客户端直接写多个副本。
+
+典型代表：
+
+```text
+Cassandra
+DynamoDB-like systems
+```
+
+写入流程：
+
+```text
+Client → Replica A
+Client → Replica B
+Client → Replica C
+```
+
+如果满足 quorum：
+
+```text
+W + R > N
+```
+
+则认为读写一致。
+
+优点：
+
+- 高可用
+- 无 leader 瓶颈
+
+缺点：
+
+- 冲突处理复杂
+- 需要 read repair
+- 需要 anti-entropy
+- 调试困难
+
+---
+
+# 二、复制日志
+
+大多数复制系统都基于日志。
+
+---
+
+## 1. 日志是什么？
+
+日志是一个有序记录序列：
+
+```text
+Log 1
+Log 2
+Log 3
+Log 4
+...
+```
+
+每个日志记录可能包含：
+
+```text
+事务 ID
+操作类型
+数据变更
+时间戳
+版本号
+LSN
+Term
+```
+
+---
+
+## 2. 状态机复制
+
+复制系统通常可以抽象为状态机复制：
+
+```text
+所有副本从相同初始状态开始
+按相同顺序应用相同日志
+最终得到相同状态
+```
+
+核心思想：
+
+```text
+状态 = 初始状态 + 日志序列
+```
+
+只要日志顺序一致，副本状态就一致。
+
+---
+
+## 3. 日志复制流程
+
+Leader-based 系统通常这样工作：
+
+```text
+1. Client 写请求到达 Leader
+2. Leader 将请求追加到本地日志
+3. Leader 将日志发送给 Followers
+4. Followers 写入本地日志并确认
+5. Leader 等待多数派确认
+6. Leader 标记日志 committed
+7. Leader 应用日志并返回客户端
+8. Followers 异步应用 committed 日志
+```
+
+---
+
+# 三、同步复制、异步复制与半同步复制
+
+---
+
+## 1. 同步复制
+
+Leader 等待 follower 确认后才返回客户端。
+
+```text
+Write → Leader log → Follower ACK → Client ACK
+```
+
+优点：
+
+- 数据丢失概率低
+- failover 后数据完整
+- 一致性强
+
+缺点：
+
+- 写延迟高
+- follower 故障会影响写入
+- 跨区域延迟明显
+
+---
+
+## 2. 异步复制
+
+Leader 本地写入成功即返回客户端。
+
+```text
+Write → Leader log → Client ACK
+Follower later
+```
+
+优点：
+
+- 延迟低
+- 吞吐高
+- follower 故障不影响写入
+
+缺点：
+
+- follower 可能落后
+- leader 故障可能丢数据
+- 读 follower 可能读到旧数据
+
+---
+
+## 3. 半同步复制
+
+Leader 等待至少一个 follower 收到日志，但不一定等待日志应用完成。
+
+```text
+Write → Leader log → Follower receive ACK → Client ACK
+```
+
+这是折中方案。
+
+优点：
+
+- 比异步更安全
+- 比同步延迟低
+
+缺点：
+
+- 仍可能丢未应用数据
+- follower 故障时可能退化为异步
+
+---
+
+# 四、Quorum 多数派机制
+
+Quorum 是分布式复制和一致性的重要基础。
+
+---
+
+## 1. 基本概念
+
+假设有：
+
+```text
+N = 副本总数
+W = 写入成功所需副本数
+R = 读取所需副本数
+```
+
+如果满足：
+
+```text
+W + R > N
+```
+
+则任意写集合和读集合必然相交。
+
+这意味着：
+
+```text
+读请求至少能接触到一个最新写入副本
+```
+
+---
+
+## 2. 示例
+
+```text
+N = 3
+W = 2
+R = 2
+```
+
+写入需要 2 个副本成功。  
+读取需要 2 个副本。
+
+任意两个集合必然有交集：
+
+```text
+Write set ∩ Read set ≠ ∅
+```
+
+因此可以读到最新值。
+
+---
+
+## 3. 常见配置
+
+### 强一致
+
+```text
+N = 3
+W = 2
+R = 2
+```
+
+或：
+
+```text
+N = 5
+W = 3
+R = 3
+```
+
+---
+
+### 写优先
+
+```text
+N = 3
+W = 3
+R = 1
+```
+
+写入更可靠，但写延迟高。
+
+---
+
+### 读优先
+
+```text
+N = 3
+W = 1
+R = 3
+```
+
+读取更可靠，但写可能丢。
+
+---
+
+### 最终一致
+
+```text
+N = 3
+W = 1
+R = 1
+```
+
+延迟低，但可能读到旧数据。
+
+---
+
+# 五、Raft 复制协议
+
+Raft 是现代分布式数据库常用的共识协议。
+
+---
+
+## 1. Raft 的角色
+
+Raft 节点有三种状态：
+
+```text
+Follower
+Candidate
+Leader
+```
+
+正常情况：
+
+```text
+一个 Leader
+多个 Followers
+```
+
+Leader 失联时：
+
+```text
+Follower → Candidate → 选举新 Leader
+```
+
+---
+
+## 2. Term
+
+Raft 使用 term 表示任期。
+
+```text
+Term 1
+Term 2
+Term 3
+```
+
+Term 的作用：
+
+- 区分不同选举周期
+- 防止旧 leader 继续写入
+- 保证日志一致性
+
+---
+
+## 3. Leader Election
+
+Leader 故障后，follower 会发起选举。
+
+流程简化：
+
+```text
+1. Follower 发现 leader 超时
+2. 变成 Candidate
+3. term + 1
+4. 请求投票
+5. 获得多数票后成为 Leader
+```
+
+---
+
+## 4. Log Replication
+
+Leader 接收写请求后：
+
+```text
+1. 追加日志
+2. 发送给 followers
+3. 等待多数派确认
+4. 标记 committed
+5. 应用到状态机
+```
+
+---
+
+## 5. Commit Index
+
+Raft 中每个节点维护：
+
+```text
+commitIndex
+```
+
+表示已经提交的最大日志索引。
+
+Follower 只能应用：
+
+```text
+commitIndex 之前的日志
+```
+
+---
+
+## 6. Raft 的安全保证
+
+Raft 保证：
+
+1. 一个 term 内最多一个 leader。
+2. 只有拥有最新日志的节点才能成为 leader。
+3. committed 日志不会丢失。
+4. 旧 leader 不能覆盖新 leader 的日志。
+5. 多数派确认后才提交。
+
+---
+
+# 六、Paxos 与 Multi-Paxos
+
+Paxos 是更早期的共识协议。
+
+---
+
+## 1. Paxos 角色
+
+Paxos 中常见角色：
+
+```text
+Proposer
+Acceptor
+Learner
+```
+
+---
+
+## 2. 基本流程
+
+Paxos 通常分为两个阶段：
+
+```text
+Prepare
+Accept
+```
+
+Proposer 询问 acceptors 是否可以接受某个提案。  
+如果多数派接受，则提案被选定。
+
+---
+
+## 3. Multi-Paxos
+
+Multi-Paxos 在 Paxos 基础上优化：
+
+- 选举稳定 leader
+- leader 连续提交日志
+- 减少 prepare 阶段开销
+
+很多系统使用 Multi-Paxos 或 Raft。
+
+---
+
+# 七、Leader 故障与 Fencing
+
+---
+
+## 1. 脑裂问题
+
+Leader 故障后，系统会选举新 leader。
+
+但旧 leader 可能只是网络分区，并没有真正死亡。
+
+如果旧 leader 恢复，可能继续写入：
+
+```text
+Old Leader → Storage
+New Leader → Storage
+```
+
+这会导致数据不一致。
+
+---
+
+## 2. Fencing Token
+
+解决方案是给 leader 一个递增 token。
+
+```text
+Old leader token = 10
+New leader token = 11
+```
+
+存储层拒绝旧 token 的写入。
+
+---
+
+## 3. Lease
+
+Leader 获得租约：
+
+```text
+Lease expires at T
+```
+
+如果 leader 不能续约，就不能继续写入。
+
+---
+
+## 4. Term / Epoch
+
+Raft 使用 term 防止旧 leader 写入。
+
+如果旧 leader 收到更高 term 的消息：
+
+```text
+它必须退回 follower
+```
+
+---
+
+# 八、副本落后与追赶
+
+---
+
+## 1. Replica Lag
+
+Follower 可能落后 leader。
+
+原因：
+
+- follower 磁盘慢
+- follower CPU 高
+- 网络延迟
+- 写入突发
+- compaction 抢占资源
+- follower 重启
+
+---
+
+## 2. 落后影响
+
+如果 follower 落后：
+
+```text
+读 follower 可能读到旧数据
+```
+
+如果 leader 故障：
+
+```text
+落后 follower 可能无法安全成为 leader
+```
+
+如果日志被截断：
+
+```text
+落后 follower 可能无法追赶
+```
+
+---
+
+## 3. 追赶方式
+
+### 增量追赶
+
+```text
+Follower 从 leader 拉取缺失日志
+```
+
+适合落后不多。
+
+---
+
+### Snapshot 传输
+
+如果落后太多：
+
+```text
+1. Leader 生成 snapshot
+2. Follower 加载 snapshot
+3. Follower 从 snapshot 对应日志位置继续追赶
+```
+
+---
+
+## 4. 日志截断
+
+日志不能无限增长。
+
+截断条件通常包括：
+
+```text
+所有副本都已应用
+所有快照都不再依赖
+所有事务都已结束
+```
+
+如果某个 follower 落后：
+
+```text
+日志不能过早截断
+```
+
+---
+
+# 九、读一致性问题
+
+---
+
+## 1. Stale Read
+
+用户写入后立即读 follower，可能读到旧数据。
+
+例如：
+
+```text
+用户修改个人资料
+立即刷新页面
+看到旧资料
+```
+
+---
+
+## 2. 读 Leader
+
+最简单：
+
+```text
+Read → Leader
+```
+
+优点：
+
+- 强一致
+
+缺点：
+
+- leader 压力大
+- 无法利用 follower 读扩展
+
+---
+
+## 3. Read-your-writes
+
+保证用户至少能看到自己的写入。
+
+实现方式：
+
+- 写后一段时间读 leader
+- 使用 session token
+- 使用版本号
+- 使用 read index
+- 使用 read barrier
+
+---
+
+## 4. Bounded Staleness
+
+允许读请求最多落后某个时间或版本。
+
+例如：
+
+```text
+最多落后 1 秒
+最多落后 100 个版本
+```
+
+适合：
+
+- 用户资料
+- 商品详情
+- 推荐结果
+- 非关键统计
+
+---
+
+## 5. Quorum Read
+
+读取多数派副本，选择最新版本。
+
+```text
+Read from 2 of 3 replicas
+```
+
+优点：
+
+- 强一致
+
+缺点：
+
+- 延迟取决于最慢副本
+- 可能触发 hedged read
+
+---
+
+# 十、Hedged Reads
+
+为了降低尾延迟，系统可以同时向多个副本发起读请求。
+
+```text
+Request → Replica A
+Request → Replica B
+```
+
+谁先返回就用谁。
+
+---
+
+## 1. 优点
+
+- 降低 p99 延迟
+- 避免单个慢副本影响用户
+
+---
+
+## 2. 缺点
+
+- 增加请求量
+- 增加副本负载
+- 可能放大故障
+- 需要控制并发窗口
+
+---
+
+## 3. 使用建议
+
+通常只在 p99 延迟明显高于 p50 时使用。
+
+例如：
+
+```text
+p50 = 2 ms
+p99 = 80 ms
+```
+
+可以考虑 hedged read。
+
+---
+
+# 十一、多区域复制
+
+---
+
+## 1. 区域内复制
+
+同一区域多个副本：
+
+```text
+Region A:
+Leader
+Follower 1
+Follower 2
+```
+
+延迟低：
+
+```text
+通常 1–5 ms
+```
+
+适合强一致写入。
+
+---
+
+## 2. 跨区域复制
+
+跨区域延迟高：
+
+```text
+北京 → 上海：约 20–40 ms
+北京 → 新加坡：约 50–100 ms
+北京 → 美国：约 150–250 ms
+```
+
+如果跨区域同步多数派：
+
+```text
+写入延迟会很高
+```
+
+---
+
+## 3. 常见多区域策略
+
+### 策略一：区域内强一致，跨区域异步复制
+
+```text
+Region A 内多数派确认
+Region B 异步追赶
+```
+
+优点：
+
+- 写入延迟低
+- 区域内强一致
+
+缺点：
+
+- 跨区域读可能旧
+
+---
+
+### 策略二：跨区域多数派
+
+```text
+Region A + Region B + Region C
+写入需要两个区域确认
+```
+
+优点：
+
+- 区域级容灾
+- 数据更持久
+
+缺点：
+
+- 延迟高
+- 成本高
+
+---
+
+### 策略三：就近读写
+
+```text
+Asia user → Asia DB
+EU user → EU DB
+```
+
+优点：
+
+- 延迟低
+
+缺点：
+
+- 跨区域一致性复杂
+- 冲突处理复杂
+
+---
+
+# 十二、冲突处理
+
+多主或无主复制中，冲突不可避免。
+
+---
+
+## 1. Last Write Wins
+
+按时间戳选择最新写入。
+
+```text
+value = latest timestamp
+```
+
+优点：
+
+- 简单
+
+缺点：
+
+- 可能丢更新
+- 依赖时钟
+- 不适合复杂业务
+
+---
+
+## 2. Vector Clock
+
+Vector clock 用于表达因果关系。
+
+例如：
+
+```text
+A: 3
+B: 1
+C: 2
+```
+
+可以判断：
+
+```text
+事件 X 在事件 Y 之前
+事件 X 和事件 Y 并发
+```
+
+---
+
+## 3. Version Vector
+
+Version vector 常用于 Dynamo-like 系统。
+
+当检测到并发版本时：
+
+```text
+返回多个兄弟版本
+应用层合并
+```
+
+---
+
+## 4. CRDT
+
+CRDT，Conflict-free Replicated Data Type，无冲突复制数据类型。
+
+适合特定数据结构：
+
+```text
+Counter
+Set
+Map
+Register
+```
+
+例如：
+
+```text
+G-Counter
+PN-Counter
+OR-Set
+LWW-Register
+```
+
+优点：
+
+- 自动合并
+- 最终一致
+
+缺点：
+
+- 只适合特定类型
+- 业务语义复杂时难设计
+
+---
+
+# 十三、Read Repair 与 Anti-Entropy
+
+---
+
+## 1. Read Repair
+
+读取时发现副本不一致，则修复落后副本。
+
+例如：
+
+```text
+Read from Replica A and B
+A has v3
+B has v2
+```
+
+系统可以：
+
+```text
+将 v3 写回 B
+```
+
+优点：
+
+- 利用读流量修复数据
+
+缺点：
+
+- 增加读延迟
+- 可能写放大
+
+---
+
+## 2. Anti-Entropy
+
+后台任务比较副本差异并修复。
+
+常见方法：
+
+```text
+Merkle Tree
+Hash Set Reconciliation
+Full Scan
+```
+
+---
+
+## 3. Merkle Tree
+
+把数据分块计算哈希，形成树。
+
+比较两个副本的 Merkle tree，可以快速发现差异块。
+
+优点：
+
+- 不需要全量比较
+- 适合大数据集
+
+缺点：
+
+- 计算开销
+- 实现复杂
+
+---
+
+# 十四、复制性能优化
+
+---
+
+## 1. 减少同步副本数
+
+如果业务允许，可以：
+
+```text
+区域内多数派
+跨区域异步
+```
+
+避免跨大洲同步写。
+
+---
+
+## 2. Group Commit
+
+多个事务合并成一次日志刷盘或网络发送。
+
+```text
+100 个事务 → 一次 fsync
+```
+
+优点：
+
+- 提高吞吐
+- 降低磁盘压力
+
+缺点：
+
+- 可能增加延迟
+- 需要控制 batch 大小
+
+---
+
+## 3. Pipelined Replication
+
+Leader 不等前一个日志完全确认，就继续发送后续日志。
+
+```text
+Log 1 → Follower
+Log 2 → Follower
+Log 3 → Follower
+```
+
+优点：
+
+- 提高网络利用率
+- 提高吞吐
+
+缺点：
+
+- 实现复杂
+- 需要确认窗口
+
+---
+
+## 4. 压缩日志
+
+复制日志可以压缩。
+
+优点：
+
+- 降低网络带宽
+- 降低存储成本
+
+缺点：
+
+- 增加 CPU
+- 增加延迟
+
+---
+
+## 5. 批量应用日志
+
+Follower 可以批量应用日志。
+
+```text
+100 条日志 → 一次 apply
+```
+
+优点：
+
+- 提高 follower 吞吐
+
+缺点：
+
+- 增加延迟
+- 需要处理事务边界
+
+---
+
+## 6. 读写分离
+
+读请求分散到 follower。
+
+```text
+Write → Leader
+Read  → Followers
+```
+
+优点：
+
+- 提高读吞吐
+
+缺点：
+
+- 可能 stale read
+- 需要一致性策略
+
+---
+
+## 7. 热点副本拆分
+
+如果某个 shard 读压力过大：
+
+```text
+增加副本
+拆分热点 key
+缓存热点数据
+```
+
+---
+
+# 十五、复制监控指标
+
+生产系统必须监控复制状态。
+
+---
+
+## 1. Replica Lag
+
+```text
+replica lag
+replication backlog
+```
+
+如果 lag 增大：
+
+```text
+follower 可能无法安全成为 leader
+```
+
+---
+
+## 2. Commit Index
+
+```text
+leader commit index
+follower commit index
+```
+
+可以判断副本是否落后。
+
+---
+
+## 3. Term / Epoch
+
+```text
+current term
+leader term
+election count
+```
+
+频繁选举通常意味着

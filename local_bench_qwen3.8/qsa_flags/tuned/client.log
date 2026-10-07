@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.033s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=18.822s output_tokens=2101 average_output_rate=111.63 tok/s
+elapsed=34.113s output_tokens=4101 average_output_rate=120.22 tok/s
+elapsed=49.598s output_tokens=6201 average_output_rate=125.03 tok/s
+elapsed=65.274s output_tokens=8251 average_output_rate=126.41 tok/s
+elapsed=81.346s output_tokens=10251 average_output_rate=126.02 tok/s
+elapsed=123.631s output_tokens=12301 average_output_rate=99.50 tok/s
+elapsed=166.803s output_tokens=14351 average_output_rate=86.04 tok/s
+elapsed=209.965s output_tokens=16401 average_output_rate=78.11 tok/s
+elapsed=253.146s output_tokens=18451 average_output_rate=72.89 tok/s
+elapsed=296.482s output_tokens=20501 average_output_rate=69.15 tok/s
+elapsed=339.658s output_tokens=22551 average_output_rate=66.39 tok/s
+elapsed=382.835s output_tokens=24601 average_output_rate=64.26 tok/s
+elapsed=426.233s output_tokens=26651 average_output_rate=62.53 tok/s
+elapsed=469.639s output_tokens=28701 average_output_rate=61.11 tok/s
+elapsed=513.109s output_tokens=30751 average_output_rate=59.93 tok/s
+elapsed=555.619s output_tokens=32768 average_output_rate=58.98 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.03308996418491,
+  "e2e_s": 555.6189429201186,
+  "client_wall_s": 555.619049328845,
+  "tpot_ms": 16.925133608689645,
+  "decode_interactivity_tok_s": 59.083728561326296,
+  "output_throughput_tok_s": 58.97565974309522,
+  "total_throughput_tok_s": 117.95131948619044,
+  "stream_chunk_count": 535,
+  "server_meta": {
+    "id": "ed95b0442df84223a2dd7cb62849c35d",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790600167.424711,
+    "prefill_finished_time": 1790600168.4401438,
+    "queue_time": 0.0003159046173095703,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 555.6024709092453,
+    "spec_accept_rate": 0.0821066778238434,
+    "spec_accept_length": 1.246358069301282,
+    "spec_num_correct_drafts": 6476,
+    "spec_num_proposed_drafts": 78873,
+    "spec_verify_ct": 26291,
+    "spec_accepted_drafts": 6476,
+    "spec_proposed_drafts": 78873,
+    "spec_correct_drafts_histogram": [
+      23393,
+      778,
+      662,
+      1458
+    ],
+    "spec_accept_histogram": [
+      23393,
+      778,
+      662,
+      1458
+    ],
+    "request_received_ts": 1790600167.4231756,
+    "api_server_dispatch_finish_ts": 1790600167.4236817,
+    "response_sent_to_client_ts": 1790600168.44146,
+    "request_finished_ts": 1790600723.0256464,
+    "decode_throughput": 59.08387794059408
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need provide compreh",
+  "output_tail": "and recovery.  \n3. **A comparison** of distributed SQL, NoSQL, and NewSQL database designs.  \n4. **A practical example**, such as designing a distributed database for an e-commerce or banking system.\n"
+}

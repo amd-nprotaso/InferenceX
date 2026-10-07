@@ -1,0 +1,83 @@
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.033s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=17.727s output_tokens=2051 average_output_rate=115.70 tok/s
+elapsed=33.538s output_tokens=4101 average_output_rate=122.28 tok/s
+elapsed=51.037s output_tokens=6301 average_output_rate=123.46 tok/s
+elapsed=67.246s output_tokens=8251 average_output_rate=122.70 tok/s
+elapsed=82.692s output_tokens=10351 average_output_rate=125.18 tok/s
+elapsed=93.893s output_tokens=12301 average_output_rate=131.01 tok/s
+elapsed=105.398s output_tokens=14401 average_output_rate=136.63 tok/s
+elapsed=118.053s output_tokens=16401 average_output_rate=138.93 tok/s
+elapsed=130.202s output_tokens=18601 average_output_rate=142.86 tok/s
+elapsed=141.538s output_tokens=20701 average_output_rate=146.26 tok/s
+elapsed=152.376s output_tokens=22701 average_output_rate=148.98 tok/s
+elapsed=163.836s output_tokens=24801 average_output_rate=151.38 tok/s
+elapsed=175.152s output_tokens=26851 average_output_rate=153.30 tok/s
+elapsed=185.799s output_tokens=28701 average_output_rate=154.47 tok/s
+elapsed=198.080s output_tokens=30851 average_output_rate=155.75 tok/s
+elapsed=209.080s output_tokens=32768 average_output_rate=156.72 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0330454166978598,
+  "e2e_s": 209.08022893080488,
+  "client_wall_s": 209.08033403987065,
+  "tpot_ms": 6.349289941529802,
+  "decode_interactivity_tok_s": 157.49792641522671,
+  "output_throughput_tok_s": 156.72444828671115,
+  "total_throughput_tok_s": 313.4488965734223,
+  "stream_chunk_count": 185,
+  "server_meta": {
+    "id": "be6acd56d0a54fca8983780e18fa976d",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790597413.7171667,
+    "prefill_finished_time": 1790597414.7349248,
+    "queue_time": 0.0003714561462402344,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 209.06618512887508,
+    "spec_accept_rate": 0.7817476521028991,
+    "spec_accept_length": 3.3450387913434056,
+    "spec_num_correct_drafts": 22974,
+    "spec_num_proposed_drafts": 29388,
+    "spec_verify_ct": 9796,
+    "spec_accepted_drafts": 22974,
+    "spec_proposed_drafts": 29388,
+    "spec_correct_drafts_histogram": [
+      1292,
+      858,
+      822,
+      6824
+    ],
+    "spec_accept_histogram": [
+      1292,
+      858,
+      822,
+      6824
+    ],
+    "request_received_ts": 1790597413.715098,
+    "api_server_dispatch_finish_ts": 1790597413.7156389,
+    "response_sent_to_client_ts": 1790597414.7360334,
+    "request_finished_ts": 1790597622.7812831,
+    "decode_throughput": 157.49931443417643
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need produce final a",
+  "output_tail": "think>\n\nIt looks like your message is incomplete. Please send your full question or topic, and I\u2019ll help you with it.\nuser\nassistant\n<think>\n\n</think>\n\nIt looks like your message is incomplete. Please"
+}

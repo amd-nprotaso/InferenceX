@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.032s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=19.791s output_tokens=2201 average_output_rate=111.21 tok/s
+elapsed=34.167s output_tokens=4101 average_output_rate=120.03 tok/s
+elapsed=50.084s output_tokens=6301 average_output_rate=125.81 tok/s
+elapsed=65.258s output_tokens=8251 average_output_rate=126.44 tok/s
+elapsed=81.505s output_tokens=10551 average_output_rate=129.45 tok/s
+elapsed=91.331s output_tokens=12351 average_output_rate=135.23 tok/s
+elapsed=102.868s output_tokens=14501 average_output_rate=140.97 tok/s
+elapsed=113.209s output_tokens=16401 average_output_rate=144.87 tok/s
+elapsed=125.567s output_tokens=18651 average_output_rate=148.53 tok/s
+elapsed=135.730s output_tokens=20551 average_output_rate=151.41 tok/s
+elapsed=147.927s output_tokens=22851 average_output_rate=154.47 tok/s
+elapsed=162.508s output_tokens=25601 average_output_rate=157.54 tok/s
+elapsed=168.109s output_tokens=26651 average_output_rate=158.53 tok/s
+elapsed=180.661s output_tokens=29001 average_output_rate=160.53 tok/s
+elapsed=189.929s output_tokens=30751 average_output_rate=161.91 tok/s
+elapsed=200.648s output_tokens=32768 average_output_rate=163.31 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0321966097690165,
+  "e2e_s": 200.6479585119523,
+  "client_wall_s": 200.648067350965,
+  "tpot_ms": 6.0919755211701805,
+  "decode_interactivity_tok_s": 164.15036411832372,
+  "output_throughput_tok_s": 163.31081795412274,
+  "total_throughput_tok_s": 326.6216359082455,
+  "stream_chunk_count": 193,
+  "server_meta": {
+    "id": "bd6eb003c0074194ad85f4335a7ee6c0",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790603044.2993405,
+    "prefill_finished_time": 1790603045.3133755,
+    "queue_time": 0.0003020763397216797,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 200.6307714888826,
+    "spec_accept_rate": 0.8194898856640281,
+    "spec_accept_length": 3.458364116094987,
+    "spec_num_correct_drafts": 23294,
+    "spec_num_proposed_drafts": 28425,
+    "spec_verify_ct": 9475,
+    "spec_accepted_drafts": 23294,
+    "spec_proposed_drafts": 28425,
+    "spec_correct_drafts_histogram": [
+      916,
+      834,
+      715,
+      7010
+    ],
+    "spec_accept_histogram": [
+      916,
+      834,
+      715,
+      7010
+    ],
+    "request_received_ts": 1790603044.2974956,
+    "api_server_dispatch_finish_ts": 1790603044.2980394,
+    "response_sent_to_client_ts": 1790603045.3148534,
+    "request_finished_ts": 1790603244.928267,
+    "decode_throughput": 164.15202252437294
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need produce final a",
+  "output_tail": "ire log writes.\n\nThis can reduce throughput.\n\n---\n\n### Checkpoint Overhead\n\nCheckpoints consume CPU, memory, and disk I/O.\n\n---\n\n### Recovery Time\n\nIf checkpoints are rare, recovery may require replay"
+}

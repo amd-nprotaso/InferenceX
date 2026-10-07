@@ -1,0 +1,560 @@
+
+  {
+    "schemaVersion": 1,
+    "deviceProperties": [
+    {
+      "id": 0, "name": "AMD Instinct MI355X", "totalGlobalMem": 309220868096,
+      "computeMajor": 9, "computeMinor": 5,
+      "maxThreadsPerBlock": 1024, "maxThreadsPerMultiprocessor": 2048,
+      "regsPerBlock": 131072, "warpSize": 64,
+      "sharedMemPerBlock": 163840, "numSms": 256
+    , "maxSharedMemoryPerMultiProcessor": 163840
+    },
+    {
+      "id": 1, "name": "AMD Instinct MI355X", "totalGlobalMem": 309220868096,
+      "computeMajor": 9, "computeMinor": 5,
+      "maxThreadsPerBlock": 1024, "maxThreadsPerMultiprocessor": 2048,
+      "regsPerBlock": 131072, "warpSize": 64,
+      "sharedMemPerBlock": 163840, "numSms": 256
+    , "maxSharedMemoryPerMultiProcessor": 163840
+    },
+    {
+      "id": 2, "name": "AMD Instinct MI355X", "totalGlobalMem": 309220868096,
+      "computeMajor": 9, "computeMinor": 5,
+      "maxThreadsPerBlock": 1024, "maxThreadsPerMultiprocessor": 2048,
+      "regsPerBlock": 131072, "warpSize": 64,
+      "sharedMemPerBlock": 163840, "numSms": 256
+    , "maxSharedMemoryPerMultiProcessor": 163840
+    },
+    {
+      "id": 3, "name": "AMD Instinct MI355X", "totalGlobalMem": 309220868096,
+      "computeMajor": 9, "computeMinor": 5,
+      "maxThreadsPerBlock": 1024, "maxThreadsPerMultiprocessor": 2048,
+      "regsPerBlock": 131072, "warpSize": 64,
+      "sharedMemPerBlock": 163840, "numSms": 256
+    , "maxSharedMemoryPerMultiProcessor": 163840
+    }
+    ],
+      "trace_id": "7E42B294A3E64718B575E7914B7D4D89",
+      "hip_driver_version": 70226015,
+      "hip_runtime_version": 70226015,
+      "roctracer_version": 4.1,
+  "displayTimeUnit": "ms",
+  "baseTimeNanoseconds": 1782967788000000000,
+  "traceEvents": [
+  {
+    "ph": "X", "cat": "cpu_op", "name": "FlashAttnVarlenFunc", "pid": 149731, "tid": 149731,
+    "ts": 7626933094510.938, "dur": 108.259,
+    "args": {
+      "External id": 22017,"Record function id": 0, "Sequence number": 1407, "Fwd thread id": 0, "Ev Idx": 0
+    }
+  },
+  {
+    "ph": "X", "cat": "cpu_op", "name": "aiter::mha_varlen_fwd", "pid": 149731, "tid": 149731,
+    "ts": 7626933094533.088, "dur": 72.779,
+    "args": {
+      "External id": 22018,"Record function id": 0, "Ev Idx": 1
+    }
+  },
+  {
+    "ph": "X", "cat": "cpu_op", "name": "aten::empty", "pid": 149731, "tid": 149731,
+    "ts": 7626933094550.128, "dur": 37.049,
+    "args": {
+      "External id": 22019,"Record function id": 0, "Ev Idx": 2
+    }
+  },
+  {
+    "ph": "X", "cat": "cpu_op", "name": "aten::empty", "pid": 149731, "tid": 149731,
+    "ts": 7626933094588.427, "dur": 0.530,
+    "args": {
+      "External id": 22020,"Record function id": 0, "Ev Idx": 3
+    }
+  },
+  {
+    "ph": "X", "cat": "cpu_op", "name": "aten::empty", "pid": 149731, "tid": 149731,
+    "ts": 7626933094589.337, "dur": 0.480,
+    "args": {
+      "External id": 22021,"Record function id": 0, "Ev Idx": 4
+    }
+  },
+  {
+    "ph": "X", "cat": "cpu_op", "name": "aten::empty", "pid": 149731, "tid": 149731,
+    "ts": 7626933094590.057, "dur": 1.200,
+    "args": {
+      "External id": 22022,"Record function id": 0, "Ev Idx": 5
+    }
+  },
+  {
+    "ph": "X", "cat": "cpu_op", "name": "aten::alias", "pid": 149731, "tid": 149731,
+    "ts": 7626933094612.067, "dur": 0.980,
+    "args": {
+      "External id": 22023,"Record function id": 0, "Ev Idx": 6
+    }
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipStreamIsCapturing", "pid": 149731, "tid": 149731,
+    "ts": 7626933094554.808, "dur": 0.859,
+    "args": {
+      "External id": 22019,      "cid": 290, "correlation": 302
+    }
+  },
+  {
+    "ph": "f", "id": 302, "pid": 149731, "tid": 149731, "ts": 7626933094554.808,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipMalloc", "pid": 149731, "tid": 149731,
+    "ts": 7626933094556.407, "dur": 27.580,
+    "args": {
+      "External id": 22019,            "bytes": 2097152, "cid": 108, "correlation": 303, "ptr": "0x18d978696f84aa95"
+    }
+  },
+  {
+    "ph": "s", "id": 303, "pid": 149731, "tid": 149731, "ts": 7626933094556.407,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipGetDevicePropertiesR0600", "pid": 149731, "tid": 149731,
+    "ts": 7626933094592.457, "dur": 0.290,
+    "args": {
+      "External id": 22018,      "cid": 370, "correlation": 304
+    }
+  },
+  {
+    "ph": "f", "id": 304, "pid": 149731, "tid": 149731, "ts": 7626933094592.457,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipGetDevicePropertiesR0600", "pid": 149731, "tid": 149731,
+    "ts": 7626933094593.007, "dur": 0.090,
+    "args": {
+      "External id": 22018,      "cid": 370, "correlation": 305
+    }
+  },
+  {
+    "ph": "f", "id": 305, "pid": 149731, "tid": 149731, "ts": 7626933094593.007,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipGetDevicePropertiesR0600", "pid": 149731, "tid": 149731,
+    "ts": 7626933094593.597, "dur": 0.080,
+    "args": {
+      "External id": 22018,      "cid": 370, "correlation": 306
+    }
+  },
+  {
+    "ph": "f", "id": 306, "pid": 149731, "tid": 149731, "ts": 7626933094593.597,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipLaunchKernel", "pid": 149731, "tid": 149731,
+    "ts": 7626933094594.867, "dur": 6.040,
+    "args": {
+      "External id": 22018,          "kernel": "std::enable_if<!(kattr_no_packed_fp32_ops_v<ck_tile::gfx950_t>), void>::type ck_tile::kentry<ck_tile::gfx950_t, 1, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<16, 128, 32, 256, 32, 256>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<16, 128, 32, 256, 32, 256>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs>(ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<16, 128, 32, 256, 32, 256>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs)", "cid": 107, "correlation": 307,      "grid": [24, 1, 64],      "block": [64, 1, 1],      "shared memory": 0
+    }
+  },
+  {
+    "ph": "s", "id": 307, "pid": 149731, "tid": 149731, "ts": 7626933094594.867,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipDeviceSynchronize", "pid": 149731, "tid": 149731,
+    "ts": 7626933094628.247, "dur": 390.506,
+    "args": {
+            "cid": 48, "correlation": 308
+    }
+  },
+  {
+    "ph": "f", "id": 308, "pid": 149731, "tid": 149731, "ts": 7626933094628.247,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "hipDeviceSynchronize", "pid": 149731, "tid": 149731,
+    "ts": 7626933095024.273, "dur": 0.230,
+    "args": {
+            "cid": 48, "correlation": 309
+    }
+  },
+  {
+    "ph": "f", "id": 309, "pid": 149731, "tid": 149731, "ts": 7626933095024.273,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "std::enable_if<!(kattr_no_packed_fp32_ops_v<ck_tile::gfx950_t>), void>::type ck_tile::kentry<ck_tile::gfx950_t, 1, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<16, 128, 32, 256, 32, 256>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<16, 128, 32, 256, 32, 256>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs>(ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<16, 128, 32, 256, 32, 256>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, ck_tile::sequence<1, 1, 1>, ck_tile::sequence<16, 16, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs)", "pid": 2, "tid": 0,
+    "ts": 7626933094611.224, "dur": 400.641,
+    "args": {
+      "External id": 22018,      "device": 2, "stream": 0,      "correlation": 307, "kind": "Dispatch Kernel",      "grid":     [24, 1, 64], "block":     [64, 1, 1]
+    }
+  },
+  {
+    "ph": "f", "id": 307, "pid": 2, "tid": 0, "ts": 7626933094611.224,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 0,
+    "args": {
+      "labels": "CPU"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 0,
+    "args": {
+      "sort_index": 149731
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 0, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 0, "tid": 0,
+    "args": {
+      "labels": "GPU 0"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 0, "tid": 0,
+    "args": {
+      "sort_index": 5000000
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 1, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 1, "tid": 0,
+    "args": {
+      "labels": "GPU 1"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 1, "tid": 0,
+    "args": {
+      "sort_index": 5000001
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 2, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 2, "tid": 0,
+    "args": {
+      "labels": "GPU 2"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 2, "tid": 0,
+    "args": {
+      "sort_index": 5000002
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 3, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 3, "tid": 0,
+    "args": {
+      "labels": "GPU 3"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 3, "tid": 0,
+    "args": {
+      "sort_index": 5000003
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 4, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 4, "tid": 0,
+    "args": {
+      "labels": "GPU 4"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 4, "tid": 0,
+    "args": {
+      "sort_index": 5000004
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 5, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 5, "tid": 0,
+    "args": {
+      "labels": "GPU 5"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 5, "tid": 0,
+    "args": {
+      "sort_index": 5000005
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 6, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 6, "tid": 0,
+    "args": {
+      "labels": "GPU 6"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 6, "tid": 0,
+    "args": {
+      "sort_index": 5000006
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 7, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 7, "tid": 0,
+    "args": {
+      "labels": "GPU 7"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 7, "tid": 0,
+    "args": {
+      "sort_index": 5000007
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 8, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 8, "tid": 0,
+    "args": {
+      "labels": "GPU 8"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 8, "tid": 0,
+    "args": {
+      "sort_index": 5000008
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 9, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 9, "tid": 0,
+    "args": {
+      "labels": "GPU 9"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 9, "tid": 0,
+    "args": {
+      "sort_index": 5000009
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 10, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 10, "tid": 0,
+    "args": {
+      "labels": "GPU 10"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 10, "tid": 0,
+    "args": {
+      "sort_index": 5000010
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 11, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 11, "tid": 0,
+    "args": {
+      "labels": "GPU 11"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 11, "tid": 0,
+    "args": {
+      "sort_index": 5000011
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 12, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 12, "tid": 0,
+    "args": {
+      "labels": "GPU 12"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 12, "tid": 0,
+    "args": {
+      "sort_index": 5000012
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 13, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 13, "tid": 0,
+    "args": {
+      "labels": "GPU 13"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 13, "tid": 0,
+    "args": {
+      "sort_index": 5000013
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 14, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 14, "tid": 0,
+    "args": {
+      "labels": "GPU 14"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 14, "tid": 0,
+    "args": {
+      "sort_index": 5000014
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 7626933094475.981, "pid": 15, "tid": 0,
+    "args": {
+      "name": "python3"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 7626933094475.981, "pid": 15, "tid": 0,
+    "args": {
+      "labels": "GPU 15"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 15, "tid": 0,
+    "args": {
+      "sort_index": 5000015
+    }
+  },
+  {
+    "name": "thread_name", "ph": "M", "ts": 7626933094475.981, "pid": 2, "tid": 0,
+    "args": {
+      "name": "stream 0 "
+    }
+  },
+  {
+    "name": "thread_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 2, "tid": 0,
+    "args": {
+      "sort_index": 0
+    }
+  },
+  {
+    "name": "thread_name", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 149731,
+    "args": {
+      "name": "thread 149731 (python3)"
+    }
+  },
+  {
+    "name": "thread_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 149731,
+    "args": {
+      "sort_index": 149731
+    }
+  },
+  {
+    "name": "thread_name", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 149731,
+    "args": {
+      "name": "thread 149731 (python3)"
+    }
+  },
+  {
+    "name": "thread_sort_index", "ph": "M", "ts": 7626933094475.981, "pid": 149731, "tid": 149731,
+    "args": {
+      "sort_index": 149731
+    }
+  },
+  {
+    "ph": "X", "cat": "Trace", "ts": 7626933094443.072, "dur": 583.854,
+    "pid": "Spans", "tid": "PyTorch Profiler",
+    "name": "PyTorch Profiler (0)",
+    "args": {
+      "Op count": 0
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 7626933094443.072,
+    "pid": "Spans", "tid": 0,
+    "args": {
+      "sort_index": 536870912
+    }
+  },
+  {
+    "name": "Iteration Start: PyTorch Profiler", "ph": "i", "s": "g",
+    "pid": "Traces", "tid": "Trace PyTorch Profiler", "ts": 7626933094443.072
+  },
+  {
+    "name": "Record Window End", "ph": "i", "s": "g",
+    "pid": "", "tid": "", "ts": 7626933095111.505
+  }
+  ],
+  "traceName": "qsa_hip_tuned_rerun/profile_verify_c16_ctx32680.json"
+}

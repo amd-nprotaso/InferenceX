@@ -1,0 +1,21 @@
+QSA PA synthetic comparison, 2026-10-05
+
+Concurrency 8; ISL 32768; OSL 32768; TP1.
+Same current run_server.sh settings including NEXTN (3 steps, 4 draft tokens) and simulated acceptance length 2.32.
+Order: off_1, on_1, on_2, off_2; fresh server per trial.
+Representative warmup: 8 requests, ISL 32768, OSL 256; cache flushed before measurement.
+Eight distinct deterministic synthetic input-token sequences, identical across all trials.
+All 32 measured requests completed at exact requested lengths.
+Dispatch verified in each server.log: flag=0 eligible=False; flag=1 eligible=True plus QSA_AB_EXECUTING _forward_flydsl_sparse.
+
+Output throughput: OFF 749.65 tokens/s; ON 757.95 tokens/s; +1.11%.
+TPOT: OFF 10.5267 ms; ON 10.4095 ms; -1.11%.
+Batch duration: OFF 349.69 s; ON 345.86 s; -1.09%.
+Steady decode token rate per user: OFF 95.72; ON 96.75; +1.08%.
+
+Limits: two trials per setting, automatically selected server seeds differ. This measures model-serving performance with simulated NEXTN acceptance, not isolated kernel speed or model accuracy.
+See comparison.json, validation.json, provenance.json, and each trial directory. actual_requests.json contains the eight payloads sent; client-request-template.json is the unused-input template from the reused client.
+Experiment servers have exited. Original launch script and runtime source were not edited.
+
+BASELINE CLARIFICATION AFTER COMPARING PR #41881:
+This experiment compares Triton packed sparse decode (flag OFF) with AITER FlyDSL paged decode (flag ON). It does NOT compare CK varlen with FlyDSL. The ROCm Triton fallback is committed in the exact benchmark revision bda4e1491e6048b596eccf5d4038e4d7bb5995c3; introduced by 8b5d77c268 (#38876). PR #41881 microbenchmarks use CK varlen as baseline. Older local c8 runs also used CK and real acceptance length approximately 4.0, whereas this run uses simulated acceptance approximately 2.32.

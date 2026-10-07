@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.032s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=17.869s output_tokens=2151 average_output_rate=120.37 tok/s
+elapsed=32.655s output_tokens=4101 average_output_rate=125.58 tok/s
+elapsed=48.209s output_tokens=6151 average_output_rate=127.59 tok/s
+elapsed=64.958s output_tokens=8201 average_output_rate=126.25 tok/s
+elapsed=103.162s output_tokens=10251 average_output_rate=99.37 tok/s
+elapsed=145.411s output_tokens=12301 average_output_rate=84.59 tok/s
+elapsed=187.671s output_tokens=14351 average_output_rate=76.47 tok/s
+elapsed=229.943s output_tokens=16401 average_output_rate=71.33 tok/s
+elapsed=272.252s output_tokens=18451 average_output_rate=67.77 tok/s
+elapsed=314.609s output_tokens=20501 average_output_rate=65.16 tok/s
+elapsed=356.977s output_tokens=22551 average_output_rate=63.17 tok/s
+elapsed=399.248s output_tokens=24601 average_output_rate=61.62 tok/s
+elapsed=441.557s output_tokens=26651 average_output_rate=60.36 tok/s
+elapsed=483.909s output_tokens=28701 average_output_rate=59.31 tok/s
+elapsed=526.246s output_tokens=30751 average_output_rate=58.43 tok/s
+elapsed=567.928s output_tokens=32768 average_output_rate=57.70 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0315692140720785,
+  "e2e_s": 567.9280889523216,
+  "client_wall_s": 567.9282904299907,
+  "tpot_ms": 17.300836809541597,
+  "decode_interactivity_tok_s": 57.80067236103223,
+  "output_throughput_tok_s": 57.69742510131101,
+  "total_throughput_tok_s": 115.39485020262202,
+  "stream_chunk_count": 560,
+  "server_meta": {
+    "id": "21f9b338d4b845e0880aeb026be07cf2",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790597759.3640196,
+    "prefill_finished_time": 1790597760.3777356,
+    "queue_time": 0.0003485679626464844,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 567.9086253917776,
+    "spec_accept_rate": 0.06462386747309869,
+    "spec_accept_length": 1.1939080376011075,
+    "spec_num_correct_drafts": 5321,
+    "spec_num_proposed_drafts": 82338,
+    "spec_verify_ct": 27446,
+    "spec_accepted_drafts": 5321,
+    "spec_proposed_drafts": 82338,
+    "spec_correct_drafts_histogram": [
+      25037,
+      695,
+      516,
+      1198
+    ],
+    "spec_accept_histogram": [
+      25037,
+      695,
+      516,
+      1198
+    ],
+    "request_received_ts": 1790597759.3618746,
+    "api_server_dispatch_finish_ts": 1790597759.3623657,
+    "response_sent_to_client_ts": 1790597760.3792083,
+    "request_finished_ts": 1790598327.2705,
+    "decode_throughput": 57.80117703810356
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need produce final a",
+  "output_tail": "*Indexing**\n- **Transactions**\n- **Recovery**\n\nJust send the full prompt again, or say **\u201ccontinue\u201d** and I\u2019ll pick up from the last answer.\n\n\nuser\nassistant\n<think>\nWe need answer to user's latest: \""
+}

@@ -1,0 +1,10239 @@
+We need answer user's request. User repeated many times: "Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery." Need produce final answer. Need likely ignore repetition and provide comprehensive explanation. Need maybe mention design goals, architecture, performance considerations, replication strategies, indexing, transactions (2PC, concurrency control, isolation, distributed commit, consensus), recovery (WAL, checkpoints, replication logs, failure handling). Need be thorough. Need maybe structure. Ensure no hidden issues. The user repeated many times maybe due glitch. We can answer once. Need maybe include examples. Need final in English.
+
+Need think about content. Distributed database: multiple interconnected sites, local DBMS, global schema, transparency. Design aspects: data distribution (fragmentation, allocation, replication), communication, query processing, concurrency, fault tolerance. Performance: latency, bandwidth, locality, load balancing, partitioning, caching, read/write scaling, consistency tradeoffs (CAP/PACELC). Replication: synchronous/asynchronous, leader-follower, quorum, multi-master, conflict resolution, read/write paths, performance impact. Indexing: local/global indexes, partitioned indexes, secondary indexes, covering indexes, distributed index maintenance, performance tradeoffs, hot partitions, index skew. Transactions: distributed transactions, 2PC, 3PC, optimistic/pessimistic, isolation levels, distributed concurrency control (locking, MVCC, timestamp, OCC), coordination overhead, latency, deadlocks, timeouts, idempotency, saga for microservices. Recovery: WAL, checkpoints, ARIES, distributed logging, replication-based recovery, leader election, failover, quorum, log shipping, snapshots, point-in-time recovery, handling in-doubt transactions, network partitions.
+
+Need maybe include design and performance of distributed database: architecture layers, components: coordinator, participants, storage engines, log, index, replication manager. Design choices: shared-nothing, shared-storage, cloud-native, geo-distributed. Performance metrics: throughput, latency, tail latency, availability, durability, consistency, scalability. Bottlenecks: network RTT, coordination, hotspots, skewed data, index maintenance, replication lag.
+
+Need maybe include tables. Desired oververbosity 9, so detailed. Need maybe include practical recommendations.
+
+Let's craft final: title, overview, design principles, performance, then sections. Include equations? Maybe not. Include examples: key-value, relational NewSQL, Cassandra, Spanner, PostgreSQL logical replication. Need not too long but thorough.
+
+Need ensure answer addresses repeated prompt. Could say "Below is a single consolidated explanation".
+
+Let's produce final with headings.
+</think>
+
+Below is a consolidated explanation of the **design and performance of a distributed database**, focusing on **replication, indexing, transactions, and recovery**.
+
+---
+
+# 1. What Is a Distributed Database?
+
+A **distributed database** stores data across multiple interconnected nodes, often in different physical locations, while presenting a unified logical database to applications.
+
+The goal is to achieve:
+
+- **Scalability**: handle more data and more requests by adding nodes.
+- **Availability**: continue operating despite node or network failures.
+- **Performance**: reduce latency by placing data closer to users.
+- **Fault tolerance**: survive hardware, software, and network failures.
+- **Consistency**: ensure data remains correct across nodes.
+
+A distributed database may be:
+
+| Type | Description |
+|---|---|
+| **Homogeneous** | All sites use the same DBMS software. |
+| **Heterogeneous** | Different sites may use different DBMSs. |
+| **Centralized control** | One node coordinates transactions and metadata. |
+| **Peer-to-peer** | Multiple nodes can coordinate operations. |
+| **Shared-nothing** | Each node has its own storage and memory. |
+| **Shared-storage** | Nodes share a common storage layer. |
+
+---
+
+# 2. Core Design Goals
+
+A distributed database design usually balances several competing goals.
+
+## 2.1 Scalability
+
+The system should scale horizontally by adding more nodes.
+
+There are two main forms:
+
+### Read scalability
+
+Multiple replicas can serve read requests.
+
+Example:
+
+```text
+Client → Read replica 1
+Client → Read replica 2
+Client → Read replica 3
+```
+
+This increases read throughput.
+
+### Write scalability
+
+Writes can be distributed across shards or partitions.
+
+Example:
+
+```text
+User A data → Shard 1
+User B data → Shard 2
+User C data → Shard 3
+```
+
+This increases write throughput and storage capacity.
+
+---
+
+## 2.2 Availability
+
+Availability means the system can continue serving requests despite failures.
+
+Availability is improved by:
+
+- Replication
+- Failover
+- Leader election
+- Quorum reads and writes
+- Multi-region deployment
+- Graceful degradation
+
+However, high availability often requires tradeoffs with consistency.
+
+---
+
+## 2.3 Consistency
+
+Consistency means all clients see a correct and predictable view of the data.
+
+Distributed systems often use consistency models such as:
+
+| Consistency Model | Meaning |
+|---|---|
+| **Strong consistency** | All reads see the latest committed write. |
+| **Sequential consistency** | Operations appear in some global order. |
+| **Causal consistency** | Causally related operations are seen in order. |
+| **Eventual consistency** | Replicas converge over time. |
+| **Read-your-writes consistency** | A client sees its own writes. |
+| **Monotonic reads** | A client never sees older data after newer data. |
+
+Strong consistency is easier to reason about but can reduce availability and performance.
+
+---
+
+## 2.4 Latency and Throughput
+
+Performance depends heavily on:
+
+- Network round-trip time
+- Number of coordination steps
+- Data locality
+- Replication factor
+- Index structure
+- Locking and concurrency control
+- Disk or SSD speed
+- Log durability settings
+
+A distributed database must minimize:
+
+- Cross-node communication
+- Hot partitions
+- Lock contention
+- Replication lag
+- Index maintenance overhead
+- Recovery time
+
+---
+
+# 3. Data Distribution Design
+
+Before discussing replication, indexing, transactions, and recovery, it is important to understand how data is distributed.
+
+## 3.1 Fragmentation
+
+Fragmentation divides a database into smaller pieces.
+
+### Horizontal fragmentation
+
+Rows are divided based on conditions.
+
+Example:
+
+```text
+Customers_US → customers where country = 'US'
+Customers_EU → customers where country = 'EU'
+Customers_APAC → customers where country = 'APAC'
+```
+
+### Vertical fragmentation
+
+Columns are divided.
+
+Example:
+
+```text
+Customer_Profile → customer_id, name, email
+Customer_Financials → customer_id, credit_score, balance
+```
+
+### Hybrid fragmentation
+
+Combines horizontal and vertical fragmentation.
+
+---
+
+## 3.2 Allocation
+
+Allocation decides where fragments are stored.
+
+Options:
+
+| Strategy | Description |
+|---|---|
+| **Centralized** | All data stored at one site. |
+| **Partitioned** | Each fragment stored at one site. |
+| **Replicated** | Each fragment stored at multiple sites. |
+| **Hybrid** | Some fragments replicated, some partitioned. |
+
+---
+
+## 3.3 Partitioning and Sharding
+
+In modern distributed databases, data is usually partitioned into **shards**.
+
+A shard is a subset of data assigned to a node or group of nodes.
+
+Common partitioning methods:
+
+### Range partitioning
+
+```text
+Shard 1: user_id 0–999
+Shard 2: user_id 1000–1999
+Shard 3: user_id 2000–2999
+```
+
+Good for range queries, but can create hotspots.
+
+### Hash partitioning
+
+```text
+shard = hash(user_id) % number_of_shards
+```
+
+Good for load balancing, but poor for range queries.
+
+### List partitioning
+
+```text
+Shard 1: country = 'US'
+Shard 2: country = 'EU'
+Shard 3: country = 'APAC'
+```
+
+Good for geographic or categorical locality.
+
+### Composite partitioning
+
+Uses multiple keys.
+
+Example:
+
+```text
+partition_key = tenant_id
+sort_key = timestamp
+```
+
+Common in multi-tenant systems.
+
+---
+
+## 3.4 Data Locality
+
+Performance improves when data is stored near the nodes that access it.
+
+Example:
+
+```text
+European users → European database region
+Asian users → Asian database region
+```
+
+This reduces cross-region latency.
+
+However, global consistency may require cross-region coordination.
+
+---
+
+# 4. Replication
+
+Replication is one of the most important mechanisms in distributed databases.
+
+## 4.1 Purpose of Replication
+
+Replication copies data from one node to another.
+
+It provides:
+
+- High availability
+- Fault tolerance
+- Read scalability
+- Disaster recovery
+- Geographic locality
+- Load balancing
+
+---
+
+## 4.2 Basic Replication Models
+
+### Leader-follower replication
+
+One node is the **leader** or **primary**.
+
+It accepts writes and sends changes to followers.
+
+```text
+Client write → Leader
+Leader → Follower 1
+Leader → Follower 2
+Leader → Follower 3
+```
+
+Reads can be served by followers.
+
+This is common in:
+
+- PostgreSQL streaming replication
+- MySQL replication
+- MongoDB replica sets
+- Cassandra leader-based replication
+
+---
+
+### Multi-master replication
+
+Multiple nodes can accept writes.
+
+```text
+Client A → Node 1
+Client B → Node 2
+Node 1 ↔ Node 2
+```
+
+Advantages:
+
+- Better write availability
+- Lower write latency for geographically distributed clients
+
+Disadvantages:
+
+- Conflict resolution is complex
+- Strong consistency is harder
+- Write amplification can be high
+
+Used in systems such as:
+
+- Cassandra
+- DynamoDB global tables
+- CockroachDB in some configurations
+- Multi-master PostgreSQL setups
+
+---
+
+### Quorum replication
+
+A write is considered successful if a majority of replicas acknowledge it.
+
+For `R` replicas:
+
+```text
+Write quorum W
+Read quorum R
+```
+
+If:
+
+```text
+W + R > N
+```
+
+then reads and writes overlap, providing strong consistency.
+
+Example:
+
+```text
+N = 3 replicas
+W = 2
+R = 2
+```
+
+A write succeeds if 2 replicas acknowledge.
+
+A read succeeds if 2 replicas respond.
+
+This is common in:
+
+- DynamoDB
+- Cassandra
+- Riak
+- ZooKeeper-like systems
+
+---
+
+## 4.3 Synchronous vs Asynchronous Replication
+
+### Synchronous replication
+
+The leader waits for followers to acknowledge before committing.
+
+```text
+Client write → Leader
+Leader waits for follower acknowledgment
+Follower acknowledges
+Leader commits
+Leader returns success
+```
+
+Advantages:
+
+- Strong durability
+- No data loss if follower acknowledges
+- Easier failover
+
+Disadvantages:
+
+- Higher write latency
+- Lower write throughput
+- Sensitive to network failures
+
+Used when consistency and durability are critical.
+
+---
+
+### Asynchronous replication
+
+The leader commits without waiting for followers.
+
+```text
+Client write → Leader
+Leader commits
+Leader returns success
+Leader later sends changes to followers
+```
+
+Advantages:
+
+- Lower write latency
+- Higher throughput
+- Better availability during network partitions
+
+Disadvantages:
+
+- Replication lag
+- Possible data loss if leader fails
+- Stale reads from followers
+
+Used in many high-throughput systems.
+
+---
+
+### Semi-synchronous replication
+
+The leader waits for at least one follower to acknowledge receipt of the log, but not necessarily full application.
+
+This is a compromise between synchronous and asynchronous replication.
+
+---
+
+## 4.4 Replication Performance Impact
+
+Replication affects performance in several ways.
+
+### Write amplification
+
+If data is replicated to `N` nodes, each write may generate `N` log entries or network messages.
+
+Example:
+
+```text
+1 client write → 3 replica writes
+```
+
+This increases:
+
+- Network traffic
+- Disk I/O
+- CPU usage
+- Log volume
+
+---
+
+### Replication lag
+
+Followers may lag behind the leader.
+
+```text
+Leader commit time: 10:00:00.000
+Follower apply time: 10:00:00.250
+```
+
+Lag can cause:
+
+- Stale reads
+- Inconsistent application behavior
+- Failed failover if follower is too far behind
+
+---
+
+### Read scalability
+
+Replication improves read throughput.
+
+```text
+Read traffic can be distributed across replicas.
+```
+
+This is one of the main performance benefits.
+
+---
+
+### Failover cost
+
+If the leader fails, the system must choose a new leader.
+
+Failover may require:
+
+- Detecting failure
+- Electing a new leader
+- Ensuring the new leader has the latest committed data
+- Redirecting clients
+- Recovering in-doubt transactions
+
+Failover time affects availability.
+
+---
+
+## 4.5 Replication and Consistency Tradeoffs
+
+Replication design often involves the CAP theorem.
+
+CAP says a distributed system cannot simultaneously guarantee:
+
+- **Consistency**
+- **Availability**
+- **Partition tolerance**
+
+In practice, distributed databases choose tradeoffs.
+
+| System Type | Typical Choice |
+|---|---|
+| Strongly consistent relational distributed DB | Consistency + Partition tolerance |
+| Highly available key-value store | Availability + Partition tolerance |
+| Global transactional database | Strong consistency with high latency |
+| Eventually consistent store | Availability with eventual consistency |
+
+---
+
+# 5. Indexing in Distributed Databases
+
+Indexing is critical for performance, but in distributed databases it becomes more complex.
+
+## 5.1 Purpose of Indexing
+
+Indexes speed up queries by avoiding full scans.
+
+Example:
+
+```sql
+SELECT *
+FROM users
+WHERE email = 'alice@example.com';
+```
+
+Without an index:
+
+```text
+Scan all rows
+```
+
+With an index:
+
+```text
+Look up email index → find row location
+```
+
+---
+
+## 5.2 Local vs Global Indexes
+
+### Local index
+
+Each partition or shard has its own index.
+
+```text
+Shard 1 → Index for Shard 1
+Shard 2 → Index for Shard 2
+Shard 3 → Index for Shard 3
+```
+
+Advantages:
+
+- Index maintenance is local
+- Easier to rebalance shards
+- Better scalability
+- Less cross-node coordination
+
+Disadvantages:
+
+- Query may need to search multiple indexes
+- Non-partition-key queries may require scatter-gather
+
+Example:
+
+```sql
+SELECT *
+FROM users
+WHERE email = 'alice@example.com';
+```
+
+If the table is partitioned by `user_id`, the database may need to query all shards.
+
+---
+
+### Global index
+
+A single index covers all partitions.
+
+```text
+Global email index → points to rows across all shards
+```
+
+Advantages:
+
+- Fast lookup by non-partition key
+- Avoids scatter-gather
+
+Disadvantages:
+
+- Index updates may require distributed transactions
+- Global index can become a bottleneck
+- Rebalancing is harder
+- More complex failure handling
+
+---
+
+## 5.3 Index Maintenance Cost
+
+In a distributed database, every write may update:
+
+- The base table
+- One or more indexes
+- Replication logs
+- Remote replicas
+
+Example:
+
+```text
+INSERT user
+→ update primary table
+→ update email index
+→ update name index
+→ update replication log
+→ send to replicas
+```
+
+This increases write latency.
+
+---
+
+## 5.4 Index Skew and Hotspots
+
+Indexes can create hotspots.
+
+Example:
+
+```text
+All inserts have status = 'NEW'
+```
+
+If there is an index on `status`, all inserts may update the same index partition.
+
+This causes:
+
+- Lock contention
+- Index page contention
+- Hot shards
+- Reduced throughput
+
+Solutions:
+
+- Partition by a different key
+- Use hash partitioning
+- Add a salt or bucket
+- Use partial indexes
+- Use covering indexes
+- Avoid low-cardinality indexes on hot columns
+
+---
+
+## 5.5 Covering Indexes
+
+A covering index contains all columns needed by a query.
+
+Example:
+
+```sql
+CREATE INDEX idx_user_email_name
+ON users(email, name);
+```
+
+Query:
+
+```sql
+SELECT email, name
+FROM users
+WHERE email = 'alice@example.com';
+```
+
+The database can answer from the index without accessing the base table.
+
+Benefits:
+
+- Fewer I/O operations
+- Lower latency
+- Less network traffic in distributed systems
+
+---
+
+## 5.6 Distributed Index Lookup
+
+A distributed query may require multiple steps.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE customer_id = 123;
+```
+
+If `orders` is partitioned by `order_id`, the database may need to:
+
+1. Query a global index for `customer_id`
+2. Find matching `order_id` values
+3. Fetch rows from multiple shards
+4. Merge results
+
+This can be expensive.
+
+Better design:
+
+```text
+Partition orders by customer_id
+```
+
+Then:
+
+```sql
+SELECT *
+FROM orders
+WHERE customer_id = 123;
+```
+
+can be served from one shard.
+
+---
+
+## 5.7 Indexing and Query Performance
+
+Good distributed indexing considers:
+
+- Query patterns
+- Partition key
+- Shard locality
+- Index size
+- Write amplification
+- Hot partitions
+- Cross-shard joins
+- Index consistency
+
+A common rule:
+
+> Choose the partition key based on the most important query pattern.
+
+Example:
+
+```text
+Most queries are by tenant_id
+→ partition by tenant_id
+```
+
+Example:
+
+```text
+Most queries are by user_id
+→ partition by user_id
+```
+
+Example:
+
+```text
+Most queries are by time range
+→ partition by date or timestamp
+```
+
+---
+
+# 6. Transactions in Distributed Databases
+
+A transaction is a logical unit of work that must satisfy ACID properties.
+
+## 6.1 ACID Properties
+
+| Property | Meaning |
+|---|---|
+| **Atomicity** | All changes happen or none happen. |
+| **Consistency** | Database moves from one valid state to another. |
+| **Isolation** | Concurrent transactions do not interfere incorrectly. |
+| **Durability** | Committed changes survive failures. |
+
+In distributed databases, ACID is harder because data may be spread across multiple nodes.
+
+---
+
+## 6.2 Distributed Transactions
+
+A distributed transaction touches multiple nodes.
+
+Example:
+
+```sql
+BEGIN;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 2;
+
+COMMIT;
+```
+
+If account 1 is on Node A and account 2 is on Node B, this is a distributed transaction.
+
+---
+
+## 6.3 Two-Phase Commit
+
+The classic protocol for distributed transactions is **Two-Phase Commit**, or **2PC**.
+
+### Phase 1: Prepare
+
+Coordinator asks all participants:
+
+```text
+Can you commit?
+```
+
+Participants:
+
+- Write transaction log
+- Lock resources
+- Reply yes or no
+
+### Phase 2: Commit or Abort
+
+If all participants say yes:
+
+```text
+Coordinator sends COMMIT
+Participants commit
+```
+
+If any participant says no:
+
+```text
+Coordinator sends ABORT
+Participants rollback
+```
+
+---
+
+### 2PC Advantages
+
+- Provides atomic commit across nodes
+- Preserves ACID atomicity
+- Works well for small transaction groups
+
+---
+
+### 2PC Disadvantages
+
+- High latency
+- Coordinator is a bottleneck
+- Blocking if coordinator fails
+- Locks may be held for long periods
+- Poor availability during network partitions
+
+---
+
+## 6.4 Three-Phase Commit
+
+Three-Phase Commit, or **3PC**, attempts to reduce blocking.
+
+Phases:
+
+1. Can commit?
+2. Pre-commit
+3. Commit
+
+It is more complex and still not perfect in real networks.
+
+In practice, many systems avoid 3PC and use other approaches.
+
+---
+
+## 6.5 Distributed Concurrency Control
+
+Distributed databases must control concurrent access.
+
+### Locking
+
+Transactions lock data items.
+
+Example:
+
+```text
+Transaction A locks account 1
+Transaction B waits for account 1
+```
+
+Advantages:
+
+- Strong isolation
+- Easy to reason about
+
+Disadvantages:
+
+- Lock contention
+- Deadlocks
+- Network latency
+- Reduced throughput
+
+---
+
+### Two-Phase Locking
+
+Two-Phase Locking ensures transactions acquire locks before releasing them.
+
+Phases:
+
+1. Growing phase: acquire locks
+2. Shrinking phase: release locks
+
+This can enforce serializability but can reduce concurrency.
+
+---
+
+### Timestamp Ordering
+
+Each transaction gets a timestamp.
+
+The system orders operations by timestamp.
+
+Advantages:
+
+- No locks
+- No deadlocks
+
+Disadvantages:
+
+- May abort transactions frequently
+- Complex in distributed systems
+
+---
+
+### Optimistic Concurrency Control
+
+Transactions execute without locks and validate at commit time.
+
+Example:
+
+```text
+Read data
+Modify locally
+At commit, check if data changed
+If changed, abort and retry
+```
+
+Advantages:
+
+- High concurrency when conflicts are rare
+
+Disadvantages:
+
+- High retry cost when conflicts are common
+
+Used in:
+
+- CockroachDB
+- FoundationDB
+- Some NewSQL systems
+
+---
+
+### Multi-Version Concurrency Control
+
+MVCC keeps multiple versions of data.
+
+Readers do not block writers, and writers do not block readers.
+
+Example:
+
+```text
+Version 1: balance = 100
+Version 2: balance = 50
+```
+
+A transaction sees a consistent snapshot.
+
+Advantages:
+
+- High concurrency
+- Good read performance
+
+Disadvantages:
+
+- More storage
+- Garbage collection needed
+- Complex visibility rules
+
+Used in:
+
+- PostgreSQL
+- MySQL InnoDB
+- Oracle
+- Many distributed databases
+
+---
+
+## 6.6 Isolation Levels
+
+Distributed databases support isolation levels such as:
+
+| Isolation Level | Description |
+|---|---|
+| **Read uncommitted** | May read uncommitted data. |
+| **Read committed** | Reads only committed data. |
+| **Repeatable read** | Same query returns same data within transaction. |
+| **Snapshot isolation** | Transaction sees a consistent snapshot. |
+| **Serializable** | Transactions behave as if executed one at a time. |
+
+Stronger isolation usually reduces performance.
+
+---
+
+## 6.7 Distributed Transaction Performance
+
+Distributed transactions are expensive because they require coordination.
+
+Costs include:
+
+- Multiple network round trips
+- Lock waits
+- Log flushing
+- Participant voting
+- Timeout handling
+- Retry logic
+- Cross-shard query overhead
+
+Example:
+
+```text
+Local transaction:
+Client → Node A → commit
+
+Distributed transaction:
+Client → Coordinator → Node A prepare
+Coordinator → Node B prepare
+Coordinator → Node A commit
+Coordinator → Node B commit
+```
+
+This can be several times slower.
+
+---
+
+## 6.8 Reducing Distributed Transaction Cost
+
+Performance can be improved by:
+
+### Data co-location
+
+Place related data on the same shard.
+
+Example:
+
+```text
+Partition orders and order_items by customer_id
+```
+
+Then queries and transactions for one customer can often be local.
+
+---
+
+### Avoid cross-shard transactions
+
+Design schemas so most transactions touch one partition.
+
+---
+
+### Use idempotency
+
+Make operations safe to retry.
+
+Example:
+
+```text
+transfer_id = unique request ID
+```
+
+If a client retries, the database does not duplicate the transfer.
+
+---
+
+### Use sagas for long-running workflows
+
+Instead of one long distributed transaction, use a sequence of local transactions with compensating actions.
+
+Example:
+
+```text
+1. Reserve inventory
+2. Create payment
+3. Ship order
+```
+
+If payment fails:
+
+```text
+Compensate: release inventory
+```
+
+Sagas are common in microservice architectures.
+
+---
+
+### Use optimistic concurrency
+
+Use optimistic concurrency when conflicts are rare.
+
+---
+
+### Use batched commits
+
+Group multiple writes into one commit.
+
+---
+
+### Use asynchronous processing
+
+Move non-critical work out of the transaction path.
+
+Example:
+
+```text
+Commit order
+Queue email notification
+```
+
+---
+
+# 7. Recovery in Distributed Databases
+
+Recovery ensures the database can survive failures and restore a consistent state.
+
+## 7.1 Failure Types
+
+Distributed databases must handle:
+
+| Failure Type | Description |
+|---|---|
+| **Node failure** | A server crashes. |
+| **Disk failure** | Storage becomes unavailable. |
+| **Network partition** | Nodes cannot communicate. |
+| **Process failure** | Database process crashes. |
+| **Coordinator failure** | Transaction coordinator crashes. |
+| **Replica failure** | A replica becomes unavailable. |
+| **Data corruption** | Stored data becomes invalid. |
+| **Site failure** | Entire data center fails. |
+
+---
+
+## 7.2 Write-Ahead Logging
+
+A common recovery mechanism is **Write-Ahead Logging**, or WAL.
+
+Rule:
+
+> Log records must be written to durable storage before changes are applied to the database.
+
+Example:
+
+```text
+1. Write log record to disk
+2. Apply change to memory
+3. Later flush data page to disk
+```
+
+If the system crashes, the log can be used to redo or undo changes.
+
+---
+
+## 7.3 Undo and Redo Logs
+
+### Undo log
+
+Used to roll back uncommitted transactions.
+
+Example:
+
+```text
+Transaction started but did not commit
+→ undo its changes
+```
+
+### Redo log
+
+Used to reapply committed changes that were not yet written to disk.
+
+Example:
+
+```text
+Transaction committed
+→ redo its changes after crash
+```
+
+---
+
+## 7.4 Checkpointing
+
+A checkpoint records a consistent database state.
+
+During recovery:
+
+```text
+Start from last checkpoint
+Replay log records after checkpoint
+```
+
+Benefits:
+
+- Faster recovery
+- Less log replay
+
+Costs:
+
+- Checkpointing can cause I/O spikes
+- May reduce performance if too frequent
+
+---
+
+## 7.5 ARIES Recovery
+
+Many database systems use ideas from **ARIES**, a classic recovery algorithm.
+
+ARIES uses:
+
+- Write-ahead logging
+- Redo
+- Undo
+- Checkpoints
+- Log sequence numbers
+- Compensation records
+
+It supports:
+
+- Crash recovery
+- Rollback of transactions
+- Repeatable recovery
+- High performance
+
+---
+
+## 7.6 Distributed Recovery Challenges
+
+Distributed recovery is harder than single-node recovery.
+
+Issues include:
+
+- In-doubt transactions
+- Network partitions
+- Replica divergence
+- Leader failure
+- Log gaps
+- Clock skew
+- Partial commits
+- Stale followers
+- Conflicting updates
+
+---
+
+## 7.7 In-Doubt Transactions
+
+An in-doubt transaction occurs when the coordinator does not know whether participants committed.
+
+Example:
+
+```text
+Coordinator sends commit
+Network fails
+Coordinator does not know if participants committed
+```
+
+Recovery must resolve this.
+
+Options:
+
+- Wait for network recovery
+- Consult participants
+- Use transaction status logs
+- Abort if uncertain
+- Use idempotent operations
+- Use consensus protocols
+
+---
+
+## 7.8 Recovery Through Replication
+
+Replication is also a recovery mechanism.
+
+If a leader fails, a follower can become the new leader.
+
+Example:
+
+```text
+Leader fails
+Follower 2 has latest log
+Follower 2 becomes leader
+Clients reconnect to Follower 2
+```
+
+Recovery depends on:
+
+- Replication mode
+- Log durability
+- Follower lag
+- Quorum rules
+- Failover policy
+
+---
+
+## 7.9 Synchronous Replication and Recovery
+
+With synchronous replication:
+
+```text
+Leader commits only after follower acknowledges
+```
+
+If the leader fails, the follower likely has the committed data.
+
+This improves recovery safety.
+
+But it increases write latency.
+
+---
+
+## 7.10 Asynchronous Replication and Recovery
+
+With asynchronous replication:
+
+```text
+Leader commits before follower applies
+```
+
+If the leader fails, some committed writes may be lost.
+
+This improves performance but weakens durability.
+
+Systems may use:
+
+- Quorum writes
+- Synchronous quorum
+- Semi-synchronous replication
+- Multi-region consensus
+
+---
+
+## 7.11 Consensus and Recovery
+
+Strongly consistent distributed databases often use consensus protocols.
+
+Examples:
+
+- Paxos
+- Raft
+- Multi-Paxos
+- Raft with leader election
+
+Consensus helps ensure:
+
+- Only one leader at a time
+- Committed log entries are not lost
+- Followers converge to the same state
+- Safe failover
+
+Example:
+
+```text
+Write log entry
+Majority of replicas acknowledge
+Entry is committed
+```
+
+If the leader fails, a new leader can be elected safely.
+
+---
+
+## 7.12 Point-in-Time Recovery
+
+Point-in-time recovery restores the database to a specific moment.
+
+Example:
+
+```text
+Restore from backup at 02:00
+Replay logs until 10:15
+```
+
+This is useful for:
+
+- Accidental deletion
+- Corrupted data
+- Bad migration
+- Application bug
+
+In distributed databases, point-in-time recovery is complex because all shards and replicas must be restored consistently.
+
+---
+
+## 7.13 Backup and Restore
+
+Backups may be:
+
+| Type | Description |
+|---|---|
+| **Full backup** | Complete database snapshot. |
+| **Incremental backup** | Changes since last backup. |
+| **Logical backup** | SQL dump or export. |
+| **Physical backup** | Raw data files. |
+| **Snapshot backup** | Storage-level snapshot. |
+| **Continuous backup** | Logs continuously archived. |
+
+Distributed backups must handle:
+
+- Multiple shards
+- Replication lag
+- Transaction consistency
+- Cross-shard transactions
+- Backup coordination
+- Restore consistency
+
+---
+
+# 8. Performance Considerations
+
+## 8.1 Network Latency
+
+Network latency is often the dominant cost.
+
+Example:
+
+```text
+Local disk write: microseconds
+Same data center network: sub-millisecond
+Cross-region network: tens to hundreds of milliseconds
+```
+
+A distributed transaction across regions may require multiple round trips.
+
+Example:
+
+```text
+Prepare Node A
+Prepare Node B
+Commit Node A
+Commit Node B
+```
+
+If each round trip is 100 ms, the transaction may take hundreds of milliseconds.
+
+---
+
+## 8.2 Coordination Overhead
+
+Coordination includes:
+
+- Leader election
+- Transaction coordination
+- Lock management
+- Consensus voting
+- Metadata updates
+- Shard rebalancing
+
+Too much coordination reduces throughput.
+
+---
+
+## 8.3 Hot Partitions
+
+A hot partition receives disproportionate traffic.
+
+Example:
+
+```text
+One tenant has 90% of traffic
+```
+
+This causes:
+
+- CPU saturation
+- Disk saturation
+- Lock contention
+- Network saturation
+- Poor tail latency
+
+Solutions:
+
+- Better partition key
+- Split hot partitions
+- Use caching
+- Add replicas
+- Use request routing
+- Use load-aware scheduling
+
+---
+
+## 8.4 Skewed Data Distribution
+
+Hash partitioning can still create skew if keys are not uniform.
+
+Example:
+
+```text
+user_id values are not evenly distributed
+```
+
+Solutions:
+
+- Use composite keys
+- Add salting
+- Use range partitioning with split points
+- Monitor partition sizes
+- Rebalance shards
+
+---
+
+## 8.5 Replication Factor
+
+Higher replication improves availability but increases cost.
+
+Example:
+
+```text
+Replication factor 3
+```
+
+Each write may be sent to 3 nodes.
+
+Tradeoff:
+
+| Replication Factor | Availability | Write Cost |
+|---|---|---|
+| 1 | Low | Low |
+| 2 | Medium | Medium |
+| 3 | High | Higher |
+| 5 | Very high | Much higher |
+
+---
+
+## 8.6 Read/Write Ratio
+
+Performance depends on workload.
+
+### Read-heavy workload
+
+Replication helps.
+
+```text
+Many reads → many replicas
+```
+
+### Write-heavy workload
+
+Replication can become expensive.
+
+```text
+Many writes → many replicas → high write amplification
+```
+
+### Mixed workload
+
+Need careful balance.
+
+---
+
+## 8.7 Query Complexity
+
+Complex queries may require:
+
+- Scatter-gather
+- Cross-shard joins
+- Distributed aggregation
+- Sorting across nodes
+- Multiple index lookups
+
+These can be expensive.
+
+Better designs often use:
+
+- Denormalization
+- Materialized views
+- Precomputed aggregates
+- Co-located data
+- Local joins
+
+---
+
+## 8.8 Indexing Performance
+
+Indexes improve reads but slow writes.
+
+In distributed databases, index maintenance may require:
+
+- Local index updates
+- Global index updates
+- Cross-node coordination
+- Replication of index changes
+
+Too many indexes can reduce write throughput.
+
+---
+
+## 8.9 Locking and Contention
+
+Locks can reduce performance.
+
+Common problems:
+
+- Hot rows
+- Long transactions
+- Cross-shard locks
+- Deadlocks
+- Lock waits across regions
+
+Solutions:
+
+- Short transactions
+- Row-level locking
+- Optimistic concurrency
+- Better partitioning
+- Avoid hot rows
+- Use queues for serialization
+
+---
+
+## 8.10 Tail Latency
+
+Distributed systems often have high tail latency.
+
+Example:
+
+```text
+Median latency: 5 ms
+99th percentile latency: 150 ms
+```
+
+Causes:
+
+- Network jitter
+- Garbage collection
+- Disk stalls
+- Lock contention
+- Leader election
+- Retry storms
+- Hot partitions
+
+Mitigations:
+
+- Hedged reads
+- Request timeouts
+- Circuit breakers
+- Backoff
+- Load shedding
+- Better partitioning
+- Caching
+
+---
+
+# 9. Design Patterns for Performance
+
+## 9.1 Co-locate Related Data
+
+Place data that is accessed together on the same shard.
+
+Example:
+
+```text
+Partition orders by customer_id
+Partition order_items by customer_id
+```
+
+Then:
+
+```sql
+SELECT *
+FROM orders
+JOIN order_items ON orders.order_id = order_items.order_id
+WHERE orders.customer_id = 123;
+```
+
+can be local.
+
+---
+
+## 9.2 Use Denormalization Carefully
+
+Denormalization reduces joins.
+
+Example:
+
+```text
+Store customer_name in orders table
+```
+
+Benefits:
+
+- Faster reads
+- Fewer distributed joins
+
+Costs:
+
+- Update anomalies
+- More storage
+- More write complexity
+
+---
+
+## 9.3 Use Caching
+
+Caching reduces database load.
+
+Examples:
+
+- Application cache
+- Distributed cache
+- Database buffer cache
+- Query result cache
+- Materialized views
+
+Caching must handle invalidation carefully.
+
+---
+
+## 9.4 Use Read Replicas
+
+Read replicas improve read scalability.
+
+Example:
+
+```text
+Writes → primary
+Reads → replicas
+```
+
+But beware of replication lag.
+
+---
+
+## 9.5 Use Batch Operations
+
+Batching reduces network round trips.
+
+Example:
+
+```text
+Insert 1000 rows in one batch
+```
+
+instead of:
+
+```text
+Insert 1000 rows one by one
+```
+
+---
+
+## 9.6 Use Async Processing
+
+Move non-critical work out of the critical path.
+
+Example:
+
+```text
+Commit transaction
+Send event to queue
+Process email asynchronously
+```
+
+---
+
+## 9.7 Use Partitioning Based on Access Patterns
+
+Choose partition keys carefully.
+
+Good partition keys:
+
+- Distribute load evenly
+- Match common queries
+- Avoid hotspots
+- Keep related data together
+
+Bad partition keys:
+
+- Low cardinality
+- Monotonically increasing keys
+- Keys that create hot partitions
+- Keys that force cross-shard queries
+
+---
+
+# 10. Example: Designing a Distributed E-Commerce Database
+
+Suppose we design a distributed database for an e-commerce system.
+
+Entities:
+
+```text
+users
+orders
+order_items
+payments
+inventory
+```
+
+## 10.1 Partitioning
+
+Partition by `customer_id`.
+
+```text
+users → partition by user_id
+orders → partition by customer_id
+order_items → partition by customer_id
+payments → partition by customer_id
+```
+
+This allows customer-specific queries to be local.
+
+Inventory may be partitioned by `product_id`.
+
+---
+
+## 10.2 Replication
+
+Use leader-follower replication.
+
+```text
+Primary accepts writes
+Read replicas serve reads
+```
+
+For critical regions, use synchronous replication within a region and asynchronous replication across regions.
+
+---
+
+## 10.3 Indexing
+
+Use local indexes:
+
+```sql
+CREATE INDEX idx_orders_customer
+ON orders(customer_id);
+
+CREATE INDEX idx_order_items_customer
+ON order_items(customer_id);
+```
+
+Use global indexes only when necessary:
+
+```sql
+CREATE INDEX idx_orders_status
+ON orders(status);
+```
+
+But monitor write cost.
+
+---
+
+## 10.4 Transactions
+
+Order creation may require:
+
+```text
+1. Check inventory
+2. Create order
+3. Create order items
+4. Create payment
+```
+
+If all data is co-located by `customer_id`, this can be a local transaction.
+
+Inventory may require cross-shard coordination if product inventory is global.
+
+Options:
+
+- Reserve inventory with optimistic concurrency
+- Use a saga
+- Use a distributed transaction
+- Use a dedicated inventory service
+
+---
+
+## 10.5 Recovery
+
+Use:
+
+- Write-ahead logging
+- Checkpoints
+- Replication
+- Leader election
+- Point-in-time recovery
+- Backups
+
+If a primary fails:
+
+```text
+Detect failure
+Elect new leader
+Recover in-doubt transactions
+Redirect clients
+```
+
+---
+
+# 11. Comparison of Design Choices
+
+## 11.1 Strong Consistency vs High Availability
+
+| Design | Pros | Cons |
+|---|---|---|
+| Strong consistency | Predictable behavior | Higher latency, lower availability |
+| High availability | Better uptime | Stale reads, complex conflict resolution |
+
+---
+
+## 11.2 Synchronous vs Asynchronous Replication
+
+| Design | Pros | Cons |
+|---|---|---|
+| Synchronous | Safe failover, no acknowledged data loss | Higher write latency |
+| Asynchronous | Faster writes, better availability | Replication lag, possible data loss |
+
+---
+
+## 11.3 Local vs Global Indexes
+
+| Design | Pros | Cons |
+|---|---|---|
+| Local indexes | Scalable, easier rebalancing | Scatter-gather queries |
+| Global indexes | Fast non-partition-key lookups | Distributed maintenance, bottlenecks |
+
+---
+
+## 11.4 Distributed Transactions vs Sagas
+
+| Design | Pros | Cons |
+|---|---|---|
+| Distributed transactions | Strong atomicity | High latency, coordination cost |
+| Sagas | Better scalability, long-running workflows | Complex compensation logic |
+
+---
+
+# 12. Common Performance Problems and Solutions
+
+| Problem | Cause | Solution |
+|---|---|---|
+| High write latency | Synchronous replication, cross-region commits | Use local quorum, async replication, co-location |
+| Hot partitions | Poor partition key | Better partitioning, splitting, salting |
+| Slow reads | Missing indexes, cross-shard queries | Add indexes, co-locate data, cache |
+| Write amplification | Too many replicas or indexes | Reduce replication/indexes, batch writes |
+| Lock contention | Hot rows, long transactions | Short transactions, optimistic concurrency |
+| Replication lag | Network or follower overload | Increase resources, monitor lag, use quorum |
+| Deadlocks | Cross-shard locking | Better ordering, shorter transactions |
+| Poor tail latency | Network jitter, retries | Hedged reads, timeouts, backoff |
+| Recovery delay | Large logs, slow failover | Checkpoints, faster leader election |
+| In-doubt transactions | Coordinator failure | Transaction status logs, consensus |
+
+---
+
+# 13. Practical Design Guidelines
+
+## 13.1 Choose the Right Partition Key
+
+The partition key is one of the most important decisions.
+
+It should:
+
+- Distribute load evenly
+- Match common queries
+- Keep related data together
+- Avoid hotspots
+- Avoid frequent cross-shard transactions
+
+---
+
+## 13.2 Minimize Cross-Shard Work
+
+Cross-shard operations are expensive.
+
+Prefer:
+
+- Local transactions
+- Local queries
+- Local indexes
+- Co-located data
+
+---
+
+## 13.3 Use Replication for Availability, Not Just Performance
+
+Replication improves availability and read scalability, but it also increases write cost and complexity.
+
+Choose replication factor based on:
+
+- Required availability
+- Durability requirements
+- Network topology
+- Write throughput
+- Failure tolerance
+
+---
+
+## 13.4 Keep Transactions Short
+
+Long transactions increase:
+
+- Locks
+- Coordination
+- Recovery complexity
+- Retry cost
+
+Keep transactions small and focused.
+
+---
+
+## 13.5 Monitor Replication Lag
+
+Replication lag can cause:
+
+- Stale reads
+- Failed failover
+- Application inconsistency
+
+Monitor:
+
+- Follower lag
+- Log apply delay
+- Network latency
+- Disk I/O
+- Leader health
+
+---
+
+## 13.6 Test Failure Scenarios
+
+Distributed databases must be tested under failure.
+
+Test:
+
+- Leader crash
+- Follower crash
+- Network partition
+- Region outage
+- Disk failure
+- Slow disk
+- High latency
+- Clock skew
+- Partial commit
+- Client retry
+
+---
+
+## 13.7 Design for Idempotency
+
+Networks can fail after a request is processed.
+
+Use unique request IDs:
+
+```text
+request_id = UUID
+```
+
+This prevents duplicate writes on retry.
+
+---
+
+# 14. Summary
+
+A distributed database is designed to store data across multiple nodes while providing scalability, availability, and performance.
+
+## Replication
+
+Replication copies data across nodes.
+
+It improves:
+
+- Availability
+- Read scalability
+- Fault tolerance
+- Geographic locality
+
+But it introduces:
+
+- Write amplification
+- Replication lag
+- Consistency tradeoffs
+- Failover complexity
+
+Common models:
+
+- Leader-follower
+- Multi-master
+- Quorum
+- Synchronous
+- Asynchronous
+
+---
+
+## Indexing
+
+Indexes speed up queries but increase write cost.
+
+In distributed databases, indexes can be:
+
+- Local
+- Global
+- Partitioned
+- Covering
+- Distributed
+
+Good indexing requires:
+
+- Matching query patterns
+- Choosing good partition keys
+- Avoiding hotspots
+- Minimizing cross-shard lookups
+
+---
+
+## Transactions
+
+Distributed transactions provide atomicity across nodes but are expensive.
+
+Common mechanisms:
+
+- Two-phase commit
+- Three-phase commit
+- Locking
+- MVCC
+- Optimistic concurrency
+- Sagas
+
+Performance improves when transactions are:
+
+- Short
+- Local
+- Idempotent
+- Co-located
+- Low-conflict
+
+---
+
+## Recovery
+
+Recovery ensures the database can survive failures.
+
+Key mechanisms:
+
+- Write-ahead logging
+- Checkpoints
+- Undo/redo
+- Replication
+- Leader election
+- Consensus
+- Backups
+- Point-in-time recovery
+
+Distributed recovery must handle:
+
+- In-doubt transactions
+- Network partitions
+- Replica divergence
+- Leader failure
+- Partial commits
+
+---
+
+# 15. Final Takeaway
+
+The performance of a distributed database depends heavily on design choices:
+
+```text
+Partitioning → determines locality and hotspots
+Replication → determines availability and write cost
+Indexing → determines query speed and write overhead
+Transactions → determine consistency and coordination cost
+Recovery → determines fault tolerance and downtime
+```
+
+A well-designed distributed database:
+
+- Co-locates related data
+- Uses appropriate partition keys
+- Chooses replication based on consistency needs
+- Uses local indexes where possible
+- Keeps transactions short and local
+- Handles failures with logs, replication, and consensus
+- Monitors latency, lag, hotspots, and tail performance
+
+In short:
+
+> Distributed database performance is mostly a problem of minimizing coordination, maximizing locality, and choosing the right consistency model for the workload.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

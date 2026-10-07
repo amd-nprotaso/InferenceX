@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.035s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=19.817s output_tokens=2201 average_output_rate=111.07 tok/s
+elapsed=35.384s output_tokens=4151 average_output_rate=117.31 tok/s
+elapsed=54.809s output_tokens=6451 average_output_rate=117.70 tok/s
+elapsed=80.853s output_tokens=9651 average_output_rate=119.37 tok/s
+elapsed=84.814s output_tokens=10301 average_output_rate=121.45 tok/s
+elapsed=96.829s output_tokens=12301 average_output_rate=127.04 tok/s
+elapsed=110.375s output_tokens=14351 average_output_rate=130.02 tok/s
+elapsed=123.243s output_tokens=16451 average_output_rate=133.48 tok/s
+elapsed=135.341s output_tokens=18501 average_output_rate=136.70 tok/s
+elapsed=147.150s output_tokens=20501 average_output_rate=139.32 tok/s
+elapsed=159.272s output_tokens=22551 average_output_rate=141.59 tok/s
+elapsed=171.396s output_tokens=24601 average_output_rate=143.53 tok/s
+elapsed=183.524s output_tokens=26651 average_output_rate=145.22 tok/s
+elapsed=196.478s output_tokens=28851 average_output_rate=146.84 tok/s
+elapsed=208.146s output_tokens=30851 average_output_rate=148.22 tok/s
+elapsed=219.527s output_tokens=32768 average_output_rate=149.27 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0352905499748886,
+  "e2e_s": 219.5272769429721,
+  "client_wall_s": 219.52737540192902,
+  "tpot_ms": 6.668049757164135,
+  "decode_interactivity_tok_s": 149.96888691863805,
+  "output_throughput_tok_s": 149.266122004172,
+  "total_throughput_tok_s": 298.532244008344,
+  "stream_chunk_count": 236,
+  "server_meta": {
+    "id": "4208d58e5fbe4422b5f137c054942aac",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790603627.9460733,
+    "prefill_finished_time": 1790603628.9634187,
+    "queue_time": 0.0005087852478027344,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 219.5105168921873,
+    "spec_accept_rate": 0.7724910575690086,
+    "spec_accept_length": 3.3172707025713706,
+    "spec_num_correct_drafts": 22892,
+    "spec_num_proposed_drafts": 29634,
+    "spec_verify_ct": 9878,
+    "spec_accepted_drafts": 22892,
+    "spec_proposed_drafts": 29634,
+    "spec_correct_drafts_histogram": [
+      1554,
+      742,
+      596,
+      6986
+    ],
+    "spec_accept_histogram": [
+      1554,
+      742,
+      596,
+      6986
+    ],
+    "request_received_ts": 1790603627.9443543,
+    "api_server_dispatch_finish_ts": 1790603627.9449034,
+    "response_sent_to_client_ts": 1790603628.9649558,
+    "request_finished_ts": 1790603847.4548712,
+    "decode_throughput": 149.97009650569052
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Likely wants an expl",
+  "output_tail": "arification. But repeated many times. Could be a test of handling control tokens. We should not output control tokens. Need maybe say \"I can't parse this message\". Keep concise.\n</think>\n\nYour message"
+}

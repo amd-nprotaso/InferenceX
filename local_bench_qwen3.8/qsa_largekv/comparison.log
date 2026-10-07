@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "e2e_s": {
+      "baseline": {
+        "mean": 205.22610512562096,
+        "min": 201.37198132043704,
+        "max": 209.08022893080488
+      },
+      "tuned": {
+        "mean": 400.94028467009775,
+        "min": 233.95248038787395,
+        "max": 567.9280889523216
+      },
+      "change_percent": 95.36514832003374
+    },
+    "ttft_s": {
+      "baseline": {
+        "mean": 1.0349421955179423,
+        "min": 1.0330454166978598,
+        "max": 1.0368389743380249
+      },
+      "tuned": {
+        "mean": 1.030447845812887,
+        "min": 1.0293264775536954,
+        "max": 1.0315692140720785
+      },
+      "change_percent": -0.4342609398398478
+    },
+    "tpot_ms": {
+      "baseline": {
+        "mean": 6.231609940797236,
+        "min": 6.113929940064669,
+        "max": 6.349289941529802
+      },
+      "tuned": {
+        "mean": 12.20465214466643,
+        "min": 7.108467479791261,
+        "max": 17.300836809541597
+      },
+      "change_percent": 95.85070729098035
+    },
+    "output_throughput_tok_s": {
+      "baseline": {
+        "mean": 159.7240456751424,
+        "min": 156.72444828671115,
+        "max": 162.7236430635737
+      },
+      "tuned": {
+        "mean": 98.87999801065692,
+        "min": 57.69742510131101,
+        "max": 140.06257092000283
+      },
+      "change_percent": -38.09322973713941
+    }
+  },
+  "checks": {
+    "identical_requests": true,
+    "fixed_seed": 20260928,
+    "profile": false,
+    "trials_per_arm": 2,
+    "identical_output_text": false,
+    "server_argument_differences": {},
+    "loaded_qsa": {
+      "baseline": [
+        {
+          "pid": 206166,
+          "libraries": [
+            "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "baseline_repeat": [
+        {
+          "pid": 206166,
+          "libraries": [
+            "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "tuned": [
+        {
+          "pid": 220094,
+          "libraries": [
+            "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_largekv/micro/m64_n256/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "tuned_repeat": [
+        {
+          "pid": 220094,
+          "libraries": [
+            "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_largekv/micro/m64_n256/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ]
+    }
+  }
+}

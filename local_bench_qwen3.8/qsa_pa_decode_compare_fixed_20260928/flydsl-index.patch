@@ -1,0 +1,11 @@
+--- /opt/venv/lib/python3.12/site-packages/flydsl/expr/primitive.py
++++ /opt/venv/lib/python3.12/site-packages/flydsl/expr/primitive.py
+@@ -242,6 +242,8 @@
+         return _expand_int_tuple_leaves(value.to_py_value())
+     # widen narrow dynamic ints to i32
+     if isinstance(value, Numeric):
++        if isinstance(value.value, ir.Value) and isinstance(value.value.type, ir.IndexType):
++            return Int64(value.value).value
+         if isinstance(value.value, ir.Value) and type(value).width < 32:
+             return Int32(value).value
+         return value.value

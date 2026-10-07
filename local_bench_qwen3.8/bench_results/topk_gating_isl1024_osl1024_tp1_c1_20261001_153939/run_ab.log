@@ -1,0 +1,16 @@
+=== [16:16:11] baseline_r1 (SGLANG_ROCM_USE_AITER_TOPK_GATING=0)
+=== [16:17:32] server healthy
+=== [16:19:06] client exit=0
+=== [16:19:18] patch_r1 (SGLANG_ROCM_USE_AITER_TOPK_GATING=1)
+=== [16:20:29] server healthy
+=== [16:21:53] client exit=0
+/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/bench_results/topk_gating_isl1024_osl1024_tp1_c1_20261001_153939/run_ab.sh: line 42: 557532 Killed                  SGLANG_ROCM_USE_AITER_TOPK_GATING=$flag TP=1 EP_SIZE=1 CONC=1 PORT=$PORT RESULT_DIR="$OUT/$tag" setsid ./run_server.sh > "$OUT/server_$tag.log" 2>&1
+=== [16:22:09] baseline_r2 (SGLANG_ROCM_USE_AITER_TOPK_GATING=0)
+=== [16:23:20] server healthy
+=== [16:24:44] client exit=0
+/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/bench_results/topk_gating_isl1024_osl1024_tp1_c1_20261001_153939/run_ab.sh: line 42: 563212 Killed                  SGLANG_ROCM_USE_AITER_TOPK_GATING=$flag TP=1 EP_SIZE=1 CONC=1 PORT=$PORT RESULT_DIR="$OUT/$tag" setsid ./run_server.sh > "$OUT/server_$tag.log" 2>&1
+=== [16:25:00] patch_r2 (SGLANG_ROCM_USE_AITER_TOPK_GATING=1)
+=== [16:26:11] server healthy
+=== [16:27:36] client exit=0
+/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/bench_results/topk_gating_isl1024_osl1024_tp1_c1_20261001_153939/run_ab.sh: line 42: 569066 Killed                  SGLANG_ROCM_USE_AITER_TOPK_GATING=$flag TP=1 EP_SIZE=1 CONC=1 PORT=$PORT RESULT_DIR="$OUT/$tag" setsid ./run_server.sh > "$OUT/server_$tag.log" 2>&1
+=== [16:27:52] all done

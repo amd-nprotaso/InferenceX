@@ -1,0 +1,32 @@
+bash: /opt/venv/lib/python3.12/site-packages/torch/lib/libtinfo.so.6: no version information available (required by bash)
++ MODEL=amd/Qwen3.5-397B-A17B-MXFP4
++ PORT=8888
++ TP=1
++ EP_SIZE=1
++ CONC=1
++ MEM_FRAC_STATIC=0.80
++ SCHEDULER_RECV_INTERVAL=30
++ SIMULATE_ACC=1
++ DISABLE_RADIX_CACHE=0
++ KV_OFFLOADING=none
++ SKIP_DOWNLOAD=0
++ DRY_RUN=0
++ QR_QUANT=NONE
++ QR_MAX_MB=8
++ export ROCM_QUICK_REDUCE_QUANTIZATION=NONE
++ ROCM_QUICK_REDUCE_QUANTIZATION=NONE
++ export ROCM_QUICK_REDUCE_MAX_SIZE_BYTES_MB=8
++ ROCM_QUICK_REDUCE_MAX_SIZE_BYTES_MB=8
++ export SGLANG_GDN_CHUNK_H_BV=16
++ SGLANG_GDN_CHUNK_H_BV=16
++ export SGLANG_GDN_CHUNK_H_NUM_WARPS=4
++ SGLANG_GDN_CHUNK_H_NUM_WARPS=4
++ export SGLANG_GDN_CHUNK_H_NUM_STAGES=3
++ SGLANG_GDN_CHUNK_H_NUM_STAGES=3
++ PREFILL_TOKENS=32768
++ [[ -n '' ]]
++ [[ 0 != \1 ]]
++ [[ 0 != \1 ]]
++ [[ -n '' ]]
++ hf download amd/Qwen3.5-397B-A17B-MXFP4
+Fetching 107 files:   0%|          | 0/107 [00:00<?, ?it/s]Fetching 107 files:  48%|████▊     | 51/107 [00:17<00:19,  2.91it/s]Fetching 107 files:  49%|████▊     | 52/107 [00:19<00:21,  2.54it/s]Fetching 107 files:  50%|████▉     | 53/107 [00:20<00:21,  2.52it/s]Fetching 107 files:  50%|█████     | 54/107 [00:20<00:20,  2.58it/s]Fetching 107 files:  51%|█████▏    | 55/107 [00:21<00:23,  2.23it/s]Fetching 107 files:  52%|█████▏    | 56/107 [00:23<00:29,  1.74it/s]Fetching 107 files:  54%|█████▍    | 58/107 [00:23<00:23,  2.07it/s]Fetching 107 files:  55%|█████▌    | 59/107 [00:25<00:32,  1.50it/s]Fetching 107 files:  56%|█████▌    | 60/107 [00:29<00:53,  1.14s/it]Fetching 107 files:  57%|█████▋    | 61/107 [00:35<01:31,  1.99s/it]Fetching 107 files:  58%|█████▊    | 62/107 [00:36<01:19,  1.76s/it]Fetching 107 files:  59%|█████▉    | 63/107 [00:39<01:31,  2.08s/it]Fetching 107 files:  60%|█████▉    | 64/107 [00:41<01:33,  2.16s/it]Fetching 107 files:  61%|██████    | 65/107 [00:42<01:10,  1.68s/it]Fetching 107 files:  62%|██████▏   | 66/107 [00:43<01:05,  1.60s/it]Fetching 107 files:  63%|██████▎   | 67/107 [00:45<01:03,  1.59s/it]Fetching 107 files:  64%|██████▎   | 68/107 [00:46<00:58,  1.49s/it]Fetching 107 files:  64%|██████▍   | 69/107 [00:46<00:46,  1.21s/it]Fetching 107 files:  65%|██████▌   | 70/107 [00:51<01:17,  2.10s/it]Fetching 107 files:  66%|██████▋   | 71/107 [00:57<02:03,  3.44s/it]Fetching 107 files:  67%|██████▋   | 72/107 [00:58<01:30,  2.58s/it]Fetching 107 files:  68%|██████▊   | 73/107 [01:01<01:36,  2.85s/it]Fetching 107 files:  69%|██████▉   | 74/107 [01:02<01:14,  2.27s/it]Fetching 107 files:  70%|███████   | 75/107 [01:03<01:02,  1.96s/it]Fetching 107 files:  71%|███████   | 76/107 [01:04<00:48,  1.58s/it]Fetching 107 files:  72%|███████▏  | 77/107 [01:05<00:39,  1.31s/it]Fetching 107 files:  73%|███████▎  | 78/107 [01:08<00:57,  1.99s/it]Fetching 107 files:  74%|███████▍  | 79/107 [01:10<00:52,  1.88s/it]Fetching 107 files:  75%|███████▍  | 80/107 [01:11<00:43,  1.60s/it]Fetching 107 files:  76%|███████▌  | 81/107 [01:14<00:52,  2.03s/it]Fetching 107 files:  77%|███████▋  | 82/107 [01:20<01:18,  3.13s/it]Fetching 107 files:  78%|███████▊  | 83/107 [01:21<01:03,  2.63s/it]Fetching 107 files:  79%|███████▊  | 84/107 [01:21<00:43,  1.87s/it]Fetching 107 files:  79%|███████▉  | 85/107 [01:23<00:38,  1.73s/it]Fetching 107 files:  80%|████████  | 86/107 [01:24<00:35,  1.68s/it]Fetching 107 files:  81%|████████▏ | 87/107 [01:25<00:28,  1.41s/it]Fetching 107 files:  82%|████████▏ | 88/107 [01:26<00:25,  1.34s/it]Fetching 107 files:  83%|████████▎ | 89/107 [01:31<00:42,  2.37s/it]

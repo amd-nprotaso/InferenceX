@@ -1,0 +1,68 @@
+{
+  "arguments": {
+    "isl": 32678,
+    "osl": 32678,
+    "conc": [
+      1
+    ],
+    "modes": "decode,verify",
+    "verify_tokens": 4,
+    "aiter_path": "/sgl-workspace/aiter",
+    "trace_dir": "/var/home/qwen_trace_analysis",
+    "output": "qsa_e2e/stack_microcheck",
+    "device": 1,
+    "jit_dir": "qsa_e2e/stack_baseline_jit",
+    "warmup": 2,
+    "inner": 2,
+    "repeats": 3,
+    "profile": false,
+    "dry_run": false
+  },
+  "torch": "2.11.0+rocm7.2",
+  "hip": "7.2.26015",
+  "aiter": "/sgl-workspace/aiter/aiter/__init__.py",
+  "gpu": "_CudaDeviceProperties(name='AMD Instinct MI355X', major=9, minor=5, gcnArchName='gfx950:sramecc+:xnack-', total_memory=294896MB, multi_processor_count=256, uuid=64653731-3337-3736-3863-393430346462, pci_bus_id=133, pci_device_id=0, pci_domain_id=0, L2_cache_size=4MB)",
+  "trace": {
+    "kernel_names": [
+      "std::enable_if<!(kattr_no_packed_fp32_ops_v<ck_tile::gfx950_t>), void>::type ck_tile::kentry<ck_tile::gfx950_t, 1, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs>(ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs)"
+    ],
+    "phase_statistics": [
+      {
+        "phase": "verify",
+        "name": "std::enable_if<!(kattr_no_packed_fp32_ops_v<ck_tile::gfx950_t>), void>::type ck_tile::kentry<ck_tile::gfx950_t, 1, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs>(ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs)",
+        "count": "18000",
+        "calls_per_cycle": "12.0",
+        "mean_us": "149.24882772222222",
+        "p50_us": "149.279",
+        "p95_us": "150.32",
+        "us_per_cycle": "1790.9859326666665"
+      },
+      {
+        "phase": "draft",
+        "name": "std::enable_if<!(kattr_no_packed_fp32_ops_v<ck_tile::gfx950_t>), void>::type ck_tile::kentry<ck_tile::gfx950_t, 1, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs>(ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs)",
+        "count": "3000",
+        "calls_per_cycle": "2.0",
+        "mean_us": "147.38437633333334",
+        "p50_us": "147.36",
+        "p95_us": "148.2",
+        "us_per_cycle": "294.76875266666667"
+      },
+      {
+        "phase": "draft_extend",
+        "name": "std::enable_if<!(kattr_no_packed_fp32_ops_v<ck_tile::gfx950_t>), void>::type ck_tile::kentry<ck_tile::gfx950_t, 1, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >, ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs>(ck_tile::FmhaFwdKernel<ck_tile::BlockFmhaPipelineQRKSVS<ck_tile::BlockFmhaPipelineProblem<std::bfloat16_t, std::bfloat16_t, std::bfloat16_t, float, float, std::bfloat16_t, unsigned char, float, std::bfloat16_t, float, std::bfloat16_t, ck_tile::TileFmhaShape<ck_tile::sequence<128, 64, 32, 256, 32, 256>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, ck_tile::sequence<4, 1, 1>, ck_tile::sequence<32, 32, 16>, true>, true, ck_tile::ComposedAttention<0u, true>, ck_tile::SimplifiedGenericAttentionMask<false>, false, ck_tile::TileFmhaTraits<true, true, false, false, false, (ck_tile::BlockAttentionBiasEnum)0, false, false, false, (ck_tile::BlockAttentionQuantScaleEnum)0, -1, false, false> >, ck_tile::BlockFmhaPipelineQXKSVSCustomPolicy<true, false, 1, 1>, false>, ck_tile::Default2DEpilogue<ck_tile::Default2DEpilogueProblem<float, std::bfloat16_t, true, false, true>, void> >::FmhaFwdGroupModeKargs)",
+        "count": "1500",
+        "calls_per_cycle": "1.0",
+        "mean_us": "151.28022133333334",
+        "p50_us": "151.27949999999998",
+        "p95_us": "151.839",
+        "us_per_cycle": "151.28022133333334"
+      }
+    ],
+    "shape_provenance": "Local SGLang source plus trace report; AMD trace has no input tensor shapes",
+    "recorded_isl": 32768,
+    "recorded_osl": 32768,
+    "recorded_concurrency": 1
+  },
+  "timing": "GPU events around graph replay / inner; includes AITER call kernels, excludes gather/indexer",
+  "limitations": "Synthetic compact KV; extrapolated concurrency; context samples, not full generation"
+}

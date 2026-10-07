@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.033s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=18.220s output_tokens=2151 average_output_rate=118.06 tok/s
+elapsed=33.965s output_tokens=4201 average_output_rate=123.69 tok/s
+elapsed=49.132s output_tokens=6151 average_output_rate=125.19 tok/s
+elapsed=64.870s output_tokens=8201 average_output_rate=126.42 tok/s
+elapsed=79.670s output_tokens=10251 average_output_rate=128.67 tok/s
+elapsed=96.810s output_tokens=12501 average_output_rate=129.13 tok/s
+elapsed=108.703s output_tokens=14351 average_output_rate=132.02 tok/s
+elapsed=125.575s output_tokens=17301 average_output_rate=137.77 tok/s
+elapsed=132.192s output_tokens=18501 average_output_rate=139.96 tok/s
+elapsed=146.207s output_tokens=20951 average_output_rate=143.30 tok/s
+elapsed=155.986s output_tokens=22651 average_output_rate=145.21 tok/s
+elapsed=167.299s output_tokens=24601 average_output_rate=147.05 tok/s
+elapsed=179.777s output_tokens=26751 average_output_rate=148.80 tok/s
+elapsed=191.114s output_tokens=28701 average_output_rate=150.18 tok/s
+elapsed=203.626s output_tokens=30851 average_output_rate=151.51 tok/s
+elapsed=214.805s output_tokens=32768 average_output_rate=152.55 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0326173198409379,
+  "e2e_s": 214.80533037288114,
+  "client_wall_s": 214.8054289421998,
+  "tpot_ms": 6.524024569018836,
+  "decode_interactivity_tok_s": 153.27961895618557,
+  "output_throughput_tok_s": 152.54735488467225,
+  "total_throughput_tok_s": 305.0947097693445,
+  "stream_chunk_count": 216,
+  "server_meta": {
+    "id": "fab8d65bbcec4cf5a05d28b71042f265",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790595698.161394,
+    "prefill_finished_time": 1790595699.1781728,
+    "queue_time": 0.00038909912109375,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 214.79013866372406,
+    "spec_accept_rate": 0.7504051327843371,
+    "spec_accept_length": 3.2511161821609287,
+    "spec_num_correct_drafts": 22690,
+    "spec_num_proposed_drafts": 30237,
+    "spec_verify_ct": 10079,
+    "spec_accepted_drafts": 22690,
+    "spec_proposed_drafts": 30237,
+    "spec_correct_drafts_histogram": [
+      1548,
+      1001,
+      901,
+      6629
+    ],
+    "spec_accept_histogram": [
+      1548,
+      1001,
+      901,
+      6629
+    ],
+    "request_received_ts": 1790595698.1599534,
+    "api_server_dispatch_finish_ts": 1790595698.1605082,
+    "response_sent_to_client_ts": 1790595699.1799397,
+    "request_finished_ts": 1790595912.950092,
+    "decode_throughput": 153.2810764181227
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need provide compreh",
+  "output_tail": "mpty.\n\nPlease send a complete question or request, such as:\n\n- **Explain distributed databases**\n- **Explain replication**\n- **Explain indexing**\n- **Explain transactions**\n- **Explain recovery**\n- **"
+}

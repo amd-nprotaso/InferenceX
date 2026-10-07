@@ -1,0 +1,18 @@
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting 8 simultaneous requests: ISL=32678 OSL=32678
+Traceback (most recent call last):
+  File "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_pa_decode_32678_c8_20260929/client_exact.py", line 71, in <module>
+    results = [future.result() for future in futures]
+               ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_pa_decode_32678_c8_20260929/client_exact.py", line 53, in run_one
+    if not chunks: raise RuntimeError(f'No output: {final}')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: No output: {}

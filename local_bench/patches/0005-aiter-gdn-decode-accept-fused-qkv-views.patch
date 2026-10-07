@@ -1,0 +1,29 @@
+diff --git a/aiter/ops/flydsl/linear_attention_kernels.py b/aiter/ops/flydsl/linear_attention_kernels.py
+index 454cdd5..d9257d6 100644
+--- a/aiter/ops/flydsl/linear_attention_kernels.py
++++ b/aiter/ops/flydsl/linear_attention_kernels.py
+@@ -240,9 +240,21 @@ def flydsl_gdn_decode_varlen(
+         raise ValueError(f"head_k_dim must be 128, got {K}")
+     if HV % Hg:
+         raise ValueError(f"num_v_heads {HV} must be a multiple of num_k_heads {Hg}")
+-    for name, t_ in (("q", q), ("k", k), ("v", v)):
+-        if t_.dtype != torch.bfloat16 or not t_.is_contiguous():
+-            raise ValueError(f"{name} must be contiguous bf16")
++    # The kernel addresses these as ``tok * <x>_token_stride + head * D + d``,
++    # so it needs head-major contiguity *within* a token but the token stride is
++    # a free parameter. Requiring full contiguity here would reject the layout a
++    # fused QKV projection actually produces: a server that splits one
++    # ``[1, T, (Hg + Hg + HV) * D]`` buffer hands over three views whose token
++    # stride is the fused width (Qwen3.8-Flash-Next: 10240 = (16+16+48)*128),
++    # not the per-tensor width. Those views are exactly what the kernel handles.
++    for name, t_, dim in (("q", q, K), ("k", k, K), ("v", v, V)):
++        if t_.dtype != torch.bfloat16:
++            raise ValueError(f"{name} must be bf16, got {t_.dtype}")
++        if t_.stride()[-1] != 1 or t_.stride()[-2] != dim:
++            raise ValueError(
++                f"{name} must be head-major contiguous within a token "
++                f"(stride[-2:] == ({dim}, 1)), got {t_.stride()[-2:]}"
++            )
+     for name, t_ in (("a", a), ("b", b), ("A_log", A_log), ("dt_bias", dt_bias)):
+         if t_.dtype not in (torch.float32, torch.bfloat16):
+             raise ValueError(f"{name} must be fp32 or bf16, got {t_.dtype}")

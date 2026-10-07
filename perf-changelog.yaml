@@ -7094,3 +7094,39 @@
     - "将可选 local_bench FlyDSL GDN h 静态及变长内核的逻辑 value tile 从 16 改为 8，使 TP4 每序列 workgroup 数翻倍至 256。"
     - "保留物理 16 列 MFMA/LDS 布局并屏蔽未使用列的全局 value/state 访问；尚未测量本次修改的服务性能。"
   pr-link: XXX
+
+
+- config-keys:
+    - local-qwen3.8-flash-next-mxfp4-mi355x-qsa
+  scenario-type:
+    - fixed-seq-len
+  description:
+    - "Record isolated local gfx950 QSA FMHA larger-KV experiments: M64 N256 with four waves and 16x16x16 MFMA reduces decode/verification microbenchmark latency by 12.8%/19.2% against M128 N64. Original installed kernel is preserved."
+    - "Unprofiled TP1 concurrency1 ISL32768 OSL32768 tests show no E2E gain: baseline 162.72/156.72 output tok/s versus tuned 57.70/140.06. Outputs and speculative acceptance differ despite equal seeds; see local_bench_qwen3.8/qsa_largekv/report.md."
+    - "记录独立的本地 gfx950 QSA FMHA 大 KV tile 实验：M64 N256、四个 wave、16x16x16 MFMA 相对 M128 N64 将 decode/verification 微基准延迟降低12.8%/19.2%，保留原安装内核。"
+    - "关闭 profiling 的 TP1、并发1、ISL32768、OSL32768 测试未显示端到端收益：基线162.72/156.72 output tok/s，调优57.70/140.06。相同种子下输出与投机接受率仍不同，详见 local_bench_qwen3.8/qsa_largekv/report_zh.md。"
+  pr-link: XXX
+
+
+- config-keys:
+    - local-qwen3.8-flash-next-mxfp4-mi355x-qsa
+  scenario-type:
+    - fixed-seq-len
+  description:
+    - "Record isolated gfx950 QSA compiler-flag sweep: post-machine scheduling enabled reduces verification microbenchmark latency by 3.8%; occupancy2/3 and preload0/16 do not improve timing. All six configurations pass FP32 reference checks and match baseline output hashes on twelve synthetic cases."
+    - "Unprofiled TP1 concurrency1 ISL32768 OSL32768 E2E baseline 148.49/151.08 output tok/s versus post_sched 58.98/154.36; no repeatable gain demonstrated, with different generated outputs and speculative acceptance. Keep installed baseline; see local_bench_qwen3.8/qsa_flags/report.md."
+    - "记录独立 gfx950 QSA 编译参数实验：启用 post-machine scheduling 将 verification 微基准延迟降低3.8%；occupancy2/3 与 preload0/16 未改善计时。六种配置均通过 FP32 参考校验，十二个合成输入的输出哈希均与基线一致。"
+    - "关闭 profiling 的 TP1、并发1、ISL32768、OSL32768 端到端基线148.49/151.08 output tok/s，post_sched 为58.98/154.36；生成输出和投机接受率不同，未证明可重复收益。保留原安装基线，详见 local_bench_qwen3.8/qsa_flags/report_zh.md。"
+  pr-link: XXX
+
+
+- config-keys:
+    - local-qwen3.8-flash-next-mxfp4-mi355x-qsa
+  scenario-type:
+    - fixed-seq-len
+  description:
+    - "Compare SGLANG_HC_COMBINE_SPLIT unset/1/0 with installed baseline QSA on gfx950, TP1 concurrency1 ISL32768 OSL32768, no profiling. Installed SGLang defaults to True, so unset and 1 select the same setting."
+    - "Two primary trials per setting average 147.37/154.05/137.94 output tok/s for unset/1/0; disabled decode time per verification is about 5.1% higher. Outputs and acceptance vary; retain enabled default, without claiming a precise repeatable E2E gain. See local_bench_qwen3.8/qsa_hc_split/report.md for results and a preserved harness environment-audit interruption."
+    - "在 gfx950 上使用已安装基线 QSA 比较 SGLANG_HC_COMBINE_SPLIT 未设置/1/0，TP1、并发1、ISL32768、OSL32768，关闭 profiling。已安装 SGLang 默认 True，未设置与1选择相同设置。"
+    - "每组两次主测量平均吞吐量依次为147.37/154.05/137.94 output tok/s；关闭时每次验证的 decode 耗时约高5.1%。输出及接受率不同，建议保持默认开启，不宣称精确可重复的端到端收益。结果及保留的环境审计中断见 local_bench_qwen3.8/qsa_hc_split/report_zh.md。"
+  pr-link: XXX

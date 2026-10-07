@@ -1,0 +1,152 @@
+{
+  "trials": [
+    {
+      "trial": "baseline",
+      "e2e_s": 220.67371730972081,
+      "ttft_s": 1.0350101976655424,
+      "tpot_ms": 6.703045964295031,
+      "output_throughput_tok_s": 148.49055685097366,
+      "spec_accept_length": 3.150163430109594,
+      "spec_accept_rate": 0.7167531884893931,
+      "spec_verify_ct": 10402,
+      "num_retractions": 0,
+      "decode_ms_per_verification_proxy": 21.11504586733852,
+      "output_sha256": "75c7ac2065930a5f1c37291db3c03912ebace74493586def64cba2b659f43d59"
+    },
+    {
+      "trial": "baseline_repeat",
+      "e2e_s": 216.89460877189413,
+      "ttft_s": 1.0316012352705002,
+      "tpot_ms": 6.587817241023701,
+      "output_throughput_tok_s": 151.0778689192945,
+      "spec_accept_length": 3.2068898023096497,
+      "spec_accept_rate": 0.73569517844327,
+      "spec_verify_ct": 10218,
+      "num_retractions": 0,
+      "decode_ms_per_verification_proxy": 21.125759203036175,
+      "output_sha256": "e98ea63a00c51d3f1a31dc878dfde87ee3a73174af1b7c6531f16c332f8d2439"
+    },
+    {
+      "trial": "tuned",
+      "e2e_s": 555.6189429201186,
+      "ttft_s": 1.03308996418491,
+      "tpot_ms": 16.925133608689645,
+      "output_throughput_tok_s": 58.97565974309522,
+      "spec_accept_length": 1.246358069301282,
+      "spec_accept_rate": 0.0821066778238434,
+      "spec_verify_ct": 26291,
+      "num_retractions": 0,
+      "decode_ms_per_verification_proxy": 21.094133085692203,
+      "output_sha256": "906c9790f516826123827835b27ab738533fd09997eafb16de266af056f61571"
+    },
+    {
+      "trial": "tuned_repeat",
+      "e2e_s": 212.27935942495242,
+      "ttft_s": 1.0300963977351785,
+      "tpot_ms": 6.447012635493553,
+      "output_throughput_tok_s": 154.36254381956357,
+      "spec_accept_length": 3.2627700886189386,
+      "spec_accept_rate": 0.7542235055926184,
+      "spec_verify_ct": 10043,
+      "num_retractions": 0,
+      "decode_ms_per_verification_proxy": 21.034478047119112,
+      "output_sha256": "24582db8894145da2f1bb25fb92876ad62bf5e3af797ec9551179009ffb54ab8"
+    }
+  ],
+  "summary": {
+    "e2e_s": {
+      "baseline": {
+        "mean": 218.78416304080747,
+        "min": 216.89460877189413,
+        "max": 220.67371730972081
+      },
+      "tuned": {
+        "mean": 383.9491511725355,
+        "min": 212.27935942495242,
+        "max": 555.6189429201186
+      },
+      "change_percent": 75.49220466241955
+    },
+    "ttft_s": {
+      "baseline": {
+        "mean": 1.0333057164680213,
+        "min": 1.0316012352705002,
+        "max": 1.0350101976655424
+      },
+      "tuned": {
+        "mean": 1.0315931809600443,
+        "min": 1.0300963977351785,
+        "max": 1.03308996418491
+      },
+      "change_percent": -0.1657336721053504
+    },
+    "tpot_ms": {
+      "baseline": {
+        "mean": 6.645431602659366,
+        "min": 6.587817241023701,
+        "max": 6.703045964295031
+      },
+      "tuned": {
+        "mean": 11.6860731220916,
+        "min": 6.447012635493553,
+        "max": 16.925133608689645
+      },
+      "change_percent": 75.85122864578233
+    },
+    "output_throughput_tok_s": {
+      "baseline": {
+        "mean": 149.78421288513408,
+        "min": 148.49055685097366,
+        "max": 151.0778689192945
+      },
+      "tuned": {
+        "mean": 106.6691017813294,
+        "min": 58.97565974309522,
+        "max": 154.36254381956357
+      },
+      "change_percent": -28.78481668616747
+    }
+  },
+  "checks": {
+    "identical_requests": true,
+    "fixed_seed": 20260928,
+    "profile": false,
+    "trials_per_arm": 2,
+    "identical_output_text": false,
+    "server_argument_differences": {},
+    "loaded_qsa": {
+      "baseline": [
+        {
+          "pid": 252450,
+          "libraries": [
+            "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "baseline_repeat": [
+        {
+          "pid": 252450,
+          "libraries": [
+            "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "tuned": [
+        {
+          "pid": 266486,
+          "libraries": [
+            "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_flags/micro/post_sched/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "tuned_repeat": [
+        {
+          "pid": 266486,
+          "libraries": [
+            "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_flags/micro/post_sched/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ]
+    }
+  }
+}

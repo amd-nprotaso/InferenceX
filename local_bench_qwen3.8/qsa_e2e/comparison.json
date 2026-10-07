@@ -1,0 +1,140 @@
+{
+  "metrics": [
+    {
+      "metric": "ttft_s",
+      "baseline": 1.0326173198409379,
+      "tuned": 1.0303795379586518,
+      "change_percent": -0.2167096986743111
+    },
+    {
+      "metric": "e2e_s",
+      "baseline": 214.80533037288114,
+      "tuned": 219.33219526801258,
+      "change_percent": 2.1074267045762873
+    },
+    {
+      "metric": "client_wall_s",
+      "baseline": 214.8054289421998,
+      "tuned": 219.33234561700374,
+      "change_percent": 2.1074498429097144
+    },
+    {
+      "metric": "tpot_ms",
+      "baseline": 6.524024569018836,
+      "tuned": 6.6622460319850445,
+      "change_percent": 2.1186533175026945
+    },
+    {
+      "metric": "decode_interactivity_tok_s",
+      "baseline": 153.27961895618557,
+      "tuned": 150.0995302783866,
+      "change_percent": -2.07469766656192
+    },
+    {
+      "metric": "output_throughput_tok_s",
+      "baseline": 152.54735488467225,
+      "tuned": 149.39884907454189,
+      "change_percent": -2.0639530672365125
+    },
+    {
+      "metric": "total_throughput_tok_s",
+      "baseline": 305.0947097693445,
+      "tuned": 298.79769814908377,
+      "change_percent": -2.0639530672365125
+    }
+  ],
+  "checks": {
+    "identical_request": true,
+    "identical_output_text": false,
+    "output_sha256": {
+      "baseline": "d2146e6fb6e1b2315af68739ea09653d1ffbe47e0bbe5d2937bf7635491d4e4c",
+      "tuned": "db1182237ccf1dc36e10ec0e3758668ad54418047866535ffab02b5eb01b0107"
+    },
+    "server_argument_differences": {
+      "random_seed": [
+        933737487,
+        995034812
+      ],
+      "startup_time": [
+        {
+          "load_weight": 46.50594478473067,
+          "kv_cache_allocation": 0.689126999117434,
+          "scheduler_e2e": 68.57960644876584,
+          "cuda_graph": {
+            "prefill": 0.0,
+            "decode": 0.0,
+            "target_verify": 5.890239265281707,
+            "draft_prefill": 0.0,
+            "draft_decode": 1.4699413059279323,
+            "draft_extend": 0.0
+          },
+          "tokenizer_e2e": 76.2783751571551
+        },
+        {
+          "load_weight": 46.14495250815526,
+          "kv_cache_allocation": 0.6842618132941425,
+          "scheduler_e2e": 66.31426363438368,
+          "cuda_graph": {
+            "prefill": 0.0,
+            "decode": 0.0,
+            "target_verify": 5.697203418705612,
+            "draft_prefill": 0.0,
+            "draft_decode": 1.5469507998786867,
+            "draft_extend": 0.0
+          },
+          "tokenizer_e2e": 74.33550375001505
+        }
+      ]
+    },
+    "profile": false,
+    "trials_per_arm": 1,
+    "speculative_metadata": {
+      "baseline": {
+        "spec_accept_rate": 0.7504051327843371,
+        "spec_accept_length": 3.2511161821609287,
+        "spec_num_correct_drafts": 22690,
+        "spec_num_proposed_drafts": 30237,
+        "spec_verify_ct": 10079,
+        "num_retractions": 0,
+        "cached_tokens": 0,
+        "finish_reason": {
+          "type": "length",
+          "length": 32768
+        }
+      },
+      "tuned": {
+        "spec_accept_rate": 0.711629835135049,
+        "spec_accept_length": 3.1347938390892565,
+        "spec_num_correct_drafts": 22316,
+        "spec_num_proposed_drafts": 31359,
+        "spec_verify_ct": 10453,
+        "num_retractions": 0,
+        "cached_tokens": 0,
+        "finish_reason": {
+          "type": "length",
+          "length": 32768
+        }
+      }
+    },
+    "loaded_qsa": {
+      "baseline": [
+        {
+          "pid": 178221,
+          "name": "sglang::scheduler",
+          "libraries": [
+            "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ],
+      "tuned": [
+        {
+          "pid": 187083,
+          "name": "sglang::scheduler",
+          "libraries": [
+            "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/compiled/n128/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so"
+          ]
+        }
+      ]
+    }
+  }
+}

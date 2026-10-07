@@ -1,0 +1,17 @@
+[aiter] import [module_aiter_core] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_flags/micro/occupancy3/jit/module_aiter_core.so
+[aiter] import [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_flags/micro/occupancy3/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so
+/opt/venv/lib/python3.12/site-packages/torch/profiler/profiler.py:224: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[W928 12:45:21.006373395 collection.cpp:1148] Warning: ROCTracer produced duplicate flow start: 4 (function operator())
+decode C= 1 rows= 1 context=32769 KV=2049..2049 median=393.796 us symbol_match=False
+decode C= 1 rows= 1 context=32770 KV=2050..2050 median=393.693 us symbol_match=False
+decode C= 1 rows= 1 context=32771 KV=2051..2051 median=394.022 us symbol_match=False
+decode C= 1 rows= 1 context=32772 KV=2048..2048 median=381.570 us symbol_match=False
+decode C= 1 rows= 1 context=49152 KV=2048..2048 median=382.639 us symbol_match=False
+decode C= 1 rows= 1 context=65536 KV=2048..2048 median=381.949 us symbol_match=False
+verify C= 1 rows= 4 context=32769 KV=2048..2051 median=396.858 us symbol_match=False
+verify C= 1 rows= 4 context=32770 KV=2048..2051 median=396.860 us symbol_match=False
+verify C= 1 rows= 4 context=32771 KV=2048..2051 median=397.411 us symbol_match=False
+verify C= 1 rows= 4 context=32772 KV=2048..2051 median=397.090 us symbol_match=False
+verify C= 1 rows= 4 context=49152 KV=2048..2051 median=397.103 us symbol_match=False
+verify C= 1 rows= 4 context=65536 KV=2048..2051 median=397.656 us symbol_match=False

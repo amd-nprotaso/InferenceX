@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rocm-smi)",
+      "Read(//var/home/**)",
+      "Bash(timeout 120 grep -rl \"hc_combine_gate_kernel\\\\|hc_combine_apply_kernel\\\\|HcCombineSplitParams\" my_sglang build_sglang sglang_gdnfix_b32k)",
+      "Bash(timeout 120 grep -rn \"make_smem_tensor\\\\|smem\" --include=*.py .)"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "inferencemax-repos"
+  ]
+}

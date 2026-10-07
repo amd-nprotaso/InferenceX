@@ -1,0 +1,19 @@
+[aiter] [pid=158830 pname=MainProcess] start build [module_aiter_core] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/stack_baseline_jit/build/module_aiter_core
+[aiter] Current hipcc not support: -mllvm -amdgpu-coerce-illegal-types=1, skip it.
+[aiter] [pid=158830 pname=MainProcess] [32mfinish build [module_aiter_core], cost 10.2s [0m
+[aiter] import [module_aiter_core] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/stack_baseline_jit/module_aiter_core.so
+[aiter] [pid=158830 pname=MainProcess] start build [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/stack_baseline_jit/build/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale
+[aiter] [pid=158830 pname=MainProcess] [32mfinish build [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale], cost 26.1s [0m
+[aiter] import [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/stack_baseline_jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so
+decode C= 1 rows= 1 context=32679 KV=2051..2051 median=134.340 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=32680 KV=2048..2048 median=129.840 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=32681 KV=2049..2049 median=134.340 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=32682 KV=2050..2050 median=133.121 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=49017 KV=2049..2049 median=134.100 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=65356 KV=2048..2048 median=130.060 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32679 KV=2048..2051 median=153.721 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32680 KV=2048..2051 median=154.341 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32681 KV=2048..2051 median=154.361 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32682 KV=2048..2051 median=154.261 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=49017 KV=2048..2051 median=154.321 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=65356 KV=2048..2051 median=154.481 us symbol_match=unprofiled

@@ -1,0 +1,502 @@
+{
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_token_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_token_mulWeightStage1.so",
+    "sha256": "b1100e19c872b606a1737855192ef77c79fd813dcffa45307df4cd5136ec9604"
+  },
+  "module_fmha_v3_varlen_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fmha_v3_varlen_fwd.so",
+    "sha256": "cc097630aa37d69ed95c9a57a920db28a14a53829fc98decf2314db13b6e6ef2"
+  },
+  "module_fused_qk_norm_mrope_cache_quant_shuffle.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fused_qk_norm_mrope_cache_quant_shuffle.so",
+    "sha256": "956a7d7a658d291dd1743529f54357e1587d2097184fdae5dbf9920dd591af9f"
+  },
+  "module_aiter_unary.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_aiter_unary.so",
+    "sha256": "31ccbdd469c28a0a25daee4593f82e077308195dfa28e91ad72951bf97f6b52d"
+  },
+  "module_moe_ck2stages_f8_fp4x2_preshuffle_off_b16_silu_per_1x32_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_fp4x2_preshuffle_off_b16_silu_per_1x32_mulWeightStage2.so",
+    "sha256": "51a53436fd6430b6b9769d210db5e50dffd6f981c0bd820542881ff5efda680b"
+  },
+  "module_gemm_a8w8_blockscale_bpreshuffle_cktile.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_blockscale_bpreshuffle_cktile.so",
+    "sha256": "3614ad39316a292e4967c97fad44e06b16de8b7d4ceada79e5bed4767a1deb58"
+  },
+  "module_gemm_a8w8_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_asm.so",
+    "sha256": "fb0598f3f77e00847dd8ddafab83f4264925028399a26710ef696d99b278dd08"
+  },
+  "module_gemm_a8w8.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8.so",
+    "sha256": "8d9fda4d35d79e136b7161519d6a4a7ac98f60859d1445d53d11c31171cf472a"
+  },
+  "module_moe_topk_ck.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_topk_ck.so",
+    "sha256": "609afb213363ed9eb3bd6861258c85226b94f04995115602202a13bb1d992a65"
+  },
+  "mha_varlen_fwd_bf16_nlogits_nbias_mask_nlse_ndropout_nskip_nqscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_mask_nlse_ndropout_nskip_nqscale.so",
+    "sha256": "55f5aa3c1bb16ac65ba5a53e988b26513fa8827d843935bdb94c1a6b961ee671"
+  },
+  "module_moe_ck2stages_f8_fp4x2_preshuffle_on_b16_silu_per_1x32_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_fp4x2_preshuffle_on_b16_silu_per_1x32_mulWeightStage2.so",
+    "sha256": "1a34323215ec292097552e68c3735c8d8389774e7001149711abf18e65882c09"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_1x128_mulWeightStage2_splitk.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_1x128_mulWeightStage2_splitk.so",
+    "sha256": "b0dfa697ab679755accd6e3375b9f00b4a6e43ccde2008d5fda90d38fa30e37c"
+  },
+  "module_mxfp8fp4gemm_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_mxfp8fp4gemm_asm.so",
+    "sha256": "f1f74ad03575ea0e74752f268a726508e55072bf04464479d1b50c407a19702e"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_1x128_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_1x128_mulWeightStage1.so",
+    "sha256": "2f0a7c866f0103911f36c71ff4051f7f53062d1daef5b5febec890ad218edd5b"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_tensor_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_tensor_mulWeightStage2.so",
+    "sha256": "f3b7f421fa405911bc7bc3262315f896c00d5e2281f7245ea0f4c6fdfc96a3e3"
+  },
+  "module_gemm_a8w8_bpreshuffle_cktile.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_bpreshuffle_cktile.so",
+    "sha256": "5c268583e75cc1692cb0a19fc1c6dd877c01e4f282b49785db9bd2ea21e16e66"
+  },
+  "module_gemm_common.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_common.so",
+    "sha256": "0f64678bebbab5d28073aa6fa4f2aeefbd2db23f54f9feaeb3fcc2608a0ba789"
+  },
+  "module_chunk_gdr_fwd_h.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_chunk_gdr_fwd_h.so",
+    "sha256": "f59ec71bfe693f28fb2e626cb76967d9058cabb4387e7d9fe0b4a6e015223bba"
+  },
+  "module_mla_v4_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_mla_v4_asm.so",
+    "sha256": "f703d1deae29513d567c808dce22eabb112c65f33b8d38ef8cb0cee8642813f8"
+  },
+  "module_quick_all_reduce.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_quick_all_reduce.so",
+    "sha256": "3ef5077c4f36163d8c5b87ca31f685abaf60ab8051c47abd64f23c72ca6d0b32"
+  },
+  "module_gdr_decode_packed_bf16.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gdr_decode_packed_bf16.so",
+    "sha256": "695869cb145c2b4d17c211edd30ea6d6f8057067a7860084d2392e4962150466"
+  },
+  "module_rmsnorm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rmsnorm.so",
+    "sha256": "8d15b731d07255edd5fc1cc9b98f5a1d2ed79f9ca499766cc02460d5bbfc08b4"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_tensor_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_tensor_mulWeightStage2.so",
+    "sha256": "5bc621a57475ec07a7d42bfef16b79ca75d7db7ad7e591cb73c62ad3e9f3e1ed"
+  },
+  "module_cache.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_cache.so",
+    "sha256": "131e6acf45a5ebae9edf8350f5a22ac8c885907eebca16e11b9dfd2e7b69a74a"
+  },
+  "module_pa_sparse_prefill_opus.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_pa_sparse_prefill_opus.so",
+    "sha256": "e1a1c27984f807c2c4ac7c78864cb219be43dcb5c981b5354fbd42171bfc1347"
+  },
+  "module_gemm_a8w8_blockscale_bpreshuffle_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_blockscale_bpreshuffle_asm.so",
+    "sha256": "bf6c51360fe4fb3a66eaa7fdaaf1cc087d50e94934dc4688ac345c899d0f3bc1"
+  },
+  "module_aiter_operator.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_aiter_operator.so",
+    "sha256": "ee3bacc71868a3f6f70e084b06f1bc8b819e07d78ca32ff147cb4c2f2d765582"
+  },
+  "module_moe_ck2stages_b16_b16_preshuffle_on_b16_silu_no_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_b16_b16_preshuffle_on_b16_silu_no_mulWeightStage2.so",
+    "sha256": "b300acd2fca59bc0213004792f0ef452c529b28b3be049a0400f580364d161a0"
+  },
+  "mha_varlen_fwd_bf16_nlogits_nbias_nmask_lse_ndropout_skip_nqscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_lse_ndropout_skip_nqscale.so",
+    "sha256": "c12c00ec91d9d0cd77a7e3dedd41937c395cf02fa6c1abc7854043408cdad69a"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_1x128_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_1x128_mulWeightStage2.so",
+    "sha256": "c9f77e4023c3aec3b0d57e712444594cd810daa13e65f24ce2602bf127bf64eb"
+  },
+  "module_sample.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_sample.so",
+    "sha256": "cb417ec639b2c50fa5fc66d7007aaf6b91c58cda8e47be5605d3d2aaeec3a2b4"
+  },
+  "module_causal_conv1d_fwd_split_qkv.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_causal_conv1d_fwd_split_qkv.so",
+    "sha256": "943612ba7eb3c5e5ba7279a128a87188ab56b5cd8126bb5b8c5889844cd85cca"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_token_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_token_mulWeightStage1.so",
+    "sha256": "d625c034a571da296709990eeb6f5ff388b4318a80ad64282395a1ced14d5517"
+  },
+  "module_ds32_mla.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_ds32_mla.so",
+    "sha256": "d9d370092244ba26f19d87998ba09422750e2c310d10d9ab8fd4e50b610ad2c3"
+  },
+  "module_moe_mxfp4_aux.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_mxfp4_aux.so",
+    "sha256": "37019e22673b23d5c324c77c24989a0e469e8674a4911595f65545edaccf39b1"
+  },
+  "module_gemm_a16w16_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a16w16_asm.so",
+    "sha256": "4a1fcb931ef6adc00c1ce92d9a209c9ecbc2386f2382068cde17dd6e0ff13ff7"
+  },
+  "module_rmsnorm_quant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rmsnorm_quant.so",
+    "sha256": "798ef3d80fbc74598ffa1e9a15c1589311bc47d864ed36fd65a1e1d4f4edb6db"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_1x128_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_1x128_mulWeightStage1.so",
+    "sha256": "1f19962a37913690387be76bbf677063b4e150fd7a1e27cbdc71a720b436568d"
+  },
+  "module_rope_2c_uncached_bwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_2c_uncached_bwd.so",
+    "sha256": "698ffcfa98405e8f9196c91c0c881b5d216b55ce6ef3424005c1f2e98301a25a"
+  },
+  "module_rope_1c_uncached_bwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_uncached_bwd.so",
+    "sha256": "1991669f5fd61ed9663dad64eaf514b9a182d99a00f43ba4af4484ee442259ed"
+  },
+  "module_fused_qk_rmsnorm_group_quant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fused_qk_rmsnorm_group_quant.so",
+    "sha256": "c2f1c8e7577dedc0dbddcc3890910da1b409f70d0edc987a076cb3ded8d1f7d3"
+  },
+  "module_rope_2c_uncached_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_2c_uncached_fwd.so",
+    "sha256": "06d356eac997bc2fed765632d6f7a740778311f24304eaf152c29ba2fa60c9ae"
+  },
+  "module_activation.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_activation.so",
+    "sha256": "355c7e8e03a7b369e26b3d4c51b56396c484b494ead9f7986c2c7d3ad8d25815"
+  },
+  "module_aiter_core.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_aiter_core.so",
+    "sha256": "a9d6f42eb9d437021ecce3bef39f50fc4ed2dc5a68748c666617688ebc5c8288"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_1x128_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_1x128_mulWeightStage2.so",
+    "sha256": "7eec835ffdc5cfe5c696bdb8d45780ba93ae675d085ad195e7a34571e510736e"
+  },
+  "module_gemm_a8w8_blockscale_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_blockscale_asm.so",
+    "sha256": "fbc68e1758f755776cb5a6c4691e2438034058f7fd83b7d2b1e9cd3d3ef3a95e"
+  },
+  "module_moe_ck2stages_b16_b16_preshuffle_on_b16_silu_no_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_b16_b16_preshuffle_on_b16_silu_no_mulWeightStage1.so",
+    "sha256": "fbf705451001172419b4af816a8cf2421e8f7a151496e053f3b55f57315bae72"
+  },
+  "module_gemm_a4w4_blockscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a4w4_blockscale.so",
+    "sha256": "da602a1dc0afefd2cc15802896e0adfa7e1e8ee6f35f598ad7d9ed299b2b41c4"
+  },
+  "module_fused_ar_mhc.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fused_ar_mhc.so",
+    "sha256": "748f84d688474560ed26897dc6c3668af8110389aa10a117cc564ca4cb49ab8c"
+  },
+  "module_moe_topk.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_topk.so",
+    "sha256": "55af028a8835524578912cbe726620cbba596979ec2aa5e96538810c860464fc"
+  },
+  "module_moe_topksoftmax_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_topksoftmax_asm.so",
+    "sha256": "ffd5fa8e1f5d7587b23f2c6d0aacff46dc3da83ca84d5cbdd368e260c8d1e85a"
+  },
+  "module_rope_1c_cached_positions_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_cached_positions_fwd.so",
+    "sha256": "843ac2148828b1e067bff06365accaa5b22a90dc5ab42c4b05630489a1eee9d6"
+  },
+  "module_quant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_quant.so",
+    "sha256": "11e23137635160d95f8cbbe88feb9fd2459c377f47a91fe13013ad00f4d6debf"
+  },
+  "module_moe_cktile2stages.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_cktile2stages.so",
+    "sha256": "2f7c7ae2a0706683d6fa870f2577901aba09aaa1915d5fc78eaf6ced60e2c6c1"
+  },
+  "module_topk_plain.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_topk_plain.so",
+    "sha256": "c85cfbc648348f1db91695c2e0410b1de59eebb1a8a1a86f9aaa0af7a56e42b4"
+  },
+  "module_moe_ck2stages_b16_b16_preshuffle_on_b16_gelu_no_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_b16_b16_preshuffle_on_b16_gelu_no_mulWeightStage2.so",
+    "sha256": "39906670fc3981bb614e46ff5478283e826c2f8402b70eac06f7576639522806"
+  },
+  "module_gemm_a4w4_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a4w4_asm.so",
+    "sha256": "11f32322be114673105539c444169c3f7629231a8b2ef6b2713c15f6381a7f4e"
+  },
+  "module_pa_decode_bf16_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_pa_decode_bf16_asm.so",
+    "sha256": "b9ba6150a53aa99b256159b564f987830a070854571fa3cf38bac3faecec0807"
+  },
+  "module_ps_metadata.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_ps_metadata.so",
+    "sha256": "933e32b9869f23626a30adfd039cd47595cc411cb64934eae1060736e64abe2c"
+  },
+  "module_gemm_a8w8_blockscale_bpreshuffle.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_blockscale_bpreshuffle.so",
+    "sha256": "95ed87f8afccaf5c5a608053994da7695a6c6a224b6f6bd794d07f9846eb2a1e"
+  },
+  "module_custom_all_reduce.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_custom_all_reduce.so",
+    "sha256": "d1999f4cbe35a4a571f09c6b8264e5e8accd5778d10418f99f84178993b7d7c9"
+  },
+  "module_rope_2c_cached_positions_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_2c_cached_positions_fwd.so",
+    "sha256": "6423efdad05591563f5fb694b3a1f02b5f4cdb44fe07699023159cfa7177fccb"
+  },
+  "module_moe_ck2stages_b16_b16_preshuffle_on_b16_gelu_no_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_b16_b16_preshuffle_on_b16_gelu_no_mulWeightStage1.so",
+    "sha256": "c4a26bd3345a3dd0637ca3dd899c02748e6017ab6229bfb9d84f0a9c965d7c0c"
+  },
+  "mha_varlen_fwd_bf16_nlogits_nbias_mask_nlse_ndropout_skip_nqscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_mask_nlse_ndropout_skip_nqscale.so",
+    "sha256": "a7ead06f798552247b234b75654052d4ec0c2837bbadb97e4469944e968d9848"
+  },
+  "module_moe_sorting_opus.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_sorting_opus.so",
+    "sha256": "f0f794028e034ffbd303d8831fea4ea436cedfe294d43e1044d61aeec203f884"
+  },
+  "module_opus_mla.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_opus_mla.so",
+    "sha256": "a4378a426076e4e80d48d0da0f48bc2b6d33e430d9911cb297539275262caaea"
+  },
+  "module_dsv4_rotate_quant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_dsv4_rotate_quant.so",
+    "sha256": "ddf680c8184e62c065af0091092e5636870a0962823a58307b1cb7f4e8c5192c"
+  },
+  "module_moe_sorting.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_sorting.so",
+    "sha256": "86f4bb1b7f22f8c3c06ccfb4910f5c62af751054cdc18ba4f22674c87662e7ef"
+  },
+  "module_rope_1c_cached_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_cached_fwd.so",
+    "sha256": "5738a6a445e84df603f614e29bd7bde8bf78aab1b0b20e63e4247d7d0d7d9770"
+  },
+  "module_attention.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_attention.so",
+    "sha256": "9ec2d5c2c55142fa2c30567cf85d925af7539dc226ac743ca8ba6a5f44cce66e"
+  },
+  "module_batched_gemm_a8w8.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_batched_gemm_a8w8.so",
+    "sha256": "694f3b808da802b32b8c3235bb97d77928abb600b8fd72841bec036c8fc9a3c9"
+  },
+  "module_top_k_per_row.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_top_k_per_row.so",
+    "sha256": "43dcf63e82de88393f26e6c6b13962f80105c5ef3099867744e8d5c13be1372f"
+  },
+  "module_batched_gemm_bf16.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_batched_gemm_bf16.so",
+    "sha256": "54a8344e961aa2963990fa4f42350978ddde3f325021c851f58771754dda0e11"
+  },
+  "module_gemm_a8w8_blockscale_cktile.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_blockscale_cktile.so",
+    "sha256": "4bfbf53e7efa6a3b6bb7455d89e06ed0affa67aebf8e74ed75016c5ab9310b05"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_tensor_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_tensor_mulWeightStage1.so",
+    "sha256": "d825ee1036df835fed1a53de904f8fed7fb75eafe9a51dd6f8dd957a8051756c"
+  },
+  "module_gemm_a8w8_blockscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_blockscale.so",
+    "sha256": "1a3fb07030b6ffb8f93a68cae26f8bb9972898a6a1cfe12f24016ee0fa7cb79c"
+  },
+  "module_norm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_norm.so",
+    "sha256": "bd234b8925da4fdade5a09da54f2ef4d46f5d4cb601b44a3b27c49cacba350ea"
+  },
+  "module_fused_qknorm_idxrqknorm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fused_qknorm_idxrqknorm.so",
+    "sha256": "442cafd49fb342f236106a30c2ef16dbb1e95b98c4567e9261d68668ac0cbcb9"
+  },
+  "module_mla_reduce.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_mla_reduce.so",
+    "sha256": "26ba384ca1b7c73e8bee683a9aab27c69c0b2a648578fcfd2080406af6ec881d"
+  },
+  "module_pos_encoding.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_pos_encoding.so",
+    "sha256": "0770297226f399e0082fb1acf676dba264bbadaba8684f367ddede3c395e7006"
+  },
+  "module_fused_split_gdr_update.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fused_split_gdr_update.so",
+    "sha256": "533bab611c53c90a40181dcce57a869b40a5d89b7a3cfa7fe077ac517f58f8fb"
+  },
+  "mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so": {
+    "target": "/var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/compiled/n128/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so",
+    "sha256": "f3daa2c5d81fe34b35afe4dcbd9ca445b8a8cf15716e2bd4df8abdfea1bd411c"
+  },
+  "module_attention_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_attention_asm.so",
+    "sha256": "4264e584ad0e25eb669bf1c2d910422dd312d50a541e6de33af56c6b0c8e3fc3"
+  },
+  "module_moe_ck2stages_fp4x2_fp4x2_preshuffle_off_b16_silu_per_1x32_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_fp4x2_fp4x2_preshuffle_off_b16_silu_per_1x32_mulWeightStage2.so",
+    "sha256": "c374ff0362c6205a08fcf51522d087eccb304fcf3434ea6a74b7fb5e4d437a83"
+  },
+  "module_rope_1c_cached_positions_offsets_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_cached_positions_offsets_fwd.so",
+    "sha256": "b3b60056034a7ee311649688e5a641e3b041320212000d03c6bceb1e77cbef6f"
+  },
+  "module_inverse_rope_group_quant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_inverse_rope_group_quant.so",
+    "sha256": "b1be71035d5a299bc77d8ea4ab100ae1fe36a48b44990936b8c77dd8e2c47b8b"
+  },
+  "module_rope_2c_cached_positions_offsets_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_2c_cached_positions_offsets_fwd.so",
+    "sha256": "c6ab81b86d90c690704ad076a79d6d7c4ad4ce347efbc54d947f7bc83855406b"
+  },
+  "module_smoothquant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_smoothquant.so",
+    "sha256": "333958deed8d7e7c112b75aa6884b4e3fcb117b13bc124eadfce23fec6d7ef01"
+  },
+  "module_mla_metadata.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_mla_metadata.so",
+    "sha256": "1f5a11d93819409d753a3e89dd63be4183289e4d23c91a113fcc93652b81f5d4"
+  },
+  "module_groupnorm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_groupnorm.so",
+    "sha256": "33a51cc4cc74c05b4f0eace53fa7d459f6778a66a1eb5a99c3d0fdbe5416cde9"
+  },
+  "module_moe_fmoe_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_fmoe_asm.so",
+    "sha256": "6669c5ecf487717488ebc3f0ff954ba72803445652167e5431bf621cc2b1a00d"
+  },
+  "module_rope_1c_cached_bwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_cached_bwd.so",
+    "sha256": "3b06c69165f183168bc387c6c3b2dba69c6a25ce42c36a84db264e1b8667b129"
+  },
+  "module_gemm_a8w8_bpreshuffle.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gemm_a8w8_bpreshuffle.so",
+    "sha256": "575611a4b0dc3b9cbaf989c3f94b5a5f7346622814820f89b4c453a36a695491"
+  },
+  "module_rope_1c_thd_bwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_thd_bwd.so",
+    "sha256": "2e427ac5bc05773a352ed2bb9dae3ad4aaf621eb20a8565f8cf6e534acdabccb"
+  },
+  "module_f4gemm_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_f4gemm_asm.so",
+    "sha256": "a4133370220c451f117177f8d0dc2d1fdb15201fd6ed1242181a2d898a1876a4"
+  },
+  "module_rope_2c_cached_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_2c_cached_fwd.so",
+    "sha256": "a526c2edd5f85c23c968406dfde4eb2975f32a012c2d565ef93898ceae088d5a"
+  },
+  "module_custom_all_reduce_gfx1250.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_custom_all_reduce_gfx1250.so",
+    "sha256": "43d2c498d3d2d1441eb477aa359c320cd10f04346c24bfd5155bab17d98916a4"
+  },
+  "module_fmha_v3_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fmha_v3_fwd.so",
+    "sha256": "f27773fd26c03d144b90954f42a2900418ed71f7efcc400c8046e3e99653017e"
+  },
+  "module_mla_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_mla_asm.so",
+    "sha256": "242f51f01ca9785fdd7c8660f4b98eb1233332f6a026d7aff25e42e89176a1a2"
+  },
+  "module_pa_metadata.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_pa_metadata.so",
+    "sha256": "0840f7f5a983904399bb86d66344e970cc6e8a5f547355e36657ccf2e64e14dd"
+  },
+  "module_rope_1c_2d_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_2d_fwd.so",
+    "sha256": "a8700b8de5f2c3a660d4c2bbb105e96b641a683f53e3b4e8fe24ea8e4db7bcaa"
+  },
+  "module_rope_2c_cached_bwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_2c_cached_bwd.so",
+    "sha256": "0990dbb68490a0c53c1c82961d8e1441d4a8c7cf81bf194fdc688fdf36e4eeac"
+  },
+  "module_vsa_sparse_attention.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_vsa_sparse_attention.so",
+    "sha256": "fee9d842c4578748ff42ed0ac8224aa4bb73b2705ebac72726bd5489f67e0f90"
+  },
+  "module_mhc.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_mhc.so",
+    "sha256": "4083b2e28401ae6a62728350982d2aa8d03172766f38e821b8bd9052410103ff"
+  },
+  "module_moe_asm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_asm.so",
+    "sha256": "bc290a5112e758da4954fcff2da8b5d270c7a6dde22f82a507b2d2975c8adfd0"
+  },
+  "module_gated_rmsnorm_quant.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_gated_rmsnorm_quant.so",
+    "sha256": "c79f05067db4193c13b011054d8b86bc975aaa0de75c5373ae14163bb9a14616"
+  },
+  "module_deepgemm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_deepgemm.so",
+    "sha256": "cbe48aa98b1f6af88e3cf91895f2d5d0d99a48a13b22baabeac299330ef11e81"
+  },
+  "mha_varlen_fwd_bf16_nlogits_nbias_mask_lse_ndropout_skip_nqscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_mask_lse_ndropout_skip_nqscale.so",
+    "sha256": "2423c0f74c74a63a2c1202e8739fcda6546351c11dd382672b9b73c7b247d6df"
+  },
+  "module_rocsolgemm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rocsolgemm.so",
+    "sha256": "cab984e9b6cf599cb99bf2caaabecd74327579c8541f3889c811e0c9d57e31e0"
+  },
+  "module_moe_ck2stages_fp4x2_fp4x2_preshuffle_on_b16_silu_per_1x32_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_fp4x2_fp4x2_preshuffle_on_b16_silu_per_1x32_mulWeightStage2.so",
+    "sha256": "358adb67a3190ec2043e8caa24eaf183ecce13c720650023b2ad3176b58b8f93"
+  },
+  "module_hipbsolgemm.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_hipbsolgemm.so",
+    "sha256": "39a31dbcdb0c97e9f5f66e0ad89f1c3ae1c9d21ef3da68e6eb28bd509c7a72d5"
+  },
+  "module_deepgemm_opus.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_deepgemm_opus.so",
+    "sha256": "a9a6109e1cd7a31627704c0bd60bb27150bf52f3f975e1b631f4997b63cdc636"
+  },
+  "module_rope_1c_thd_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_thd_fwd.so",
+    "sha256": "2a7505b29dc70adc0d4c40abca3c0574a0fb667e91e596962803241b52e16185"
+  },
+  "mha_varlen_fwd_bf16_nlogits_nbias_nmask_lse_ndropout_nskip_nqscale.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_lse_ndropout_nskip_nqscale.so",
+    "sha256": "69a0afe1a7e130e99d231efb08962ba11b09a46af4b75dcad59ebed75b21b579"
+  },
+  "module_moe_ck2stages_i8_i8_preshuffle_on_b16_silu_per_tensor_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_i8_i8_preshuffle_on_b16_silu_per_tensor_mulWeightStage2.so",
+    "sha256": "c7f38092a0c37bd2fc3567109098e79747aeeb880f0203409ad349d576c99597"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_token_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_token_mulWeightStage2.so",
+    "sha256": "14c83208548998c798c67e9b7c577367eab273a5a71df8ae015567cbf2520e71"
+  },
+  "module_causal_conv1d_update.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_causal_conv1d_update.so",
+    "sha256": "9e5c6579492322dd351d9460f8bd887b845712eb40b5a4ab7780253e2de890ea"
+  },
+  "module_rope_1c_2d_bwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_2d_bwd.so",
+    "sha256": "70c1df440250883b041ae7ebd1ed62e8b41f3185d42c73760ec85bad720dca56"
+  },
+  "module_custom.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_custom.so",
+    "sha256": "84829e917b018546b21b78fe603e8a5a3820b14a3dcb5e2570d78ba14bc16238"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_tensor_mulWeightStage1.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_gelu_per_tensor_mulWeightStage1.so",
+    "sha256": "529eeddbdb9fc433c9e8928a274946b79fc98976f4aafca8dac3f922bda6176d"
+  },
+  "module_rope_1c_uncached_fwd.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_rope_1c_uncached_fwd.so",
+    "sha256": "a54c05f05e3174ffab0dce47e2c772f7e353b6e007a9dd2e8d31d30e3596aaaf"
+  },
+  "module_moe_opus.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_opus.so",
+    "sha256": "82c25015a7e6d0a092a22343ba91576151f7983ae3e0baa8f3d798c80d90a2c2"
+  },
+  "module_fused_qk_norm_rope_cache_quant_shuffle.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_fused_qk_norm_rope_cache_quant_shuffle.so",
+    "sha256": "d34ddc9473e81f2687059724168932bdbefcbfc11685dda6bd1364b31db5f532"
+  },
+  "module_moe_ck2stages_b16_b16_preshuffle_off_b16_silu_no_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_b16_b16_preshuffle_off_b16_silu_no_mulWeightStage2.so",
+    "sha256": "04a720bff9f75f710b1f735a558bd23dca7d06cfb9f21861d4ff72bbbd09ddcb"
+  },
+  "module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_token_mulWeightStage2.so": {
+    "target": "/sgl-workspace/aiter/aiter/jit/module_moe_ck2stages_f8_f8_preshuffle_on_b16_silu_per_token_mulWeightStage2.so",
+    "sha256": "7df5fcf77e4dcb7fd4a92a4ddcc37c979823bd6cfd4395afc46c9cca02d8ef76"
+  }
+}

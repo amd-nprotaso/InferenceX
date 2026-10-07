@@ -1,0 +1,28 @@
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790591975,"text":"Can you base on my traces analyze: /var/home/qwen_trace_analysis and my /var/home/my_aiter/aiter and asglang: /var/home/my_sglang/sglang create local python scritp to run benchmarl of  QSA attention: ck_tile::kentry<...FmhaFwdKernel<...>>      kernel with shapes from qwen3.8 for ISL=32678 OSL=32678 CONC=\"1,4,8,16\""}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790592806,"text":"Ok, now to source code of this kernel and tell to me, are there any flags which I can tune to improve performance?"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790593456,"text":"can I also use this kernel: /var/home/my_aiter/aiter/aiter/ops/flydsl/fmha_kernels.py?"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790593652,"text":"no try to modify Hip kernel flags and compare with baseline to meassure performance gain"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790594915,"text":"Ok, run e2e benchmark: use export HF_HOME=/data/hf_cache/ /var/home/qwen3_8_profiling/server-start.sh then run client without profiling for ISL=32768 and OSL=32768 get numbers then tune qsa kernel parameters get perf numbers and compare"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790596622,"text":"ok, try to change fha configuration and change e2e benchmark again, I think we need to make KV tile bigger, take n mind that we use gfx950"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790599124,"text":"are there anothers flags which we can tune?"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790599259,"text":"yes, try to tune this flags"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790601182,"text":"ok, can you use baseline QSA kernel and run e2e becnhmark with  SGLANG_HC_COMBINE_SPLIT=1 and without this flag and compare performance"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790605673,"text":"do we need to modify: /var/home/my_sglang/open_pr/sglang to support  SGLANG_HC_COMBINE_SPLIT=1  ?"}
+{"session_id":"01a0e796-f622-7ff1-8a3d-1f31bb059f50","ts":1790607428,"text":"ok add this changes to /var/home/my_sglang/open_pr/sglang"}
+{"session_id":"01a0e8c6-3be5-7241-8ea7-7b87e04f1cc8","ts":1790611826,"text":"Update installed sglang based on changes in repo: /var/home/my_sglang/sglang and instal new aiter /var/home/my_aiter/aiter/aiter/ops/flydsl/hc_mix.py then run e2e becnhmark for qwen3.8 with ISL=32768 and OSL=32768 save perf. then run with flag: SGLANG_AITER_QSA_PA_DECODE=1 and compare performance"}
+{"session_id":"01a0e8c6-3be5-7241-8ea7-7b87e04f1cc8","ts":1790612483,"text":"what is the problem with compilation _hc_up_silu?"}
+{"session_id":"01a0e8c6-3be5-7241-8ea7-7b87e04f1cc8","ts":1790613413,"text":"can you get changes from aiter gdn_convolution_qwen38_update branch"}
+{"session_id":"01a0e8c6-3be5-7241-8ea7-7b87e04f1cc8","ts":1790614387,"text":"ok install and run benchmarks"}
+{"session_id":"01a0ec11-1c92-7263-9194-19e0cd727996","ts":1790670027,"text":"Can you run benchmark SGLANG_SERVER for ISL=32678 and OSL=32678 /var/home/qwen3_8_profiling/server-start.sh and cliend without profiling for the same ISL, OSL first check did without SGLANG_AITER_QSA_PA_DECODE=1 then with SGLANG_AITER_QSA_PA_DECODE=1 and compare performance"}
+{"session_id":"01a0ec11-1c92-7263-9194-19e0cd727996","ts":1790678310,"text":"can you also do the same but with concurency 8"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790684093,"text":"can you check this PR: https://github.com/sgl-project/sglang/pull/39595 and compare with my changes in /var/home/my_sglang/sglang I interested in python/sglang/srt/layers/attention/linear/gdn_backend.py"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790684582,"text":"so my changes and this PR can work together?"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790689633,"text":"can you add this changes to my local setup not to my repo but to the setup"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790689984,"text":"Ok, I create copy of my sglang so you can modify /var/home/my_sglang/sglang"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790690320,"text":"Ok, also add changes from this PR: https://github.com/sgl-project/sglang/pull/41282"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790691325,"text":"Ok, now run profiling like /var/home/qwen3_8_profiling but now for ISL=100 and OSL=100"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790693691,"text":"don't forget to use \"SGLANG_AITER_GDN_DECODE\": \"1\",\n    \"SGLANG_AITER_GDN_CONV\": \"1\",\n    \"SGLANG_AITER_HC_MIX\": \"1\",\n    \"AITER_GDR_FLYDSL\": \"1\",\n    \"SGLANG_AITER_HONOR_EXPLICIT_MEM_FRACTION\": \"1\" variables"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790694819,"text":"check traces, does it contain my new HC GDn , conv, and pa_decode kernels?"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790695673,"text":"ok, now we need to recollect traces with SGLANG_AITER_QSA_PA_DECODE=1"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790696647,"text":"I didn't see prefill in traces, whta is wrong?"}
+{"session_id":"01a0ed15-ea99-7ca0-8aa1-15c0d70d7322","ts":1790696969,"text":"can we capture traces with python modules?"}

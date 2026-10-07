@@ -1,0 +1,53 @@
+[aiter] import [module_aiter_core] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_hip_tuning/fast_math/jit/module_aiter_core.so
+[aiter] import [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_hip_tuning/fast_math/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so
+/opt/venv/lib/python3.12/site-packages/torch/profiler/profiler.py:224: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[W928 11:12:35.697665199 collection.cpp:1148] Warning: ROCTracer produced duplicate flow start: 4 (function operator())
+decode C= 1 rows= 1 context=32679 KV=2051..2051 median=129.585 us symbol_match=True
+decode C= 1 rows= 1 context=32680 KV=2048..2048 median=125.665 us symbol_match=True
+decode C= 1 rows= 1 context=32681 KV=2049..2049 median=129.793 us symbol_match=True
+decode C= 1 rows= 1 context=32682 KV=2050..2050 median=129.625 us symbol_match=True
+decode C= 1 rows= 1 context=49017 KV=2049..2049 median=129.051 us symbol_match=True
+decode C= 1 rows= 1 context=65356 KV=2048..2048 median=125.451 us symbol_match=True
+verify C= 1 rows= 4 context=32679 KV=2048..2051 median=147.169 us symbol_match=True
+verify C= 1 rows= 4 context=32680 KV=2048..2051 median=147.207 us symbol_match=True
+verify C= 1 rows= 4 context=32681 KV=2048..2051 median=147.195 us symbol_match=True
+verify C= 1 rows= 4 context=32682 KV=2048..2051 median=147.197 us symbol_match=True
+verify C= 1 rows= 4 context=49017 KV=2048..2051 median=147.245 us symbol_match=True
+verify C= 1 rows= 4 context=65356 KV=2048..2051 median=147.253 us symbol_match=True
+decode C= 4 rows= 4 context=32679 KV=2051..2051 median=147.251 us symbol_match=True
+decode C= 4 rows= 4 context=32680 KV=2048..2048 median=142.599 us symbol_match=True
+decode C= 4 rows= 4 context=32681 KV=2049..2049 median=147.273 us symbol_match=True
+decode C= 4 rows= 4 context=32682 KV=2050..2050 median=147.199 us symbol_match=True
+decode C= 4 rows= 4 context=49017 KV=2049..2049 median=147.391 us symbol_match=True
+decode C= 4 rows= 4 context=65356 KV=2048..2048 median=142.685 us symbol_match=True
+verify C= 4 rows=16 context=32679 KV=2048..2051 median=292.734 us symbol_match=True
+verify C= 4 rows=16 context=32680 KV=2048..2051 median=292.434 us symbol_match=True
+verify C= 4 rows=16 context=32681 KV=2048..2051 median=292.142 us symbol_match=True
+verify C= 4 rows=16 context=32682 KV=2048..2051 median=292.744 us symbol_match=True
+verify C= 4 rows=16 context=49017 KV=2048..2051 median=292.412 us symbol_match=True
+verify C= 4 rows=16 context=65356 KV=2048..2051 median=292.720 us symbol_match=True
+decode C= 8 rows= 8 context=32679 KV=2051..2051 median=148.211 us symbol_match=True
+decode C= 8 rows= 8 context=32680 KV=2048..2048 median=143.483 us symbol_match=True
+decode C= 8 rows= 8 context=32681 KV=2049..2049 median=148.099 us symbol_match=True
+decode C= 8 rows= 8 context=32682 KV=2050..2050 median=148.109 us symbol_match=True
+decode C= 8 rows= 8 context=49017 KV=2049..2049 median=148.121 us symbol_match=True
+decode C= 8 rows= 8 context=65356 KV=2048..2048 median=143.591 us symbol_match=True
+verify C= 8 rows=32 context=32679 KV=2048..2051 median=441.188 us symbol_match=True
+verify C= 8 rows=32 context=32680 KV=2048..2051 median=440.636 us symbol_match=True
+verify C= 8 rows=32 context=32681 KV=2048..2051 median=439.994 us symbol_match=True
+verify C= 8 rows=32 context=32682 KV=2048..2051 median=440.878 us symbol_match=True
+verify C= 8 rows=32 context=49017 KV=2048..2051 median=440.018 us symbol_match=True
+verify C= 8 rows=32 context=65356 KV=2048..2051 median=440.588 us symbol_match=True
+decode C=16 rows=16 context=32679 KV=2051..2051 median=293.298 us symbol_match=True
+decode C=16 rows=16 context=32680 KV=2048..2048 median=283.788 us symbol_match=True
+decode C=16 rows=16 context=32681 KV=2049..2049 median=292.916 us symbol_match=True
+decode C=16 rows=16 context=32682 KV=2050..2050 median=292.936 us symbol_match=True
+decode C=16 rows=16 context=49017 KV=2049..2049 median=292.896 us symbol_match=True
+decode C=16 rows=16 context=65356 KV=2048..2048 median=283.548 us symbol_match=True
+verify C=16 rows=64 context=32679 KV=2048..2051 median=878.553 us symbol_match=True
+verify C=16 rows=64 context=32680 KV=2048..2051 median=877.463 us symbol_match=True
+verify C=16 rows=64 context=32681 KV=2048..2051 median=875.301 us symbol_match=True
+verify C=16 rows=64 context=32682 KV=2048..2051 median=877.993 us symbol_match=True
+verify C=16 rows=64 context=49017 KV=2048..2051 median=876.131 us symbol_match=True
+verify C=16 rows=64 context=65356 KV=2048..2051 median=877.777 us symbol_match=True

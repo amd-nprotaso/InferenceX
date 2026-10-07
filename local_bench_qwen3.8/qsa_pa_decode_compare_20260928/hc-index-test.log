@@ -1,0 +1,52 @@
+Fatal Python error: Segmentation fault
+
+Current thread 0x000072e92230c140 (most recent call first):
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/primitive.py", line 260 in _infer_int_tuple_type
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/primitive.py", line 396 in make_int_tuple
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/meta.py", line 170 in wrapper
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/primitive.py", line 1206 in add_offset
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/meta.py", line 170 in wrapper
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/typing.py", line 1085 in __add__
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/expr/meta.py", line 175 in wrapper
+  File "/var/home/my_aiter/aiter/aiter/ops/flydsl/hc_mix.py", line 72 in _load
+  File "/var/home/my_aiter/aiter/aiter/ops/flydsl/hc_mix.py", line 188 in _hc_up_silu
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/compiler/kernel_function.py", line 602 in _emit_kernel
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/compiler/kernel_function.py", line 360 in launch
+  File "/var/home/my_aiter/aiter/aiter/ops/flydsl/hc_mix.py", line 271 in _launch
+  File "/opt/venv/lib/python3.12/site-packages/flydsl/compiler/jit_function.py", line 1541 in __call__
+  File "/var/home/my_aiter/aiter/aiter/ops/flydsl/hc_mix.py", line 333 in hc_mix
+  File "/var/home/my_aiter/aiter/op_tests/test_flydsl_hc_mix.py", line 38 in test_correctness
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/python.py", line 166 in pytest_pyfunc_call
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/python.py", line 1720 in runtest
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 179 in pytest_runtest_call
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 245 in <lambda>
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 353 in from_call
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 244 in call_and_report
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 137 in runtestprotocol
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 118 in pytest_runtest_protocol
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 396 in pytest_runtestloop
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 372 in _main
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 318 in wrap_session
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 365 in pytest_cmdline_main
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 199 in main
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 223 in console_main
+  File "/opt/venv/lib/python3.12/site-packages/pytest/__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main
+
+Extension modules: numpy._core._multiarray_umath, numpy.linalg._umath_linalg, torch._C, torch._C._dynamo.autograd_compiler, torch._C._dynamo.eval_frame, torch._C._dynamo.guards, torch._C._dynamo.utils, torch._C._fft, torch._C._linalg, torch._C._nested, torch._C._nn, torch._C._sparse, torch._C._special, numpy.random._common, numpy.random.bit_generator, numpy.random._bounded_integers, numpy.random._pcg64, numpy.random._mt19937, numpy.random._generator, numpy.random._philox, numpy.random._sfc64, numpy.random.mtrand, Cython.Plex.Actions, Cython.Plex.Scanners, Cython.Compiler.Scanning, hip_utils, pyarrow.lib, _cyutility, pandas._libs._cyutility, pandas._libs.tslibs.ccalendar, pandas._libs.tslibs.np_datetime, pandas._libs.tslibs.dtypes, pandas._libs.tslibs.base, pandas._libs.tslibs.nattype, pandas._libs.tslibs.timezones, pandas._libs.properties, pandas._libs.tslibs.fields, pandas._libs.tslibs.timedeltas, pandas._libs.tslibs.tzconversion, pandas._libs.tslibs.timestamps, pandas._libs.tslibs.offsets, pandas._libs.tslibs.strptime, pandas._libs.tslibs.parsing, pandas._libs.tslibs.conversion, pandas._libs.tslibs.period, pandas._libs.tslibs.vectorized, pandas._libs.ops_dispatch, pandas._libs.missing, pandas._libs.hashtable, pandas._libs.algos, pandas._libs.interval, pandas._libs.lib, pyarrow._compute, pandas._libs.ops, pandas._libs.hashing, pandas._libs.arrays, pandas._libs.tslib, pandas._libs.sparse, pandas._libs.internals, pandas._libs.indexing, pandas._libs.index, pandas._libs.writers, pandas._libs.join, pandas._libs.window.aggregations, pandas._libs.window.indexers, pandas._libs.reshape, pandas._libs.groupby, pandas._libs.json, pandas._libs.parsers, pandas._libs.testing, markupsafe._speedups, psutil._psutil_linux, yaml._yaml (total: 73)

@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.032s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=17.848s output_tokens=2051 average_output_rate=114.92 tok/s
+elapsed=33.564s output_tokens=4101 average_output_rate=122.19 tok/s
+elapsed=50.873s output_tokens=6251 average_output_rate=122.87 tok/s
+elapsed=69.972s output_tokens=8451 average_output_rate=120.78 tok/s
+elapsed=87.489s output_tokens=10301 average_output_rate=117.74 tok/s
+elapsed=107.769s output_tokens=12601 average_output_rate=116.93 tok/s
+elapsed=117.901s output_tokens=14451 average_output_rate=122.57 tok/s
+elapsed=128.481s output_tokens=16401 average_output_rate=127.65 tok/s
+elapsed=142.235s output_tokens=18951 average_output_rate=133.24 tok/s
+elapsed=150.559s output_tokens=20501 average_output_rate=136.17 tok/s
+elapsed=161.590s output_tokens=22551 average_output_rate=139.56 tok/s
+elapsed=172.947s output_tokens=24651 average_output_rate=142.54 tok/s
+elapsed=184.026s output_tokens=26701 average_output_rate=145.09 tok/s
+elapsed=196.259s output_tokens=28951 average_output_rate=147.51 tok/s
+elapsed=207.605s output_tokens=31051 average_output_rate=149.57 tok/s
+elapsed=216.895s output_tokens=32768 average_output_rate=151.08 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0316012352705002,
+  "e2e_s": 216.89460877189413,
+  "client_wall_s": 216.89477244019508,
+  "tpot_ms": 6.587817241023701,
+  "decode_interactivity_tok_s": 151.79534638161985,
+  "output_throughput_tok_s": 151.0778689192945,
+  "total_throughput_tok_s": 302.155737838589,
+  "stream_chunk_count": 197,
+  "server_meta": {
+    "id": "18b5bdb02d6a43fc930164badb49d6ea",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790599806.952928,
+    "prefill_finished_time": 1790599807.9687793,
+    "queue_time": 0.0003008842468261719,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 216.87875568168238,
+    "spec_accept_rate": 0.73569517844327,
+    "spec_accept_length": 3.2068898023096497,
+    "spec_num_correct_drafts": 22552,
+    "spec_num_proposed_drafts": 30654,
+    "spec_verify_ct": 10218,
+    "spec_accepted_drafts": 22552,
+    "spec_proposed_drafts": 30654,
+    "spec_correct_drafts_histogram": [
+      1620,
+      1191,
+      860,
+      6547
+    ],
+    "spec_accept_histogram": [
+      1620,
+      1191,
+      860,
+      6547
+    ],
+    "request_received_ts": 1790599806.9513154,
+    "api_server_dispatch_finish_ts": 1790599806.951879,
+    "response_sent_to_client_ts": 1790599807.970367,
+    "request_finished_ts": 1790600023.8300712,
+    "decode_throughput": 151.7975739267153
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Likely wants an expl",
+  "output_tail": "nless a real word arrives. \"\u2026\" is my encoding of quiet. The most consistent thing is to keep encoding quiet.\n\nBut let me consider the meta-purpose of this exercise. This looks like a test of whether I"
+}

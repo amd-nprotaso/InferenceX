@@ -1,0 +1,11 @@
+--- baseline compile flags
++++ post_sched compile flags
+@@ -77,7 +77,7 @@
+ -mllvm
+ -amdgpu-function-calls=false
+ -mllvm
+--enable-post-misched=0
++-enable-post-misched=1
+ -fno-gpu-rdc
+ -c
+ /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_flags/micro/post_sched/kernel.cpp

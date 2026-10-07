@@ -1,0 +1,8 @@
+--- /var/home/qwen3_8_profiling/server-start.sh
++++ server-start.sh
+@@ -15,4 +15,4 @@
+  --model-loader-extra-config '{"enable_multithread_load": true}' \
+  --max-running-requests 2 --cuda-graph-max-bs-decode 1 \
+  --speculative-algorithm NEXTN --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4 \
+- --stream-interval 50 --scheduler-recv-interval 30 --tokenizer-path "$MODEL" --enable-metrics --enable-cache-report
++ --stream-interval 50 --scheduler-recv-interval 30 --tokenizer-path "$MODEL" --enable-metrics --enable-cache-report --random-seed 20260928

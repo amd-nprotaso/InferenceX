@@ -1,0 +1,82 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.033s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=19.073s output_tokens=2101 average_output_rate=110.16 tok/s
+elapsed=35.638s output_tokens=4251 average_output_rate=119.28 tok/s
+elapsed=51.981s output_tokens=6201 average_output_rate=119.29 tok/s
+elapsed=68.861s output_tokens=8301 average_output_rate=120.55 tok/s
+elapsed=84.066s output_tokens=10251 average_output_rate=121.94 tok/s
+elapsed=99.551s output_tokens=12351 average_output_rate=124.07 tok/s
+elapsed=115.045s output_tokens=14451 average_output_rate=125.61 tok/s
+elapsed=129.446s output_tokens=16401 average_output_rate=126.70 tok/s
+elapsed=145.266s output_tokens=18551 average_output_rate=127.70 tok/s
+elapsed=160.038s output_tokens=20551 average_output_rate=128.41 tok/s
+elapsed=174.810s output_tokens=22551 average_output_rate=129.00 tok/s
+elapsed=189.962s output_tokens=24601 average_output_rate=129.50 tok/s
+elapsed=205.885s output_tokens=26751 average_output_rate=129.93 tok/s
+elapsed=244.676s output_tokens=31201 average_output_rate=127.52 tok/s
+elapsed=258.804s output_tokens=32768 average_output_rate=126.61 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0333327436819673,
+  "e2e_s": 258.80358055979013,
+  "client_wall_s": 258.80376223893836,
+  "tpot_ms": 7.866763750606041,
+  "decode_interactivity_tok_s": 127.11707529325027,
+  "output_throughput_tok_s": 126.61330622291041,
+  "total_throughput_tok_s": 253.22661244582082,
+  "stream_chunk_count": 198,
+  "server_meta": {
+    "id": "1cb1c1f51dc741038fab8f03b611a708",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790603857.201717,
+    "prefill_finished_time": 1790603858.2194362,
+    "queue_time": 0.0002651214599609375,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 258.78793944604695,
+    "spec_accept_rate": 0.6058469475494411,
+    "spec_accept_length": 2.8175408426483233,
+    "spec_num_correct_drafts": 21138,
+    "spec_num_proposed_drafts": 34890,
+    "spec_verify_ct": 11630,
+    "spec_accepted_drafts": 21138,
+    "spec_proposed_drafts": 34890,
+    "spec_correct_drafts_histogram": [
+      942,
+      1769,
+      7388,
+      1531
+    ],
+    "spec_accept_histogram": [
+      942,
+      1769,
+      7388,
+      1531
+    ],
+    "request_received_ts": 1790603857.1999958,
+    "api_server_dispatch_finish_ts": 1790603857.2005568,
+    "response_sent_to_client_ts": 1790603858.2211568,
+    "request_finished_ts": 1790604115.987935,
+    "decode_throughput": 127.11868449578994
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need produce final a",
+  "output_tail": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+}

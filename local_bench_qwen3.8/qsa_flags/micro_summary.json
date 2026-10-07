@@ -1,0 +1,165 @@
+[
+  {
+    "name": "baseline",
+    "status": "pass",
+    "config": {},
+    "decode": 125.67178606987,
+    "verify": 147.664937376976,
+    "max_abs_error": 0.0009373128414154053,
+    "output_hashes": [
+      "a563a0afe187fbcf4d23ee969bd8f31ced054baf2ff6117e8cd6c26a40bbc20f",
+      "a38fa3102ca0f946bf199f4381b55fc0f2230a05913bce64dc37fe5c150d32f6",
+      "43358cbd9c21ae8b6a3a6e873de62f5b1c29abdb58d5bcaf67fb0efcd5c57381",
+      "9839ee158d66cc3772cfd1117a8f97abcbfd0dc950e5c425e785885bfaba2653",
+      "eb64488d1de578d8b32b60fb6bb4875190fda0caf6b7023008418785ad039bc8",
+      "e4bc8b2f6e4e53e8af2262196cb17db60a75045720faefca80f9b9de992462e7",
+      "ab926c7f0a4a0dfe398f737b6e11b71de3d873a6b00bc471e4f43aa824176ea7",
+      "0b03872efa1e53a57420cc1d332983c3f36d42eaa018c9336aaccb2b44119100",
+      "564863e1b897bbf5ff324573e748ae746dfdfd691e50fae5d3c617fc26fa9203",
+      "d86a39f4f8458646bd91ef0fa219f9e4c17cc971faf27f9fddd5549929d99adf",
+      "aee9b38de221cb196619b329a5e21cd48a54312589fe96d89082280e7fab9e5e",
+      "c3e56530407639038745f6f1c3dddac5bdd7b3260ab700d7b2ada2dcd3370680"
+    ],
+    "selection_score_us": 2148.994606733322,
+    "bitwise_equal_baseline": true
+  },
+  {
+    "name": "post_sched",
+    "status": "pass",
+    "config": {
+      "replace_flags": [
+        "-enable-post-misched=0",
+        "-enable-post-misched=1"
+      ]
+    },
+    "decode": 125.28226375579834,
+    "verify": 142.02585220336914,
+    "max_abs_error": 0.0009373128414154053,
+    "output_hashes": [
+      "a563a0afe187fbcf4d23ee969bd8f31ced054baf2ff6117e8cd6c26a40bbc20f",
+      "a38fa3102ca0f946bf199f4381b55fc0f2230a05913bce64dc37fe5c150d32f6",
+      "43358cbd9c21ae8b6a3a6e873de62f5b1c29abdb58d5bcaf67fb0efcd5c57381",
+      "9839ee158d66cc3772cfd1117a8f97abcbfd0dc950e5c425e785885bfaba2653",
+      "eb64488d1de578d8b32b60fb6bb4875190fda0caf6b7023008418785ad039bc8",
+      "e4bc8b2f6e4e53e8af2262196cb17db60a75045720faefca80f9b9de992462e7",
+      "ab926c7f0a4a0dfe398f737b6e11b71de3d873a6b00bc471e4f43aa824176ea7",
+      "0b03872efa1e53a57420cc1d332983c3f36d42eaa018c9336aaccb2b44119100",
+      "564863e1b897bbf5ff324573e748ae746dfdfd691e50fae5d3c617fc26fa9203",
+      "d86a39f4f8458646bd91ef0fa219f9e4c17cc971faf27f9fddd5549929d99adf",
+      "aee9b38de221cb196619b329a5e21cd48a54312589fe96d89082280e7fab9e5e",
+      "c3e56530407639038745f6f1c3dddac5bdd7b3260ab700d7b2ada2dcd3370680"
+    ],
+    "selection_score_us": 2080.1570177078247,
+    "bitwise_equal_baseline": true
+  },
+  {
+    "name": "occupancy2",
+    "status": "pass",
+    "config": {
+      "occupancy": 2
+    },
+    "decode": 164.7144615650177,
+    "verify": 171.10899984836578,
+    "max_abs_error": 0.0009373128414154053,
+    "output_hashes": [
+      "a563a0afe187fbcf4d23ee969bd8f31ced054baf2ff6117e8cd6c26a40bbc20f",
+      "a38fa3102ca0f946bf199f4381b55fc0f2230a05913bce64dc37fe5c150d32f6",
+      "43358cbd9c21ae8b6a3a6e873de62f5b1c29abdb58d5bcaf67fb0efcd5c57381",
+      "9839ee158d66cc3772cfd1117a8f97abcbfd0dc950e5c425e785885bfaba2653",
+      "eb64488d1de578d8b32b60fb6bb4875190fda0caf6b7023008418785ad039bc8",
+      "e4bc8b2f6e4e53e8af2262196cb17db60a75045720faefca80f9b9de992462e7",
+      "ab926c7f0a4a0dfe398f737b6e11b71de3d873a6b00bc471e4f43aa824176ea7",
+      "0b03872efa1e53a57420cc1d332983c3f36d42eaa018c9336aaccb2b44119100",
+      "564863e1b897bbf5ff324573e748ae746dfdfd691e50fae5d3c617fc26fa9203",
+      "d86a39f4f8458646bd91ef0fa219f9e4c17cc971faf27f9fddd5549929d99adf",
+      "aee9b38de221cb196619b329a5e21cd48a54312589fe96d89082280e7fab9e5e",
+      "c3e56530407639038745f6f1c3dddac5bdd7b3260ab700d7b2ada2dcd3370680"
+    ],
+    "selection_score_us": 2547.4513828754425,
+    "bitwise_equal_baseline": true
+  },
+  {
+    "name": "occupancy3",
+    "status": "pass",
+    "config": {
+      "occupancy": 3
+    },
+    "decode": 388.16624879837036,
+    "verify": 397.0967948436737,
+    "max_abs_error": 0.0009373128414154053,
+    "output_hashes": [
+      "a563a0afe187fbcf4d23ee969bd8f31ced054baf2ff6117e8cd6c26a40bbc20f",
+      "a38fa3102ca0f946bf199f4381b55fc0f2230a05913bce64dc37fe5c150d32f6",
+      "43358cbd9c21ae8b6a3a6e873de62f5b1c29abdb58d5bcaf67fb0efcd5c57381",
+      "9839ee158d66cc3772cfd1117a8f97abcbfd0dc950e5c425e785885bfaba2653",
+      "eb64488d1de578d8b32b60fb6bb4875190fda0caf6b7023008418785ad039bc8",
+      "e4bc8b2f6e4e53e8af2262196cb17db60a75045720faefca80f9b9de992462e7",
+      "ab926c7f0a4a0dfe398f737b6e11b71de3d873a6b00bc471e4f43aa824176ea7",
+      "0b03872efa1e53a57420cc1d332983c3f36d42eaa018c9336aaccb2b44119100",
+      "564863e1b897bbf5ff324573e748ae746dfdfd691e50fae5d3c617fc26fa9203",
+      "d86a39f4f8458646bd91ef0fa219f9e4c17cc971faf27f9fddd5549929d99adf",
+      "aee9b38de221cb196619b329a5e21cd48a54312589fe96d89082280e7fab9e5e",
+      "c3e56530407639038745f6f1c3dddac5bdd7b3260ab700d7b2ada2dcd3370680"
+    ],
+    "selection_score_us": 5929.660284519196,
+    "bitwise_equal_baseline": true
+  },
+  {
+    "name": "preload0",
+    "status": "pass",
+    "config": {
+      "replace_flags": [
+        "--amdgpu-kernarg-preload-count=32",
+        "--amdgpu-kernarg-preload-count=0"
+      ]
+    },
+    "decode": 128.497713804245,
+    "verify": 148.14134538173676,
+    "max_abs_error": 0.0009373128414154053,
+    "output_hashes": [
+      "a563a0afe187fbcf4d23ee969bd8f31ced054baf2ff6117e8cd6c26a40bbc20f",
+      "a38fa3102ca0f946bf199f4381b55fc0f2230a05913bce64dc37fe5c150d32f6",
+      "43358cbd9c21ae8b6a3a6e873de62f5b1c29abdb58d5bcaf67fb0efcd5c57381",
+      "9839ee158d66cc3772cfd1117a8f97abcbfd0dc950e5c425e785885bfaba2653",
+      "eb64488d1de578d8b32b60fb6bb4875190fda0caf6b7023008418785ad039bc8",
+      "e4bc8b2f6e4e53e8af2262196cb17db60a75045720faefca80f9b9de992462e7",
+      "ab926c7f0a4a0dfe398f737b6e11b71de3d873a6b00bc471e4f43aa824176ea7",
+      "0b03872efa1e53a57420cc1d332983c3f36d42eaa018c9336aaccb2b44119100",
+      "564863e1b897bbf5ff324573e748ae746dfdfd691e50fae5d3c617fc26fa9203",
+      "d86a39f4f8458646bd91ef0fa219f9e4c17cc971faf27f9fddd5549929d99adf",
+      "aee9b38de221cb196619b329a5e21cd48a54312589fe96d89082280e7fab9e5e",
+      "c3e56530407639038745f6f1c3dddac5bdd7b3260ab700d7b2ada2dcd3370680"
+    ],
+    "selection_score_us": 2163.189285993576,
+    "bitwise_equal_baseline": true
+  },
+  {
+    "name": "preload16",
+    "status": "pass",
+    "config": {
+      "replace_flags": [
+        "--amdgpu-kernarg-preload-count=32",
+        "--amdgpu-kernarg-preload-count=16"
+      ]
+    },
+    "decode": 126.65221095085144,
+    "verify": 147.98242449760437,
+    "max_abs_error": 0.0009373128414154053,
+    "output_hashes": [
+      "a563a0afe187fbcf4d23ee969bd8f31ced054baf2ff6117e8cd6c26a40bbc20f",
+      "a38fa3102ca0f946bf199f4381b55fc0f2230a05913bce64dc37fe5c150d32f6",
+      "43358cbd9c21ae8b6a3a6e873de62f5b1c29abdb58d5bcaf67fb0efcd5c57381",
+      "9839ee158d66cc3772cfd1117a8f97abcbfd0dc950e5c425e785885bfaba2653",
+      "eb64488d1de578d8b32b60fb6bb4875190fda0caf6b7023008418785ad039bc8",
+      "e4bc8b2f6e4e53e8af2262196cb17db60a75045720faefca80f9b9de992462e7",
+      "ab926c7f0a4a0dfe398f737b6e11b71de3d873a6b00bc471e4f43aa824176ea7",
+      "0b03872efa1e53a57420cc1d332983c3f36d42eaa018c9336aaccb2b44119100",
+      "564863e1b897bbf5ff324573e748ae746dfdfd691e50fae5d3c617fc26fa9203",
+      "d86a39f4f8458646bd91ef0fa219f9e4c17cc971faf27f9fddd5549929d99adf",
+      "aee9b38de221cb196619b329a5e21cd48a54312589fe96d89082280e7fab9e5e",
+      "c3e56530407639038745f6f1c3dddac5bdd7b3260ab700d7b2ada2dcd3370680"
+    ],
+    "selection_score_us": 2155.7457268238068,
+    "bitwise_equal_baseline": true
+  }
+]

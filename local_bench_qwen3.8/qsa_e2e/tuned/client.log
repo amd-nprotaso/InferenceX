@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.030s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=20.288s output_tokens=2201 average_output_rate=108.49 tok/s
+elapsed=34.554s output_tokens=4101 average_output_rate=118.68 tok/s
+elapsed=50.037s output_tokens=6151 average_output_rate=122.93 tok/s
+elapsed=68.193s output_tokens=8501 average_output_rate=124.66 tok/s
+elapsed=79.886s output_tokens=10451 average_output_rate=130.82 tok/s
+elapsed=92.945s output_tokens=12551 average_output_rate=135.04 tok/s
+elapsed=105.218s output_tokens=14501 average_output_rate=137.82 tok/s
+elapsed=117.494s output_tokens=16451 average_output_rate=140.02 tok/s
+elapsed=130.589s output_tokens=18551 average_output_rate=142.06 tok/s
+elapsed=144.253s output_tokens=20701 average_output_rate=143.50 tok/s
+elapsed=156.313s output_tokens=22601 average_output_rate=144.59 tok/s
+elapsed=169.505s output_tokens=24701 average_output_rate=145.72 tok/s
+elapsed=181.597s output_tokens=26651 average_output_rate=146.76 tok/s
+elapsed=194.799s output_tokens=28751 average_output_rate=147.59 tok/s
+elapsed=209.499s output_tokens=31151 average_output_rate=148.69 tok/s
+elapsed=219.332s output_tokens=32768 average_output_rate=149.40 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0303795379586518,
+  "e2e_s": 219.33219526801258,
+  "client_wall_s": 219.33234561700374,
+  "tpot_ms": 6.6622460319850445,
+  "decode_interactivity_tok_s": 150.0995302783866,
+  "output_throughput_tok_s": 149.39884907454189,
+  "total_throughput_tok_s": 298.79769814908377,
+  "stream_chunk_count": 211,
+  "server_meta": {
+    "id": "0069a96b8e0c44379dcaad4453961a37",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790596056.706948,
+    "prefill_finished_time": 1790596057.7182329,
+    "queue_time": 0.00032210350036621094,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 219.31304246000946,
+    "spec_accept_rate": 0.711629835135049,
+    "spec_accept_length": 3.1347938390892565,
+    "spec_num_correct_drafts": 22316,
+    "spec_num_proposed_drafts": 31359,
+    "spec_verify_ct": 10453,
+    "spec_accepted_drafts": 22316,
+    "spec_proposed_drafts": 31359,
+    "spec_correct_drafts_histogram": [
+      1803,
+      826,
+      1982,
+      5842
+    ],
+    "spec_accept_histogram": [
+      1803,
+      826,
+      1982,
+      5842
+    ],
+    "request_received_ts": 1790596056.7050116,
+    "api_server_dispatch_finish_ts": 1790596056.7055607,
+    "response_sent_to_client_ts": 1790596057.7199519,
+    "request_finished_ts": 1790596276.018054,
+    "decode_throughput": 150.10166413970958
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Likely wants an expl",
+  "output_tail": "ed answer likely to user's weird messages. They sent \"\n\nuser\nassistant\n<think>\nWe need answer likely to user's weird messages. They sent \"\n\nuser\nassistant\n<think>\nWe need answer likely to user's weird"
+}

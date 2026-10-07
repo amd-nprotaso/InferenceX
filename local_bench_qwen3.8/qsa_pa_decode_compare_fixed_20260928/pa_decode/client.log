@@ -1,0 +1,75 @@
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.197s output_tokens=1 average_output_rate=0.84 tok/s
+elapsed=142.048s output_tokens=32768 average_output_rate=230.68 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.196915876120329,
+  "e2e_s": 142.04824515571818,
+  "client_wall_s": 142.04838554374874,
+  "tpot_ms": 4.298572627326208,
+  "decode_interactivity_tok_s": 232.635362176495,
+  "output_throughput_tok_s": 230.68196005584278,
+  "total_throughput_tok_s": 461.36392011168556,
+  "stream_chunk_count": 2,
+  "server_meta": {
+    "id": "cca7a579e4f646f9b331ddc9ab393661",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790616037.5732503,
+    "prefill_finished_time": 1790616038.7518835,
+    "queue_time": 0.000278472900390625,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "weight_versions": [
+      {
+        "version": "default",
+        "start": 0,
+        "end": 32768
+      }
+    ],
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 142.0311391078867,
+    "spec_accept_rate": 0.9998779445868424,
+    "spec_accept_length": 3.9995117783473697,
+    "spec_num_correct_drafts": 24576,
+    "spec_num_proposed_drafts": 24579,
+    "spec_verify_ct": 8193,
+    "spec_accepted_drafts": 24576,
+    "spec_proposed_drafts": 24579,
+    "spec_correct_drafts_histogram": [
+      1,
+      0,
+      0,
+      8192
+    ],
+    "spec_accept_histogram": [
+      1,
+      0,
+      0,
+      8192
+    ],
+    "request_received_ts": 1790616037.5714333,
+    "first_token_latency": 1.1814753240905702,
+    "api_server_dispatch_finish_ts": 1790616037.5719383,
+    "response_sent_to_client_ts": 1790616038.753167,
+    "request_finished_ts": 1790616179.6025724,
+    "decode_throughput": 232.63811300463777
+  },
+  "output_preview": "We!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+  "output_tail": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+}

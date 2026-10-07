@@ -1,0 +1,40 @@
+START baseline
+READY baseline
+FLUSH 200
+DONE baseline
+START pa_decode
+READY pa_decode
+FLUSH 200
+DONE pa_decode
+{
+  "e2e_s": {
+    "baseline": 227.57830144959735,
+    "pa_decode": 182.5778755498468,
+    "change_percent": -19.77360126739366
+  },
+  "ttft_s": {
+    "baseline": 2.8141186342108995,
+    "pa_decode": 2.235094287258107,
+    "change_percent": -20.575690730080222
+  },
+  "tpot_ms": {
+    "baseline": 6.878360400752408,
+    "pa_decode": 5.518951594778857,
+    "change_percent": -19.763558853718234
+  },
+  "output_throughput_tok_s": {
+    "baseline": 1148.6869544334756,
+    "pa_decode": 1431.7984849671477,
+    "change_percent": 24.64653484928805
+  },
+  "decode_interactivity_tok_s": {
+    "baseline": 145.38404996228343,
+    "pa_decode": 181.19409446647947,
+    "change_percent": 24.631343337516153
+  },
+  "total_throughput_tok_s": {
+    "baseline": 2297.3739088669513,
+    "pa_decode": 2863.5969699342954,
+    "change_percent": 24.64653484928805
+  }
+}

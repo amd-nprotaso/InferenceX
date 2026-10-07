@@ -1,0 +1,14 @@
+[aiter] import [module_aiter_core] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/compiled/n128/jit/module_aiter_core.so
+[aiter] import [mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale] under /var/home/my_InferenceX/InferenceX/local_bench_qwen3.8/qsa_e2e/compiled/n128/jit/mha_varlen_fwd_bf16_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale.so
+decode C= 1 rows= 1 context=32679 KV=2051..2051 median=114.541 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=32680 KV=2048..2048 median=107.501 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=32681 KV=2049..2049 median=114.301 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=32682 KV=2050..2050 median=114.460 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=49017 KV=2049..2049 median=114.361 us symbol_match=unprofiled
+decode C= 1 rows= 1 context=65356 KV=2048..2048 median=107.801 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32679 KV=2048..2051 median=120.581 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32680 KV=2048..2051 median=120.961 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32681 KV=2048..2051 median=120.701 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=32682 KV=2048..2051 median=120.521 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=49017 KV=2048..2051 median=120.701 us symbol_match=unprofiled
+verify C= 1 rows= 4 context=65356 KV=2048..2051 median=120.721 us symbol_match=unprofiled

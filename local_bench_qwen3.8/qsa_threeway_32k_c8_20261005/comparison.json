@@ -1,0 +1,103 @@
+{
+  "configuration": {
+    "concurrency": 8,
+    "isl": 32768,
+    "osl": 32768,
+    "tp": 1,
+    "random_seed": 42,
+    "simulated_accept_length": 2.32,
+    "nextn_steps": 3,
+    "draft_tokens": 4,
+    "warmup": "8 requests with ISL=32768, OSL=256, then flush cache"
+  },
+  "results": {
+    "ck": {
+      "batch_wall_s": 412.9657973679714,
+      "output_throughput_tok_s": 634.7838045445146,
+      "ttft_s": 4.750504452036694,
+      "tpot_ms": 12.457373829997167,
+      "steady_decode_ms_per_token": 12.387626731592196,
+      "spec_accept_length": 2.324301319336076,
+      "attention_implementation": "ck_flash_attn_varlen_func"
+    },
+    "triton": {
+      "batch_wall_s": 347.564726495184,
+      "output_throughput_tok_s": 754.23073751885,
+      "ttft_s": 4.741459453594871,
+      "tpot_ms": 10.461878682879073,
+      "steady_decode_ms_per_token": 10.388048218177214,
+      "spec_accept_length": 2.324301319336076,
+      "attention_implementation": "sparse_gqa_packed_decode_triton"
+    },
+    "flydsl": {
+      "batch_wall_s": 346.0335883432999,
+      "output_throughput_tok_s": 757.5680767149313,
+      "ttft_s": 4.748110366112087,
+      "tpot_ms": 10.414915578718018,
+      "steady_decode_ms_per_token": 10.347632891083418,
+      "spec_accept_length": 2.324301319336076,
+      "attention_implementation": "_forward_flydsl_sparse"
+    }
+  },
+  "comparisons": {
+    "triton_vs_ck": {
+      "throughput_gain_percent": 18.816947143136996,
+      "tpot_change_percent": -16.018586054734683,
+      "steady_decode_tpot_change_percent": -16.14174011487972
+    },
+    "flydsl_vs_ck": {
+      "throughput_gain_percent": 19.342691368523468,
+      "tpot_change_percent": -16.395576460593485,
+      "steady_decode_tpot_change_percent": -16.467995724364027
+    },
+    "flydsl_vs_triton": {
+      "throughput_gain_percent": 0.44248252292924395,
+      "tpot_change_percent": -0.44889742640497055,
+      "steady_decode_tpot_change_percent": -0.38905602135228534
+    }
+  },
+  "validation": {
+    "all_24_requests_exact_lengths": true,
+    "kernel_dispatch_verified": true,
+    "identical_inputs_across_arms": true,
+    "distinct_inputs_within_batch": true,
+    "server_argument_differences": {},
+    "input_sha256": {
+      "ck": [
+        "55791fd7a657cee3f88ba17a4871e3692c79244ec0d504044281127b0bfb4765",
+        "241d63d88e191b48683498f33217f6f24855ef3c4d5857f8d391250f2e8c98d1",
+        "1ef2825b59dc22ef1eb6fbb8d57734fe8d0becd3090467dc492721ca46e558d1",
+        "e0a0e02e24ce975a514d0784b11281fbcbd3e4024c173b176d5db530d3217e47",
+        "00d4068d9dff025bc98a0f87518a3b8a0ec07b8f016c60d249e895287658156e",
+        "3049de96c9357785718dc3194fa4582431834016e6df03138be9a8b4a4d53a83",
+        "77facbc8aabcafd089232a3970fa7e243548eefcb4e2e4494826c07cf99b86b9",
+        "6199631d2ad095764278526a3bd43fc8e9a542f0f73579805b2ee85ab99c78ad"
+      ],
+      "triton": [
+        "55791fd7a657cee3f88ba17a4871e3692c79244ec0d504044281127b0bfb4765",
+        "241d63d88e191b48683498f33217f6f24855ef3c4d5857f8d391250f2e8c98d1",
+        "1ef2825b59dc22ef1eb6fbb8d57734fe8d0becd3090467dc492721ca46e558d1",
+        "e0a0e02e24ce975a514d0784b11281fbcbd3e4024c173b176d5db530d3217e47",
+        "00d4068d9dff025bc98a0f87518a3b8a0ec07b8f016c60d249e895287658156e",
+        "3049de96c9357785718dc3194fa4582431834016e6df03138be9a8b4a4d53a83",
+        "77facbc8aabcafd089232a3970fa7e243548eefcb4e2e4494826c07cf99b86b9",
+        "6199631d2ad095764278526a3bd43fc8e9a542f0f73579805b2ee85ab99c78ad"
+      ],
+      "flydsl": [
+        "55791fd7a657cee3f88ba17a4871e3692c79244ec0d504044281127b0bfb4765",
+        "241d63d88e191b48683498f33217f6f24855ef3c4d5857f8d391250f2e8c98d1",
+        "1ef2825b59dc22ef1eb6fbb8d57734fe8d0becd3090467dc492721ca46e558d1",
+        "e0a0e02e24ce975a514d0784b11281fbcbd3e4024c173b176d5db530d3217e47",
+        "00d4068d9dff025bc98a0f87518a3b8a0ec07b8f016c60d249e895287658156e",
+        "3049de96c9357785718dc3194fa4582431834016e6df03138be9a8b4a4d53a83",
+        "77facbc8aabcafd089232a3970fa7e243548eefcb4e2e4494826c07cf99b86b9",
+        "6199631d2ad095764278526a3bd43fc8e9a542f0f73579805b2ee85ab99c78ad"
+      ]
+    }
+  },
+  "limitations": [
+    "One measured batch per implementation; small differences are not statistically established.",
+    "Application-level serving benchmark, not isolated kernel timing or model accuracy evaluation.",
+    "CK arm uses an experiment-local override to bypass the current ROCm Triton fallback."
+  ]
+}

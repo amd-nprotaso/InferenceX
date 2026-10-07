@@ -1,0 +1,100 @@
+{
+  "configuration": {
+    "concurrency": 8,
+    "isl": 32768,
+    "osl": 32768,
+    "tp": 1,
+    "nextn_steps": 3,
+    "draft_tokens": 4,
+    "simulated_accept_length": 2.32,
+    "order": [
+      "off_1",
+      "on_1",
+      "on_2",
+      "off_2"
+    ],
+    "warmup": "8 x (32768 input, 256 output), then flush cache",
+    "input": "distinct deterministic synthetic token IDs, identical across trials",
+    "dispatch_verified": true,
+    "flag_off_attention": "sparse_gqa_packed_decode_triton (ROCm branch), NOT CK varlen",
+    "flag_on_attention": "AITER FlyDSL _forward_flydsl_sparse"
+  },
+  "trials": {
+    "off_1": {
+      "batch_wall_s": 350.16561924666166,
+      "output_throughput_tok_s": 748.6286076970396,
+      "ttft_s": 4.744124365446623,
+      "tpot_ms": 10.541172558935246,
+      "decode_interactivity_tok_s": 94.86967986560244,
+      "steady_decode_ms_per_token": 10.479553030434401,
+      "steady_decode_tokens_per_s_per_user": 95.4239171361441
+    },
+    "on_1": {
+      "batch_wall_s": 344.81357509922236,
+      "output_throughput_tok_s": 760.2484905780358,
+      "ttft_s": 4.757758119143546,
+      "tpot_ms": 10.377293553343012,
+      "decode_interactivity_tok_s": 96.36800849531483,
+      "steady_decode_ms_per_token": 10.305870741042689,
+      "steady_decode_tokens_per_s_per_user": 97.03207279881192
+    },
+    "on_2": {
+      "batch_wall_s": 346.9101498220116,
+      "output_throughput_tok_s": 755.6538779118963,
+      "ttft_s": 4.751318653638009,
+      "tpot_ms": 10.441663027151318,
+      "decode_interactivity_tok_s": 95.7738728361301,
+      "steady_decode_ms_per_token": 10.366185310656844,
+      "steady_decode_tokens_per_s_per_user": 96.4675017889137
+    },
+    "off_2": {
+      "batch_wall_s": 349.2160026859492,
+      "output_throughput_tok_s": 750.6643395026393,
+      "ttft_s": 4.746188213524874,
+      "tpot_ms": 10.512230346693464,
+      "decode_interactivity_tok_s": 95.13090936953188,
+      "steady_decode_ms_per_token": 10.414853538708977,
+      "steady_decode_tokens_per_s_per_user": 96.01671269627472
+    }
+  },
+  "means": {
+    "off": {
+      "batch_wall_s": 349.69081096630543,
+      "output_throughput_tok_s": 749.6464735998395,
+      "ttft_s": 4.745156289485749,
+      "tpot_ms": 10.526701452814354,
+      "decode_interactivity_tok_s": 95.00029461756716,
+      "steady_decode_ms_per_token": 10.447203284571689,
+      "steady_decode_tokens_per_s_per_user": 95.72031491620942
+    },
+    "on": {
+      "batch_wall_s": 345.861862460617,
+      "output_throughput_tok_s": 757.951184244966,
+      "ttft_s": 4.754538386390777,
+      "tpot_ms": 10.409478290247165,
+      "decode_interactivity_tok_s": 96.07094066572246,
+      "steady_decode_ms_per_token": 10.336028025849767,
+      "steady_decode_tokens_per_s_per_user": 96.74978729386281
+    }
+  },
+  "change_percent_on_vs_off": {
+    "batch_wall_s": -1.0949525654128212,
+    "output_throughput_tok_s": 1.1078169427312767,
+    "ttft_s": 0.19771944974324995,
+    "tpot_ms": -1.113579245052576,
+    "decode_interactivity_tok_s": 1.1269923450924813,
+    "steady_decode_ms_per_token": -1.0641628739636366,
+    "steady_decode_tokens_per_s_per_user": 1.0755004081991926
+  },
+  "limitations": [
+    "Two independent trials per flag value; no statistical significance claim.",
+    "Server random_seed was auto-generated separately for each trial; see validation.json.",
+    "NEXTN and simulated acceptance length 2.32 retained. Measures application performance, not isolated GPU kernel latency.",
+    "Steady decode interval uses streamed token counts from approximately output token 4096 through 28672."
+  ],
+  "baseline_provenance": {
+    "sglang_commit": "bda4e1491e6048b596eccf5d4038e4d7bb5995c3",
+    "triton_fallback_introduced_by": "8b5d77c268 [AMD] Add a Triton packed sparse decode path for QSA on ROCm (#38876)",
+    "pr_41881_baseline": "CK flash_attn_varlen_func; different comparator from this experiment"
+  }
+}

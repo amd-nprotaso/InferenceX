@@ -1,0 +1,21 @@
+--- fmha_fwd_d256_bf16_group_b128x64x32x256x32x256_r4x1x1_r4x1x1_w32x32x16_w32x32x16_qr_vr_pssk_nlogits_nbias_nmask_nlse_ndropout_nskip_nqscale_ntrload_nsink_gfx950.cpp
++++ kernel.cpp
+@@ -11,13 +11,13 @@
+ 
+ using fmha_dtype = FmhaFwdBf16;
+ 
+-using fmha_block_tile = ck_tile::sequence<128, 64, 32, 256, 32, 256>;
++using fmha_block_tile = ck_tile::sequence<16, 64, 32, 256, 32, 256>;
+ 
+ using fmha_shape = ck_tile::TileFmhaShape<fmha_block_tile,
+-                                          ck_tile::sequence<4, 1, 1>,
+-                                          ck_tile::sequence<32, 32, 16>,
+-                                          ck_tile::sequence<4, 1, 1>,
+-                                          ck_tile::sequence<32, 32, 16>,
++                                          ck_tile::sequence<1, 1, 1>,
++                                          ck_tile::sequence<16, 16, 16>,
++                                          ck_tile::sequence<1, 1, 1>,
++                                          ck_tile::sequence<16, 16, 16>,
+                                           true>;
+ 
+ using fmha_traits = ck_tile::TileFmhaTraits<true,

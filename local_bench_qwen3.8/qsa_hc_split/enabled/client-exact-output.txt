@@ -1,0 +1,7570 @@
+We need answer user's request. User repeated many times: "Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery." Need produce final answer. Need likely ignore repetition, provide comprehensive explanation. Need maybe mention design and performance, replication, indexing, transactions, recovery. Need be thorough. Need final in English. Need maybe structure. Need ensure no hidden issues. Let's craft detailed answer.
+
+Need consider distributed database design: architecture, data distribution, transparency, autonomy, heterogeneity, scalability, availability, consistency tradeoffs (CAP/PACELC). Components: nodes, network, catalog, transaction manager, concurrency control, recovery manager, query processor, storage engines. Design choices: shared-nothing, shared-disk, cloud, geo-distributed, sharding/partitioning, replication topologies. Performance: latency, bandwidth, locality, partitioning, caching, query optimization, parallelism, load balancing, hotspots, network overhead, consistency overhead.
+
+Replication: purpose availability, durability, locality, read scaling. Synchronous vs asynchronous vs semi-sync. Leader-based (primary-backup), quorum (R+W>N), multi-leader, leaderless (Dynamo), consensus (Raft/Paxos). Replication modes: snapshot, log shipping, streaming, CDC. Impact performance: write amplification, read latency, lag, conflict resolution, anti-entropy, gossip, vector clocks, CRDTs. Design: placement, replication factor, consistency model, read/write paths, failure handling.
+
+Indexing: local vs global indexes. Global secondary indexes in distributed systems: partitioned by index key or table key, scatter-gather, write amplification, consistency. Local indexes per partition. Index types: B-tree, LSM-tree, hash, bitmap, inverted, geospatial, vector. Performance: query selectivity, partition pruning, covering indexes, index maintenance cost, distributed index updates, rebalancing, hot partitions.
+
+Transactions: ACID in distributed. Two-phase commit (2PC) for atomic commit across partitions, blocking, coordinator failure, timeouts. Three-phase commit less blocking but impractical. Optimistic concurrency control, pessimistic locking, MVCC, snapshot isolation, serializable isolation. Distributed deadlock detection, wait-for graph, timeouts. Performance: latency of locks, coordination, network round trips, contention, hot rows, batch commits, group commit, idempotency, saga/eventual consistency for microservices. Strong vs weak consistency.
+
+Recovery: local recovery (WAL, checkpoints, ARIES), distributed recovery (2PC recovery, stable storage, logs, participants logs, transaction manager logs). Failure types: node, network partition, disk, site. Recovery steps: restart, redo/undo, recover in-doubt transactions, reconfigure replication, rebuild replicas, snapshot restore, log replay, point-in-time recovery. Performance: checkpoint frequency, log throughput, recovery time, RPO/RTO, backup, replication lag, quorum safety, fencing, leader election.
+
+Need maybe include examples and tradeoffs. Could include table. Need answer likely academic. Need maybe mention performance metrics: throughput, latency, availability, consistency, scalability, fault tolerance. Need maybe discuss design patterns: partitioning by hash/range/list, colocation, replication factor, consistency model, index strategy, transaction protocol, recovery protocol. Need maybe include "design and performance" integrated.
+
+Need be careful: user repeated many times maybe expects answer not mention repetition. Could say "A distributed database...".
+
+Let's craft final with headings. Desired oververbosity 9, so detailed. But not too huge? Could be 2000-3000 words? Maybe enough. Need include all topics.
+
+Potential final:
+- Intro: distributed DB stores data across multiple nodes connected by network, appears as single logical DB. Goals: scalability, availability, locality, fault tolerance. Challenges: network latency/partition, partial failure, consistency.
+- Design overview: architecture layers, data distribution, transparency, autonomy, heterogeneity, scalability.
+- Performance: factors: partitioning, replication, indexing, transactions, recovery, workload, network, hardware, consistency.
+- Replication: detailed.
+- Indexing: detailed.
+- Transactions: detailed.
+- Recovery: detailed.
+- Design checklist / tradeoffs.
+
+Need maybe include equations: R+W>N quorum. PACELC.
+
+Let's produce final. Ensure no analysis in final.
+</think>
+
+A distributed database is a database whose data and processing are spread across multiple computers, sites, or regions, but which is intended to appear to users as a single logical database. Its design must balance **scalability, availability, consistency, latency, throughput, fault tolerance, and operational complexity**. The four most important design areas are **replication, indexing, transactions, and recovery**.
+
+---
+
+## 1. Overall Design of a Distributed Database
+
+A distributed database typically consists of multiple nodes, each with its own storage, CPU, memory, and network connection. The system must coordinate these nodes so that data remains correct and accessible even when some nodes fail or network links become slow or partitioned.
+
+### Core Design Goals
+
+A distributed database is usually designed to achieve one or more of the following:
+
+1. **Scalability**
+   - The system can grow by adding more nodes.
+   - Data and workload are distributed across machines.
+
+2. **Availability**
+   - The system continues to operate despite node failures, disk failures, or network problems.
+   - Users can still read or write data even if some replicas are unavailable.
+
+3. **Durability**
+   - Committed data survives crashes and hardware failures.
+
+4. **Consistency**
+   - Users see a coherent view of the data.
+   - The system must define what consistency guarantees are provided.
+
+5. **Locality**
+   - Data can be placed close to users or applications to reduce latency.
+
+6. **Fault tolerance**
+   - The system can tolerate partial failures, which are common in distributed environments.
+
+7. **Transparency**
+   - Ideally, users do not need to know where data is physically stored.
+   - The system hides distribution, replication, and failure handling.
+
+---
+
+## 2. Major Architectural Choices
+
+### 2.1 Data Distribution
+
+Data is distributed using partitioning or sharding.
+
+Common partitioning strategies include:
+
+#### Hash partitioning
+
+Data is assigned to nodes using a hash function.
+
+Example:
+
+```text
+node = hash(customer_id) mod number_of_nodes
+```
+
+Advantages:
+
+- Good load balancing.
+- Simple placement.
+- Avoids hot ranges.
+
+Disadvantages:
+
+- Range queries are expensive.
+- Rebalancing can be costly.
+- Related data may be spread across many nodes.
+
+#### Range partitioning
+
+Data is assigned based on key ranges.
+
+Example:
+
+```text
+Node A: customer_id 0–9999
+Node B: customer_id 10000–19999
+Node C: customer_id 20000–29999
+```
+
+Advantages:
+
+- Efficient range scans.
+- Good for time-series or ordered data.
+- Easier to reason about locality.
+
+Disadvantages:
+
+- Hotspots are common.
+- Rebalancing may require moving large ranges.
+- Poor key distribution can overload one node.
+
+#### List partitioning
+
+Data is assigned based on explicit values.
+
+Example:
+
+```text
+Region = "EU" -> Europe nodes
+Region = "US" -> US nodes
+```
+
+Advantages:
+
+- Useful for geographic or tenant-based placement.
+- Supports data residency requirements.
+
+Disadvantages:
+
+- Less flexible.
+- Can create uneven load.
+
+#### Composite or hybrid partitioning
+
+Data may be partitioned by multiple dimensions, such as tenant ID plus time range.
+
+Example:
+
+```text
+partition = tenant_id + month
+```
+
+This is common in multi-tenant SaaS systems.
+
+---
+
+### 2.2 Shared-Nothing Architecture
+
+Most modern distributed databases use a **shared-nothing** architecture.
+
+Each node has:
+
+- Its own CPU
+- Its own memory
+- Its own disk
+- Its own network connection
+
+Nodes communicate through messages.
+
+Advantages:
+
+- Easy horizontal scaling.
+- No shared disk bottleneck.
+- Failure isolation.
+- Cost-effective commodity hardware.
+
+Disadvantages:
+
+- Network becomes a major performance factor.
+- Coordination is required.
+- Distributed transactions are more complex.
+
+---
+
+### 2.3 Shared-Disk Architecture
+
+In a shared-disk system, multiple nodes access the same storage system.
+
+Example:
+
+- Multiple database servers access a shared SAN or distributed file system.
+
+Advantages:
+
+- Simpler data sharing.
+- Easier failover.
+- Less data movement.
+
+Disadvantages:
+
+- Shared storage can become a bottleneck.
+- Locking and coordination are still needed.
+- Scaling may be limited by storage bandwidth.
+
+---
+
+### 2.4 Cloud and Geo-Distributed Design
+
+Modern distributed databases often span multiple availability zones or regions.
+
+Design issues include:
+
+- Network latency between regions
+- Data residency laws
+- Regional failure domains
+- Cross-region replication
+- Consistency vs. latency tradeoffs
+
+A database in one region may have replicas in other regions. Writes may be synchronous or asynchronous depending on consistency requirements.
+
+---
+
+## 3. Performance Factors in Distributed Databases
+
+Performance in a distributed database is not only about CPU or disk speed. It is heavily affected by network behavior.
+
+### Key performance factors
+
+1. **Network latency**
+   - Cross-node queries require network round trips.
+   - Cross-region latency can be tens to hundreds of milliseconds.
+
+2. **Network bandwidth**
+   - Large scans, replication, and backups consume bandwidth.
+
+3. **Data locality**
+   - Queries are faster when data is stored on the same node or nearby nodes.
+
+4. **Partitioning quality**
+   - Good partitioning avoids hotspots and reduces cross-partition work.
+
+5. **Replication strategy**
+   - Synchronous replication improves consistency but increases write latency.
+   - Asynchronous replication improves write latency but can cause stale reads.
+
+6. **Index design**
+   - Poor indexes cause scatter-gather queries.
+   - Global indexes can create distributed write amplification.
+
+7. **Transaction protocol**
+   - Strong consistency may require multiple network round trips.
+   - Weak consistency can improve performance but increases application complexity.
+
+8. **Concurrency control**
+   - Locking can reduce throughput under contention.
+   - MVCC can improve read performance but increases storage and cleanup work.
+
+9. **Recovery and logging**
+   - Frequent logging and checkpointing affect throughput.
+   - Recovery time depends on log volume and checkpoint frequency.
+
+---
+
+## 4. Replication
+
+Replication means storing copies of data on multiple nodes.
+
+Replication is one of the most important mechanisms for achieving availability, durability, and performance.
+
+---
+
+## 4.1 Why Replicate Data?
+
+Replication provides several benefits:
+
+### Availability
+
+If one node fails, another replica can serve requests.
+
+Example:
+
+```text
+Primary node fails
+Secondary replica becomes leader
+```
+
+### Durability
+
+If one disk fails, other replicas still contain the data.
+
+### Read scalability
+
+Read traffic can be distributed across multiple replicas.
+
+Example:
+
+```text
+Write to primary
+Reads from multiple secondaries
+```
+
+### Locality
+
+Data can be placed close to users.
+
+Example:
+
+```text
+US users read from US replica
+EU users read from EU replica
+```
+
+### Disaster recovery
+
+Remote replicas protect against regional failures.
+
+---
+
+## 4.2 Replication Models
+
+### 4.2.1 Leader-Based Replication
+
+Also called primary-backup replication.
+
+One node is the leader or primary.
+
+- Writes go to the leader.
+- The leader sends changes to followers.
+- Followers apply changes asynchronously or synchronously.
+
+Example:
+
+```text
+Client -> Leader -> Follower 1
+                 -> Follower 2
+                 -> Follower 3
+```
+
+Advantages:
+
+- Simple write path.
+- Easy conflict resolution.
+- Widely used in relational databases.
+
+Disadvantages:
+
+- Leader can become a bottleneck.
+- Leader failure requires election.
+- Followers may lag.
+
+---
+
+### 4.2.2 Synchronous Replication
+
+The leader waits for one or more followers to acknowledge the write before returning success to the client.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader waits for follower acknowledgment
+Follower acknowledges
+Leader returns success
+```
+
+Advantages:
+
+- Strong durability.
+- If the leader fails, the follower has the latest data.
+- No data loss in many failure scenarios.
+
+Disadvantages:
+
+- Higher write latency.
+- If a follower is slow, the leader may stall.
+- Availability may decrease if too many acknowledgments are required.
+
+Synchronous replication is often used when data loss is unacceptable.
+
+---
+
+### 4.2.3 Asynchronous Replication
+
+The leader returns success to the client without waiting for followers to acknowledge.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader returns success
+Leader sends changes to followers later
+```
+
+Advantages:
+
+- Low write latency.
+- Better throughput.
+- Followers can be geographically distant.
+
+Disadvantages:
+
+- Followers may lag.
+- If the leader fails, recent writes may be lost.
+- Reads from followers may be stale.
+
+Asynchronous replication is common for high-performance or cross-region systems.
+
+---
+
+### 4.2.4 Semi-Synchronous Replication
+
+The leader waits for at least one follower to acknowledge receipt of the log, but not necessarily completion of all local processing.
+
+This is a compromise between synchronous and asynchronous replication.
+
+Advantages:
+
+- Better durability than pure asynchronous replication.
+- Lower latency than full synchronous replication.
+
+Disadvantages:
+
+- Still depends on follower health.
+- May stall if followers are slow.
+
+---
+
+## 4.3 Quorum-Based Replication
+
+Quorum replication is common in distributed key-value stores and NoSQL databases.
+
+Suppose there are `N` replicas.
+
+A write succeeds if `W` replicas acknowledge.
+
+A read succeeds if `R` replicas respond.
+
+A common rule is:
+
+```text
+R + W > N
+```
+
+This ensures that read and write sets overlap, so a read should see the latest write.
+
+Example:
+
+```text
+N = 3
+W = 2
+R = 2
+
+R + W = 4 > 3
+```
+
+Advantages:
+
+- Flexible consistency.
+- Can tolerate some replica failures.
+- Works well in leaderless systems.
+
+Disadvantages:
+
+- More complex conflict resolution.
+- May require vector clocks or versioning.
+- Read latency may increase if multiple replicas are contacted.
+
+---
+
+## 4.4 Multi-Leader Replication
+
+Multiple nodes can accept writes.
+
+Example:
+
+```text
+Client in US writes to US leader
+Client in EU writes to EU leader
+Leaders replicate changes to each other
+```
+
+Advantages:
+
+- Better write locality.
+- Better availability during network partitions.
+- Useful for offline or mobile clients.
+
+Disadvantages:
+
+- Write conflicts are possible.
+- Conflict resolution is complex.
+- Strong consistency is difficult.
+
+Conflict resolution methods include:
+
+- Last write wins
+- Application-level merge
+- CRDTs, or conflict-free replicated data types
+- Manual conflict resolution
+- Version vectors
+
+---
+
+## 4.5 Leaderless Replication
+
+Any replica can accept reads and writes.
+
+This is common in Dynamo-style systems.
+
+Example:
+
+```text
+Client writes to any replica
+Replica stores value and sends to other replicas
+Client reads from multiple replicas
+```
+
+Advantages:
+
+- High availability.
+- No single leader bottleneck.
+- Good for geographically distributed systems.
+
+Disadvantages:
+
+- Stale reads are possible.
+- Conflict resolution is required.
+- Consistency is more complex.
+
+Techniques used:
+
+- Read repair
+- Anti-entropy
+- Gossip protocols
+- Hinted handoff
+- Vector clocks
+- Quorum reads and writes
+
+---
+
+## 4.6 Replication and Performance
+
+Replication affects performance in several ways.
+
+### Write performance
+
+Synchronous replication increases write latency because the client waits for acknowledgments.
+
+Asynchronous replication improves write latency but may risk data loss.
+
+### Read performance
+
+Replicas can serve reads, improving read throughput and locality.
+
+However, stale replicas may return old data.
+
+### Storage cost
+
+Replication multiplies storage usage.
+
+Example:
+
+```text
+1 TB of logical data with replication factor 3
+requires 3 TB of physical storage
+```
+
+### Network cost
+
+Replication consumes network bandwidth.
+
+Cross-region replication can be expensive.
+
+### Failure handling
+
+Replication improves availability, but failure detection and leader election add complexity.
+
+---
+
+## 5. Indexing in Distributed Databases
+
+Indexes are data structures that speed up queries. In a distributed database, indexing is more complex because data is spread across multiple nodes.
+
+---
+
+## 5.1 Local Indexes
+
+A local index is stored on the same node as the data it indexes.
+
+Example:
+
+```text
+Node A stores partition 1 and its local index
+Node B stores partition 2 and its local index
+Node C stores partition 3 and its local index
+```
+
+Advantages:
+
+- Index updates are local.
+- Low write amplification.
+- Good for queries that include the partition key.
+- Easier to rebalance.
+
+Disadvantages:
+
+- Queries without the partition key may need to search all partitions.
+- This can cause scatter-gather behavior.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE customer_id = 123;
+```
+
+If `customer_id` is the partition key, the query can go directly to one partition.
+
+But:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If `status` is not the partition key, the query may need to search many partitions.
+
+---
+
+## 5.2 Global Indexes
+
+A global index spans multiple partitions or nodes.
+
+Example:
+
+```text
+Global index on email
+maps email -> partition containing customer
+```
+
+Advantages:
+
+- Efficient queries on non-partition keys.
+- Can avoid scatter-gather queries.
+- Useful for secondary indexes.
+
+Disadvantages:
+
+- Index updates may require distributed coordination.
+- Write amplification can be high.
+- Global indexes can become bottlenecks.
+- Rebalancing is more complex.
+
+Example:
+
+```sql
+SELECT *
+FROM customers
+WHERE email = 'alice@example.com';
+```
+
+If `email` is not the partition key, a global index can locate the correct partition quickly.
+
+---
+
+## 5.3 Index Types
+
+Distributed databases may use several index structures.
+
+### B-tree indexes
+
+Common in relational databases.
+
+Good for:
+
+- Equality queries
+- Range queries
+- Ordered scans
+
+In distributed systems, B-tree indexes may be local or global.
+
+---
+
+### LSM-tree indexes
+
+Log-structured merge-tree indexes are common in NoSQL and wide-column databases.
+
+They are optimized for high write throughput.
+
+Advantages:
+
+- Efficient writes.
+- Good for large-scale systems.
+- Suitable for append-heavy workloads.
+
+Disadvantages:
+
+- Compaction overhead.
+- Reads may require checking multiple levels.
+- Space amplification.
+
+---
+
+### Hash indexes
+
+Good for equality lookups.
+
+Example:
+
+```text
+hash(key) -> value
+```
+
+Advantages:
+
+- Fast point lookups.
+- Simple.
+
+Disadvantages:
+
+- Poor range queries.
+- Poor ordered scans.
+
+---
+
+### Bitmap indexes
+
+Useful for low-cardinality columns.
+
+Example:
+
+```text
+status = ACTIVE
+status = INACTIVE
+```
+
+Advantages:
+
+- Efficient for analytical queries.
+- Good for filtering large datasets.
+
+Disadvantages:
+
+- Poor for high-cardinality data.
+- Update cost can be high.
+
+---
+
+### Inverted indexes
+
+Used for full-text search.
+
+Example:
+
+```text
+"database" -> documents containing database
+```
+
+Advantages:
+
+- Good for text search.
+- Supports relevance ranking.
+
+Disadvantages:
+
+- Index maintenance can be expensive.
+- Distributed updates require coordination.
+
+---
+
+### Geospatial indexes
+
+Used for location-based queries.
+
+Examples:
+
+- R-tree
+- Quadtree
+- Geohash
+
+Useful for:
+
+```sql
+Find all stores within 10 km of a location
+```
+
+---
+
+### Vector indexes
+
+Used for similarity search and machine learning embeddings.
+
+Examples:
+
+- HNSW
+- IVF
+- PQ
+
+Useful for:
+
+```text
+Find similar documents
+Find similar images
+Recommendation systems
+```
+
+---
+
+## 5.4 Distributed Indexing and Performance
+
+### Partition pruning
+
+If the query includes the partition key, the database can avoid scanning irrelevant partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+If `tenant_id` is the partition key, the query can be routed directly to one partition.
+
+This improves performance significantly.
+
+---
+
+### Scatter-gather queries
+
+If a query does not include the partition key, the database may need to query many partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If there are 100 partitions, the query may need to contact all 100.
+
+This increases latency and network traffic.
+
+---
+
+### Covering indexes
+
+A covering index contains all columns needed by a query.
+
+Example:
+
+```sql
+SELECT customer_id, status
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If the index contains `status`, `customer_id`, and other needed columns, the database may avoid accessing the base table.
+
+This reduces I/O and improves performance.
+
+---
+
+### Index write amplification
+
+Every write may need to update multiple indexes.
+
+Example:
+
+```text
+Insert into customers
+Update primary key index
+Update email index
+Update country index
+Update created_at index
+```
+
+In a distributed system, some index updates may require network communication.
+
+This can reduce write throughput.
+
+---
+
+### Index rebalancing
+
+When partitions move between nodes, indexes may need to be rebuilt or migrated.
+
+This can be expensive.
+
+Design choices include:
+
+- Rebuild indexes after rebalancing
+- Move index data with partition data
+- Use local indexes to simplify rebalancing
+- Use global indexes carefully
+
+---
+
+## 6. Transactions in Distributed Databases
+
+A transaction is a logical unit of work that must be processed reliably.
+
+Traditional ACID properties are:
+
+- Atomicity
+- Consistency
+- Isolation
+- Durability
+
+In a distributed database, transactions may touch multiple partitions or nodes.
+
+Example:
+
+```sql
+BEGIN;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 2;
+
+COMMIT;
+```
+
+If account 1 and account 2 are on different nodes, the transaction is distributed.
+
+---
+
+## 6.1 Distributed Transaction Challenges
+
+Distributed transactions are harder than local transactions because of:
+
+1. **Network latency**
+   - Multiple nodes must communicate.
+
+2. **Partial failure**
+   - One node may fail while others succeed.
+
+3. **Network partitions**
+   - Nodes may be unable to communicate.
+
+4. **Coordination overhead**
+   - Committing requires agreement.
+
+5. **Deadlocks**
+   - Transactions on different nodes may wait for each other.
+
+6. **Consistency tradeoffs**
+   - Strong consistency may reduce availability or performance.
+
+---
+
+## 6.2 Two-Phase Commit
+
+Two-phase commit, or 2PC, is the classic protocol for distributed atomic commit.
+
+It involves a coordinator and participants.
+
+### Phase 1: Prepare
+
+The coordinator asks all participants:
+
+```text
+Are you ready to commit?
+```
+
+Each participant:
+
+- Writes a prepare record to its log.
+- Locks necessary resources.
+- Responds yes or no.
+
+### Phase 2: Commit or Abort
+
+If all participants vote yes:
+
+```text
+Coordinator sends commit
+Participants commit
+Participants acknowledge
+```
+
+If any participant votes no:
+
+```text
+Coordinator sends abort
+Participants abort
+```
+
+Advantages:
+
+- Provides atomicity across nodes.
+- Works well for small, low-latency clusters.
+
+Disadvantages:
+
+- Blocking.
+- If the coordinator fails after prepare, participants may be stuck.
+- High latency due to multiple round trips.
+- Poor availability during network partitions.
+
+---
+
+## 6.3 Three-Phase Commit
+
+Three-phase commit, or 3PC, attempts to reduce blocking compared with 2PC.
+
+It adds an extra phase:
+
+1. Can commit?
+2. Pre-commit
+3. Commit
+
+Advantages:
+
+- Less blocking than 2PC in some cases.
+
+Disadvantages:
+
+- More complex.
+- Still assumes reliable network and failure detection.
+- Rarely used in practice because it does not solve all distributed failure problems.
+
+---
+
+## 6.4 Concurrency Control
+
+Concurrency control ensures that concurrent transactions do not interfere incorrectly.
+
+### Pessimistic locking
+
+A transaction locks data before modifying it.
+
+Example:
+
+```text
+Transaction T1 locks account 1
+Transaction T2 waits for account 1
+```
+
+Advantages:
+
+- Prevents conflicts early.
+- Easier to reason about.
+
+Disadvantages:
+
+- Lock waits reduce throughput.
+- Deadlocks are possible.
+- Locks may be held across network boundaries.
+
+---
+
+### Optimistic concurrency control
+
+Transactions execute without locks and validate at commit time.
+
+Example:
+
+```text
+T1 reads balance
+T2 reads balance
+T1 updates balance
+T2 tries to update balance
+T2 fails because data changed
+```
+
+Advantages:
+
+- Good when conflicts are rare.
+- Less blocking.
+
+Disadvantages:
+
+- High abort rate under contention.
+- Requires versioning or validation.
+
+---
+
+### MVCC
+
+Multi-version concurrency control stores multiple versions of data.
+
+Readers do not block writers, and writers do not block readers.
+
+Advantages:
+
+- High read concurrency.
+- Good for analytical and mixed workloads.
+- Supports snapshot isolation.
+
+Disadvantages:
+
+- Storage overhead.
+- Garbage collection required.
+- Long-running transactions can retain old versions.
+
+---
+
+## 6.5 Isolation Levels
+
+Distributed databases may support different isolation levels.
+
+### Read uncommitted
+
+Transactions may see uncommitted data.
+
+Rarely used because of anomalies.
+
+### Read committed
+
+Transactions see only committed data.
+
+Common default in many databases.
+
+### Snapshot isolation
+
+Each transaction sees a consistent snapshot of the database.
+
+Advantages:
+
+- Good performance.
+- Avoids many read anomalies.
+
+Disadvantages:
+
+- Write-write conflicts may occur.
+- Not fully serializable.
+
+### Serializable isolation
+
+Transactions behave as if executed one at a time.
+
+Advantages:
+
+- Strong correctness.
+
+Disadvantages:
+
+- Higher coordination cost.
+- More aborts or locks.
+- Can reduce throughput.
+
+---
+
+## 6.6 Distributed Deadlocks
+
+Deadlocks can occur across nodes.
+
+Example:
+
+```text
+T1 locks account 1 on Node A
+T1 waits for account 2 on Node B
+
+T2 locks account 2 on Node B
+T2 waits for account 1 on Node A
+```
+
+Detection methods include:
+
+- Wait-for graphs
+- Timeout-based detection
+- Distributed deadlock detectors
+
+Resolution methods include:
+
+- Abort one transaction
+- Retry transaction
+- Use lock ordering
+- Use optimistic concurrency control
+
+---
+
+## 6.7 Transactions and Performance
+
+Distributed transactions can be expensive.
+
+### Latency
+
+A distributed commit may require multiple network round trips.
+
+Example:
+
+```text
+Client -> Coordinator
+Coordinator -> Participant 1
+Coordinator -> Participant 2
+Participant 1 -> Coordinator
+Participant 2 -> Coordinator
+Coordinator -> Participants
+Participants -> Coordinator
+Coordinator -> Client
+```
+
+This can be slow across regions.
+
+---
+
+### Throughput
+
+Locking and coordination can reduce throughput.
+
+High-contention transactions may serialize.
+
+---
+
+### Hotspots
+
+If many transactions update the same row or partition, performance suffers.
+
+Example:
+
+```text
+All transactions update inventory for one product
+```
+
+Solutions:
+
+- Partition inventory by region
+- Use counters or sharded inventory
+- Batch updates
+- Use optimistic concurrency control
+- Use application-level queues
+
+---
+
+### Strong consistency vs. performance
+
+Strong consistency often requires coordination.
+
+Weak consistency can improve performance but shifts complexity to the application.
+
+---
+
+## 7. Recovery in Distributed Databases
+
+Recovery is the process of restoring the database to a correct state after failures.
+
+Failures may include:
+
+- Node crash
+- Disk failure
+- Network partition
+- Power loss
+- Software bug
+- Data corruption
+- Regional outage
+
+---
+
+## 7.1 Local Recovery
+
+Each node usually has its own recovery mechanism.
+
+Common techniques include:
+
+### Write-ahead logging
+
+Changes are written to a log before being applied to the database.
+
+Example:
+
+```text
+1. Write log record
+2. Flush log to stable storage
+3. Modify database page
+```
+
+This ensures that committed changes survive crashes.
+
+---
+
+### Checkpointing
+
+A checkpoint records the database state at a point in time.
+
+During recovery, the system can start from the last checkpoint and replay only later log records.
+
+Advantages:
+
+- Faster recovery.
+- Less log replay.
+
+Disadvantages:
+
+- Checkpointing consumes I/O.
+- Too frequent checkpoints reduce throughput.
+- Too infrequent checkpoints increase recovery time.
+
+---
+
+### ARIES-style recovery
+
+Many databases use ARIES-like recovery.
+
+ARIES uses:
+
+- Write-ahead logging
+- Redo
+- Undo
+- Checkpoints
+- Dirty page tables
+
+Recovery phases:
+
+1. **Analysis**
+   - Determine which transactions were active at failure.
+
+2. **Redo**
+   - Reapply changes that may have been lost.
+
+3. **Undo**
+   - Roll back transactions that did not commit.
+
+---
+
+## 7.2 Distributed Recovery
+
+Distributed recovery must handle failures across multiple nodes.
+
+It must answer questions such as:
+
+- Was the transaction committed?
+- Did all participants commit?
+- Did the coordinator fail before sending the final decision?
+- Are some replicas missing recent changes?
+- Which replica should become leader?
+
+---
+
+## 7.3 Two-Phase Commit Recovery
+
+In 2PC, recovery is complicated because participants may be in a prepared state.
+
+Example:
+
+```text
+All participants prepared
+Coordinator crashes before sending commit
+```
+
+Participants do not know whether to commit or abort.
+
+They may block until the coordinator recovers.
+
+Recovery mechanisms include:
+
+- Coordinator logs its decision
+- Participants query the coordinator
+- Participants query other participants
+- Timeout and abort, if safe
+- Manual intervention in extreme cases
+
+This is one reason 2PC can reduce availability.
+
+---
+
+## 7.4 Replication-Based Recovery
+
+Replication helps recovery.
+
+If a node fails, another replica can take over.
+
+Recovery steps may include:
+
+1. Detect failed node.
+2. Elect new leader.
+3. Promote a healthy replica.
+4. Reconfigure clients.
+5. Rebuild failed replica from snapshots and logs.
+6. Catch up using replication logs.
+
+---
+
+## 7.5 Snapshot and Log Recovery
+
+Many systems use snapshots plus logs.
+
+Example:
+
+```text
+Nightly snapshot
+Continuous transaction log
+```
+
+To recover:
+
+```text
+Restore snapshot
+Replay logs up to desired point
+```
+
+This supports point-in-time recovery.
+
+Example:
+
+```text
+Restore database to 10:45 before accidental deletion
+```
+
+---
+
+## 7.6 Failure Types and Recovery Behavior
+
+### Node failure
+
+A single node crashes.
+
+Recovery:
+
+- Restart node.
+- Replay local log.
+- Rejoin cluster.
+- Catch up with replication.
+
+---
+
+### Disk failure
+
+A node loses storage.
+
+Recovery:
+
+- Replace disk.
+- Restore from snapshot.
+- Replay logs.
+- Rebuild replica.
+
+---
+
+### Network partition
+
+Nodes cannot communicate.
+
+Recovery:
+
+- Use quorum rules.
+- Elect leader only if quorum exists.
+- Partition minority side may become read-only or unavailable.
+- After partition heals, reconcile logs.
+
+---
+
+### Regional failure
+
+An entire data center fails.
+
+Recovery:
+
+- Promote remote replica.
+- Redirect clients.
+- Rebuild failed region.
+- Restore from remote backups.
+
+---
+
+## 7.7 Recovery and Performance
+
+Recovery affects performance in several ways.
+
+### Logging overhead
+
+Every write may require log writes.
+
+This can reduce throughput.
+
+---
+
+### Checkpoint overhead
+
+Checkpoints consume CPU, memory, and disk I/O.
+
+---
+
+### Recovery time
+
+If checkpoints are rare, recovery may require replaying many logs.
+
+This increases downtime.
+
+---
+
+### Replication lag
+
+If replicas lag, failover may lose recent writes or require waiting for catch-up.
+
+---
+
+### Backup and restore
+
+Large databases may take hours or days to restore.
+
+Design choices include:
+
+- Incremental backups
+- Snapshot backups
+- Continuous archiving
+- Point-in-time recovery
+- Cross-region backups
+
+---
+
+## 8. Consistency Models and Their Impact
+
+Distributed databases must choose consistency models.
+
+### Strong consistency
+
+All reads see the latest committed write.
+
+Example:
+
+```text
+Write succeeds
+Any subsequent read sees the write
+```
+
+Advantages:
+
+- Simpler application logic.
+- Easier correctness.
+
+Disadvantages:
+
+- Higher latency.
+- More coordination.
+- May reduce availability during partitions.
+
+---
+
+### Eventual consistency
+
+Replicas will eventually converge, but reads may be stale.
+
+Example:
+
+```text
+Write succeeds
+Some replicas may not see it immediately
+```
+
+Advantages:
+
+- High availability.
+- Low latency.
+- Good for geographically distributed systems.
+
+Disadvantages:
+
+- Application must handle stale data.
+- Conflict resolution is complex.
+- Harder to reason about correctness.
+
+---
+
+### Causal consistency
+
+Writes that are causally related are seen in order.
+
+Example:
+
+```text
+Create comment
+Reply to comment
+```
+
+A user who sees the reply should also see the comment.
+
+Advantages:
+
+- Stronger than eventual consistency.
+- More practical than full strong consistency.
+
+Disadvantages:
+
+- Requires metadata such as vector clocks.
+- More complex than eventual consistency.
+
+---
+
+### Read-your-writes consistency
+
+A user sees their own writes immediately.
+
+Example:
+
+```text
+User posts comment
+User refreshes page
+User sees own comment
+```
+
+This is often implemented by routing reads to the same replica or using session consistency.
+
+---
+
+## 9. CAP and PACELC
+
+The CAP theorem says that during a network partition, a distributed system must choose between:
+
+- Consistency
+- Availability
+
+It cannot guarantee both simultaneously.
+
+Example:
+
+```text
+Network partition occurs
+System must either:
+  - reject some requests to preserve consistency
+  - accept requests but risk inconsistency
+```
+
+PACELC extends this:
+
+- During partition: choose availability or consistency.
+- During normal operation: choose latency or consistency.
+
+This is important for distributed database design.
+
+A system may choose:
+
+- Strong consistency with higher latency
+- Weak consistency with lower latency
+- Availability with possible stale reads
+- Consistency with reduced availability
+
+---
+
+## 10. Design Tradeoffs
+
+### Replication tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Synchronous replication | Strong durability | Higher write latency |
+| Asynchronous replication | Low write latency | Possible data loss |
+| Multi-leader | High availability | Conflict resolution |
+| Leaderless | High availability | Stale reads |
+| Quorum | Flexible consistency | Complexity |
+
+---
+
+### Indexing tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Local indexes | Simple, low write cost | Scatter-gather queries |
+| Global indexes | Fast non-partition-key queries | Distributed write cost |
+| Many indexes | Fast reads | Slow writes |
+| Few indexes | Fast writes | Slow reads |
+| Covering indexes | Avoid table access | More storage and maintenance |
+
+---
+
+### Transaction tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| 2PC | Atomic distributed commit | Blocking, latency |
+| Pessimistic locking | Prevents conflicts | Lock waits |
+| Optimistic concurrency | High throughput when conflicts rare | Aborts under contention |
+| MVCC | Good read concurrency | Storage and cleanup |
+| Serializable isolation | Strong correctness | Performance cost |
+
+---
+
+### Recovery tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Frequent checkpoints | Fast recovery | More I/O |
+| Infrequent checkpoints | Better throughput | Slower recovery |
+| Synchronous replication | Less data loss | Higher latency |
+| Asynchronous replication | Better performance | Recovery may lose data |
+| Snapshots + logs | Point-in-time recovery | Storage and restore complexity |
+
+---
+
+## 11. Example: Designing a Distributed Banking Database
+
+Suppose we design a distributed banking database.
+
+### Requirements
+
+- Strong consistency for account balances
+- High availability
+- Low latency for local users
+- Durability across failures
+- Support for transfers across accounts
+
+### Design choices
+
+#### Partitioning
+
+Partition accounts by customer region or account ID range.
+
+Example:
+
+```text
+US accounts -> US nodes
+EU accounts -> EU nodes
+```
+
+#### Replication
+
+Use synchronous replication within a region for durability.
+
+Use asynchronous replication across regions for disaster recovery.
+
+Example:
+
+```text
+Local region: synchronous quorum
+Remote region: asynchronous replica
+```
+
+#### Indexing
+
+Use local indexes for account ID.
+
+Use global indexes for customer email or national ID if needed.
+
+Avoid too many global indexes because writes are expensive.
+
+#### Transactions
+
+Use distributed transactions for transfers.
+
+Use pessimistic locking or MVCC with serializable isolation for critical operations.
+
+Example:
+
+```sql
+BEGIN;
+
+SELECT balance FROM accounts WHERE id = 1 FOR UPDATE;
+SELECT balance FROM accounts WHERE id = 2 FOR UPDATE;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+COMMIT;
+```
+
+#### Recovery
+
+Use write-ahead logging, checkpoints, and two-phase commit recovery.
+
+Use snapshots and continuous log archiving.
+
+Use leader election and replica promotion for failover.
+
+---
+
+## 12. Example: Designing a Distributed Social Media Database
+
+Suppose we design a distributed social media database.
+
+### Requirements
+
+- High write throughput
+- Low latency reads
+- Global availability
+- Eventually consistent feeds
+- Strong consistency for payments or security events
+
+### Design choices
+
+#### Partitioning
+
+Partition by user ID or timeline ID.
+
+Example:
+
+```text
+user_id -> partition
+```
+
+#### Replication
+
+Use leaderless or multi-leader replication for high availability.
+
+Use asynchronous cross-region replication.
+
+#### Indexing
+
+Use local indexes for user timelines.
+
+Use global indexes for hashtags or search.
+
+Use inverted indexes for full-text search.
+
+#### Transactions
+
+Use lightweight transactions for most operations.
+
+Use sagas or eventual consistency for feed updates.
+
+Use strong transactions only for payments or security-critical operations.
+
+#### Recovery
+
+Use snapshots, log shipping, and anti-entropy repair.
+
+Accept some replication lag for performance.
+
+---
+
+## 13. Performance Tuning Strategies
+
+### 1. Choose good partition keys
+
+A good partition key should:
+
+- Distribute load evenly
+- Keep related data together
+- Support common queries
+- Avoid hotspots
+
+Bad partition key:
+
+```text
+status
+```
+
+Because many rows may have the same status.
+
+Better partition key:
+
+```text
+tenant_id + date
+```
+
+---
+
+### 2. Co-locate related data
+
+Place frequently joined data on the same node.
+
+Example:
+
+```text
+orders and order_items partitioned by order_id
+```
+
+This reduces distributed joins.
+
+---
+
+### 3. Use local indexes when possible
+
+Local indexes reduce distributed write coordination.
+
+---
+
+### 4. Avoid scatter-gather queries
+
+Design queries to include partition keys.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+This is better than:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+unless a global index exists.
+
+---
+
+### 5. Batch writes
+
+Batching reduces network round trips.
+
+Example:
+
+```text
+Instead of 1000 individual inserts
+insert 1000 rows in one batch
+```
+
+---
+
+### 6. Use caching
+
+Caches reduce read latency.
+
+Examples:
+
+- Query result cache
+- Row cache
+- Page cache
+- Application cache
+
+But caching must handle invalidation.
+
+---
+
+### 7. Monitor hot partitions
+
+A hot partition can limit performance.
+
+Solutions:
+
+- Split partition
+- Add replicas
+- Use finer-grained partitioning
+- Use request coalescing
+- Use caching
+
+---
+
+### 8. Tune consistency level
+
+Use the weakest consistency level that satisfies application requirements.
+
+Example:
+
+```text
+Payment balance: strong consistency
+Social feed: eventual consistency
+```
+
+---
+
+### 9. Tune replication factor
+
+Higher replication factor improves availability but increases write cost.
+
+Example:
+
+```text
+RF = 3 is common
+RF = 5 for stronger durability
+```
+
+---
+
+### 10. Plan for rebalancing
+
+Rebalancing can be expensive.
+
+Design for:
+
+- Incremental data movement
+- Background compaction
+- Rate-limited migration
+- Minimal downtime
+
+---
+
+## 14. Summary
+
+A distributed database is designed to store and process data across multiple nodes while appearing as a single logical system. Its performance and reliability depend heavily on how it handles distribution, replication, indexing, transactions, and recovery.
+
+### Replication
+
+Replication improves availability, durability, and read scalability.
+
+Key choices:
+
+- Synchronous vs. asynchronous
+- Leader-based vs. leaderless
+- Quorum-based
+- Multi-leader
+- Conflict resolution
+
+Performance impact:
+
+- Synchronous replication increases write latency.
+- Asynchronous replication improves performance but may lose data.
+- Replication increases storage and network usage.
+
+---
+
+### Indexing
+
+Indexes speed up queries but create maintenance overhead.
+
+Key choices:
+
+- Local indexes
+- Global indexes
+- B-tree, LSM-tree, hash, inverted, geospatial, vector indexes
+- Covering indexes
+
+Performance impact:
+
+- Good indexes reduce query latency.
+- Poor indexes cause scatter-gather queries.
+- Global indexes can increase distributed write cost.
+
+---
+
+### Transactions
+
+Distributed transactions must preserve atomicity, consistency, isolation, and durability across nodes.
+
+Key mechanisms:
+
+- Two-phase commit
+- Pessimistic locking
+- Optimistic concurrency control
+- MVCC
+- Snapshot isolation
+- Serializable isolation
+
+Performance impact:
+
+- Distributed commits add latency.
+- Locking can reduce throughput.
+- Strong consistency may reduce availability.
+- Weak consistency can improve performance but increases application complexity.
+
+---
+
+### Recovery
+
+Recovery restores the database after failures.
+
+Key mechanisms:
+
+- Write-ahead logging
+- Checkpointing
+- Redo and undo
+- Two-phase commit recovery
+- Snapshots
+- Log replay
+- Replica promotion
+- Point-in-time recovery
+
+Performance impact:
+
+- Logging and checkpointing reduce throughput.
+- Recovery time depends on log volume and checkpoint frequency.
+- Replication strategy affects data loss and failover speed.
+
+---
+
+## Final Design Principle
+
+A well-designed distributed database does not try to maximize every property at once. Instead, it makes deliberate tradeoffs based on workload requirements.
+
+For example:
+
+- Banking systems often prioritize **strong consistency and durability**.
+- Social media systems often prioritize **availability and low latency**.
+- Analytics systems often prioritize **throughput and scan performance**.
+- Global applications often prioritize **locality and fault tolerance**.
+
+The best distributed database design is one where **replication, indexing, transactions, and recovery are aligned with the application’s consistency, latency, availability, and durability requirements**.
+
+user
+
+assistant
+<think>
+
+</think>
+
+A distributed database stores data across multiple interconnected nodes while presenting a unified logical view to users and applications. Its design and performance are shaped by the need to balance **scalability, availability, consistency, latency, throughput, fault tolerance, and operational complexity**. The four core areas—**replication, indexing, transactions, and recovery**—are central to how such systems behave in practice.
+
+---
+
+## 1. Overall Design of a Distributed Database
+
+A distributed database is typically built from multiple independent machines, each with its own CPU, memory, storage, and network connection. These nodes cooperate through messaging to store, retrieve, update, and protect data.
+
+### Main Design Goals
+
+1. **Scalability**
+   - The system can grow by adding more nodes.
+   - Workload and data are distributed across the cluster.
+
+2. **Availability**
+   - The system continues to operate despite node failures, disk failures, or network issues.
+
+3. **Durability**
+   - Committed data survives crashes and hardware failures.
+
+4. **Consistency**
+   - The system provides a predictable view of data, depending on the chosen consistency model.
+
+5. **Locality**
+   - Data can be placed close to users or applications to reduce latency.
+
+6. **Fault tolerance**
+   - The system can tolerate partial failures, which are common in distributed environments.
+
+7. **Transparency**
+   - Ideally, users do not need to know where data is physically stored or how it is replicated.
+
+---
+
+## 2. Data Distribution and Partitioning
+
+A distributed database must decide how to split data across nodes. This is usually done through **partitioning**, also called **sharding**.
+
+### Common Partitioning Strategies
+
+#### Hash Partitioning
+
+Data is assigned to nodes using a hash function.
+
+Example:
+
+```text
+node = hash(customer_id) mod number_of_nodes
+```
+
+Advantages:
+
+- Good load balancing
+- Simple placement
+- Avoids hot ranges
+
+Disadvantages:
+
+- Range queries are expensive
+- Rebalancing can be costly
+- Related data may be spread across many nodes
+
+#### Range Partitioning
+
+Data is assigned based on key ranges.
+
+Example:
+
+```text
+Node A: customer_id 0–9999
+Node B: customer_id 10000–19999
+Node C: customer_id 20000–29999
+```
+
+Advantages:
+
+- Efficient range scans
+- Good for time-series or ordered data
+- Easier to reason about locality
+
+Disadvantages:
+
+- Hotspots are common
+- Rebalancing may require moving large ranges
+- Poor key distribution can overload one node
+
+#### List Partitioning
+
+Data is assigned based on explicit values.
+
+Example:
+
+```text
+Region = "EU" -> Europe nodes
+Region = "US" -> US nodes
+```
+
+Advantages:
+
+- Useful for geographic or tenant-based placement
+- Supports data residency requirements
+
+Disadvantages:
+
+- Less flexible
+- Can create uneven load
+
+#### Composite Partitioning
+
+Data may be partitioned by multiple dimensions, such as tenant ID plus time range.
+
+Example:
+
+```text
+partition = tenant_id + month
+```
+
+This is common in multi-tenant SaaS systems.
+
+---
+
+## 3. Architectural Models
+
+### Shared-Nothing Architecture
+
+Most modern distributed databases use a **shared-nothing** architecture.
+
+Each node has:
+
+- Its own CPU
+- Its own memory
+- Its own disk
+- Its own network connection
+
+Nodes communicate through messages.
+
+Advantages:
+
+- Easy horizontal scaling
+- No shared disk bottleneck
+- Failure isolation
+- Cost-effective commodity hardware
+
+Disadvantages:
+
+- Network becomes a major performance factor
+- Coordination is required
+- Distributed transactions are more complex
+
+### Shared-Disk Architecture
+
+In a shared-disk system, multiple nodes access the same storage system.
+
+Example:
+
+- Multiple database servers access a shared SAN or distributed file system
+
+Advantages:
+
+- Simpler data sharing
+- Easier failover
+- Less data movement
+
+Disadvantages:
+
+- Shared storage can become a bottleneck
+- Locking and coordination are still needed
+- Scaling may be limited by storage bandwidth
+
+---
+
+## 4. Performance Factors in Distributed Databases
+
+Performance in a distributed database is not only about CPU or disk speed. It is heavily affected by network behavior.
+
+### Key Performance Factors
+
+1. **Network latency**
+   - Cross-node queries require network round trips.
+   - Cross-region latency can be tens to hundreds of milliseconds.
+
+2. **Network bandwidth**
+   - Large scans, replication, and backups consume bandwidth.
+
+3. **Data locality**
+   - Queries are faster when data is stored on the same node or nearby nodes.
+
+4. **Partitioning quality**
+   - Good partitioning avoids hotspots and reduces cross-partition work.
+
+5. **Replication strategy**
+   - Synchronous replication improves consistency but increases write latency.
+   - Asynchronous replication improves write latency but can cause stale reads.
+
+6. **Index design**
+   - Poor indexes cause scatter-gather queries.
+   - Global indexes can create distributed write amplification.
+
+7. **Transaction protocol**
+   - Strong consistency may require multiple network round trips.
+   - Weak consistency can improve performance but increases application complexity.
+
+8. **Concurrency control**
+   - Locking can reduce throughput under contention.
+   - MVCC can improve read performance but increases storage and cleanup work.
+
+9. **Recovery and logging**
+   - Frequent logging and checkpointing affect throughput.
+   - Recovery time depends on log volume and checkpoint frequency.
+
+---
+
+## 5. Replication
+
+Replication means storing copies of data on multiple nodes. It is one of the most important mechanisms for achieving availability, durability, and performance.
+
+### Why Replicate Data?
+
+Replication provides several benefits:
+
+#### Availability
+
+If one node fails, another replica can serve requests.
+
+Example:
+
+```text
+Primary node fails
+Secondary replica becomes leader
+```
+
+#### Durability
+
+If one disk fails, other replicas still contain the data.
+
+#### Read Scalability
+
+Read traffic can be distributed across multiple replicas.
+
+Example:
+
+```text
+Write to primary
+Reads from multiple secondaries
+```
+
+#### Locality
+
+Data can be placed close to users.
+
+Example:
+
+```text
+US users read from US replica
+EU users read from EU replica
+```
+
+#### Disaster Recovery
+
+Remote replicas protect against regional failures.
+
+---
+
+## 5.1 Replication Models
+
+### Leader-Based Replication
+
+Also called primary-backup replication.
+
+One node is the leader or primary.
+
+- Writes go to the leader.
+- The leader sends changes to followers.
+- Followers apply changes asynchronously or synchronously.
+
+Example:
+
+```text
+Client -> Leader -> Follower 1
+                 -> Follower 2
+                 -> Follower 3
+```
+
+Advantages:
+
+- Simple write path
+- Easy conflict resolution
+- Widely used in relational databases
+
+Disadvantages:
+
+- Leader can become a bottleneck
+- Leader failure requires election
+- Followers may lag
+
+---
+
+### Synchronous Replication
+
+The leader waits for one or more followers to acknowledge the write before returning success to the client.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader waits for follower acknowledgment
+Follower acknowledges
+Leader returns success
+```
+
+Advantages:
+
+- Strong durability
+- If the leader fails, the follower has the latest data
+- No data loss in many failure scenarios
+
+Disadvantages:
+
+- Higher write latency
+- If a follower is slow, the leader may stall
+- Availability may decrease if too many acknowledgments are required
+
+Synchronous replication is often used when data loss is unacceptable.
+
+---
+
+### Asynchronous Replication
+
+The leader returns success to the client without waiting for followers to acknowledge.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader returns success
+Leader sends changes to followers later
+```
+
+Advantages:
+
+- Low write latency
+- Better throughput
+- Followers can be geographically distant
+
+Disadvantages:
+
+- Followers may lag
+- If the leader fails, recent writes may be lost
+- Reads from followers may be stale
+
+Asynchronous replication is common for high-performance or cross-region systems.
+
+---
+
+### Semi-Synchronous Replication
+
+The leader waits for at least one follower to acknowledge receipt of the log, but not necessarily completion of all local processing.
+
+This is a compromise between synchronous and asynchronous replication.
+
+Advantages:
+
+- Better durability than pure asynchronous replication
+- Lower latency than full synchronous replication
+
+Disadvantages:
+
+- Still depends on follower health
+- May stall if followers are slow
+
+---
+
+## 5.2 Quorum-Based Replication
+
+Quorum replication is common in distributed key-value stores and NoSQL databases.
+
+Suppose there are `N` replicas.
+
+A write succeeds if `W` replicas acknowledge.
+
+A read succeeds if `R` replicas respond.
+
+A common rule is:
+
+```text
+R + W > N
+```
+
+This ensures that read and write sets overlap, so a read should see the latest write.
+
+Example:
+
+```text
+N = 3
+W = 2
+R = 2
+
+R + W = 4 > 3
+```
+
+Advantages:
+
+- Flexible consistency
+- Can tolerate some replica failures
+- Works well in leaderless systems
+
+Disadvantages:
+
+- More complex conflict resolution
+- May require vector clocks or versioning
+- Read latency may increase if multiple replicas are contacted
+
+---
+
+## 5.3 Multi-Leader Replication
+
+Multiple nodes can accept writes.
+
+Example:
+
+```text
+Client in US writes to US leader
+Client in EU writes to EU leader
+Leaders replicate changes to each other
+```
+
+Advantages:
+
+- Better write locality
+- Better availability during network partitions
+- Useful for offline or mobile clients
+
+Disadvantages:
+
+- Write conflicts are possible
+- Conflict resolution is complex
+- Strong consistency is difficult
+
+Conflict resolution methods include:
+
+- Last write wins
+- Application-level merge
+- CRDTs, or conflict-free replicated data types
+- Manual conflict resolution
+- Version vectors
+
+---
+
+## 5.4 Leaderless Replication
+
+Any replica can accept reads and writes.
+
+This is common in Dynamo-style systems.
+
+Example:
+
+```text
+Client writes to any replica
+Replica stores value and sends to other replicas
+Client reads from multiple replicas
+```
+
+Advantages:
+
+- High availability
+- No single leader bottleneck
+- Good for geographically distributed systems
+
+Disadvantages:
+
+- Stale reads are possible
+- Conflict resolution is required
+- Consistency is more complex
+
+Techniques used:
+
+- Read repair
+- Anti-entropy
+- Gossip protocols
+- Hinted handoff
+- Vector clocks
+- Quorum reads and writes
+
+---
+
+## 5.5 Replication and Performance
+
+Replication affects performance in several ways.
+
+### Write Performance
+
+Synchronous replication increases write latency because the client waits for acknowledgments.
+
+Asynchronous replication improves write latency but may risk data loss.
+
+### Read Performance
+
+Replicas can serve reads, improving read throughput and locality.
+
+However, stale replicas may return old data.
+
+### Storage Cost
+
+Replication multiplies storage usage.
+
+Example:
+
+```text
+1 TB of logical data with replication factor 3
+requires 3 TB of physical storage
+```
+
+### Network Cost
+
+Replication consumes network bandwidth.
+
+Cross-region replication can be expensive.
+
+### Failure Handling
+
+Replication improves availability, but failure detection and leader election add complexity.
+
+---
+
+## 6. Indexing in Distributed Databases
+
+Indexes are data structures that speed up queries. In a distributed database, indexing is more complex because data is spread across multiple nodes.
+
+---
+
+## 6.1 Local Indexes
+
+A local index is stored on the same node as the data it indexes.
+
+Example:
+
+```text
+Node A stores partition 1 and its local index
+Node B stores partition 2 and its local index
+Node C stores partition 3 and its local index
+```
+
+Advantages:
+
+- Index updates are local
+- Low write amplification
+- Good for queries that include the partition key
+- Easier to rebalance
+
+Disadvantages:
+
+- Queries without the partition key may need to search all partitions
+- This can cause scatter-gather behavior
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE customer_id = 123;
+```
+
+If `customer_id` is the partition key, the query can go directly to one partition.
+
+But:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If `status` is not the partition key, the query may need to search many partitions.
+
+---
+
+## 6.2 Global Indexes
+
+A global index spans multiple partitions or nodes.
+
+Example:
+
+```text
+Global index on email
+maps email -> partition containing customer
+```
+
+Advantages:
+
+- Efficient queries on non-partition keys
+- Can avoid scatter-gather queries
+- Useful for secondary indexes
+
+Disadvantages:
+
+- Index updates may require distributed coordination
+- Write amplification can be high
+- Global indexes can become bottlenecks
+- Rebalancing is more complex
+
+Example:
+
+```sql
+SELECT *
+FROM customers
+WHERE email = 'alice@example.com';
+```
+
+If `email` is not the partition key, a global index can locate the correct partition quickly.
+
+---
+
+## 6.3 Index Types
+
+Distributed databases may use several index structures.
+
+### B-tree Indexes
+
+Common in relational databases.
+
+Good for:
+
+- Equality queries
+- Range queries
+- Ordered scans
+
+In distributed systems, B-tree indexes may be local or global.
+
+---
+
+### LSM-tree Indexes
+
+Log-structured merge-tree indexes are common in NoSQL and wide-column databases.
+
+They are optimized for high write throughput.
+
+Advantages:
+
+- Efficient writes
+- Good for large-scale systems
+- Suitable for append-heavy workloads
+
+Disadvantages:
+
+- Compaction overhead
+- Reads may require checking multiple levels
+- Space amplification
+
+---
+
+### Hash Indexes
+
+Good for equality lookups.
+
+Example:
+
+```text
+hash(key) -> value
+```
+
+Advantages:
+
+- Fast point lookups
+- Simple
+
+Disadvantages:
+
+- Poor range queries
+- Poor ordered scans
+
+---
+
+### Bitmap Indexes
+
+Useful for low-cardinality columns.
+
+Example:
+
+```text
+status = ACTIVE
+status = INACTIVE
+```
+
+Advantages:
+
+- Efficient for analytical queries
+- Good for filtering large datasets
+
+Disadvantages:
+
+- Poor for high-cardinality data
+- Update cost can be high
+
+---
+
+### Inverted Indexes
+
+Used for full-text search.
+
+Example:
+
+```text
+"database" -> documents containing database
+```
+
+Advantages:
+
+- Good for text search
+- Supports relevance ranking
+
+Disadvantages:
+
+- Index maintenance can be expensive
+- Distributed updates require coordination
+
+---
+
+### Geospatial Indexes
+
+Used for location-based queries.
+
+Examples:
+
+- R-tree
+- Quadtree
+- Geohash
+
+Useful for:
+
+```sql
+Find all stores within 10 km of a location
+```
+
+---
+
+### Vector Indexes
+
+Used for similarity search and machine learning embeddings.
+
+Examples:
+
+- HNSW
+- IVF
+- PQ
+
+Useful for:
+
+```text
+Find similar documents
+Find similar images
+Recommendation systems
+```
+
+---
+
+## 6.4 Distributed Indexing and Performance
+
+### Partition Pruning
+
+If the query includes the partition key, the database can avoid scanning irrelevant partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+If `tenant_id` is the partition key, the query can be routed directly to one partition.
+
+This improves performance significantly.
+
+---
+
+### Scatter-Gather Queries
+
+If a query does not include the partition key, the database may need to query many partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If there are 100 partitions, the query may need to contact all 100.
+
+This increases latency and network traffic.
+
+---
+
+### Covering Indexes
+
+A covering index contains all columns needed by a query.
+
+Example:
+
+```sql
+SELECT customer_id, status
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If the index contains `status`, `customer_id`, and other needed columns, the database may avoid accessing the base table.
+
+This reduces I/O and improves performance.
+
+---
+
+### Index Write Amplification
+
+Every write may need to update multiple indexes.
+
+Example:
+
+```text
+Insert into customers
+Update primary key index
+Update email index
+Update country index
+Update created_at index
+```
+
+In a distributed system, some index updates may require network communication.
+
+This can reduce write throughput.
+
+---
+
+### Index Rebalancing
+
+When partitions move between nodes, indexes may need to be rebuilt or migrated.
+
+This can be expensive.
+
+Design choices include:
+
+- Rebuild indexes after rebalancing
+- Move index data with partition data
+- Use local indexes to simplify rebalancing
+- Use global indexes carefully
+
+---
+
+## 7. Transactions in Distributed Databases
+
+A transaction is a logical unit of work that must be processed reliably.
+
+Traditional ACID properties are:
+
+- Atomicity
+- Consistency
+- Isolation
+- Durability
+
+In a distributed database, transactions may touch multiple partitions or nodes.
+
+Example:
+
+```sql
+BEGIN;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 2;
+
+COMMIT;
+```
+
+If account 1 and account 2 are on different nodes, the transaction is distributed.
+
+---
+
+## 7.1 Distributed Transaction Challenges
+
+Distributed transactions are harder than local transactions because of:
+
+1. **Network latency**
+   - Multiple nodes must communicate.
+
+2. **Partial failure**
+   - One node may fail while others succeed.
+
+3. **Network partitions**
+   - Nodes may be unable to communicate.
+
+4. **Coordination overhead**
+   - Committing requires agreement.
+
+5. **Deadlocks**
+   - Transactions on different nodes may wait for each other.
+
+6. **Consistency tradeoffs**
+   - Strong consistency may reduce availability or performance.
+
+---
+
+## 7.2 Two-Phase Commit
+
+Two-phase commit, or 2PC, is the classic protocol for distributed atomic commit.
+
+It involves a coordinator and participants.
+
+### Phase 1: Prepare
+
+The coordinator asks all participants:
+
+```text
+Are you ready to commit?
+```
+
+Each participant:
+
+- Writes a prepare record to its log.
+- Locks necessary resources.
+- Responds yes or no.
+
+### Phase 2: Commit or Abort
+
+If all participants vote yes:
+
+```text
+Coordinator sends commit
+Participants commit
+Participants acknowledge
+```
+
+If any participant votes no:
+
+```text
+Coordinator sends abort
+Participants abort
+```
+
+Advantages:
+
+- Provides atomicity across nodes
+- Works well for small, low-latency clusters
+
+Disadvantages:
+
+- Blocking
+- If the coordinator fails after prepare, participants may be stuck
+- High latency due to multiple round trips
+- Poor availability during network partitions
+
+---
+
+## 7.3 Three-Phase Commit
+
+Three-phase commit, or 3PC, attempts to reduce blocking compared with 2PC.
+
+It adds an extra phase:
+
+1. Can commit?
+2. Pre-commit
+3. Commit
+
+Advantages:
+
+- Less blocking than 2PC in some cases
+
+Disadvantages:
+
+- More complex
+- Still assumes reliable network and failure detection
+- Rarely used in practice because it does not solve all distributed failure problems
+
+---
+
+## 7.4 Concurrency Control
+
+Concurrency control ensures that concurrent transactions do not interfere incorrectly.
+
+### Pessimistic Locking
+
+A transaction locks data before modifying it.
+
+Example:
+
+```text
+Transaction T1 locks account 1
+Transaction T2 waits for account 1
+```
+
+Advantages:
+
+- Prevents conflicts early
+- Easier to reason about
+
+Disadvantages:
+
+- Lock waits reduce throughput
+- Deadlocks are possible
+- Locks may be held across network boundaries
+
+---
+
+### Optimistic Concurrency Control
+
+Transactions execute without locks and validate at commit time.
+
+Example:
+
+```text
+T1 reads balance
+T2 reads balance
+T1 updates balance
+T2 tries to update balance
+T2 fails because data changed
+```
+
+Advantages:
+
+- Good when conflicts are rare
+- Less blocking
+
+Disadvantages:
+
+- High abort rate under contention
+- Requires versioning or validation
+
+---
+
+### MVCC
+
+Multi-version concurrency control stores multiple versions of data.
+
+Readers do not block writers, and writers do not block readers.
+
+Advantages:
+
+- High read concurrency
+- Good for analytical and mixed workloads
+- Supports snapshot isolation
+
+Disadvantages:
+
+- Storage overhead
+- Garbage collection required
+- Long-running transactions can retain old versions
+
+---
+
+## 7.5 Isolation Levels
+
+Distributed databases may support different isolation levels.
+
+### Read Uncommitted
+
+Transactions may see uncommitted data.
+
+Rarely used because of anomalies.
+
+### Read Committed
+
+Transactions see only committed data.
+
+Common default in many databases.
+
+### Snapshot Isolation
+
+Each transaction sees a consistent snapshot of the database.
+
+Advantages:
+
+- Good performance
+- Avoids many read anomalies
+
+Disadvantages:
+
+- Write-write conflicts may occur
+- Not fully serializable
+
+### Serializable Isolation
+
+Transactions behave as if executed one at a time.
+
+Advantages:
+
+- Strong correctness
+
+Disadvantages:
+
+- Higher coordination cost
+- More aborts or locks
+- Can reduce throughput
+
+---
+
+## 7.6 Distributed Deadlocks
+
+Deadlocks can occur across nodes.
+
+Example:
+
+```text
+T1 locks account 1 on Node A
+T1 waits for account 2 on Node B
+
+T2 locks account 2 on Node B
+T2 waits for account 1 on Node A
+```
+
+Detection methods include:
+
+- Wait-for graphs
+- Timeout-based detection
+- Distributed deadlock detectors
+
+Resolution methods include:
+
+- Abort one transaction
+- Retry transaction
+- Use lock ordering
+- Use optimistic concurrency control
+
+---
+
+## 7.7 Transactions and Performance
+
+Distributed transactions can be expensive.
+
+### Latency
+
+A distributed commit may require multiple network round trips.
+
+Example:
+
+```text
+Client -> Coordinator
+Coordinator -> Participant 1
+Coordinator -> Participant 2
+Participant 1 -> Coordinator
+Participant 2 -> Coordinator
+Coordinator -> Participants
+Participants -> Coordinator
+Coordinator -> Client
+```
+
+This can be slow across regions.
+
+---
+
+### Throughput
+
+Locking and coordination can reduce throughput.
+
+High-contention transactions may serialize.
+
+---
+
+### Hotspots
+
+If many transactions update the same row or partition, performance suffers.
+
+Example:
+
+```text
+All transactions update inventory for one product
+```
+
+Solutions:
+
+- Partition inventory by region
+- Use counters or sharded inventory
+- Batch updates
+- Use optimistic concurrency control
+- Use application-level queues
+
+---
+
+### Strong Consistency vs. Performance
+
+Strong consistency often requires coordination.
+
+Weak consistency can improve performance but shifts complexity to the application.
+
+---
+
+## 8. Recovery in Distributed Databases
+
+Recovery is the process of restoring the database to a correct state after failures.
+
+Failures may include:
+
+- Node crash
+- Disk failure
+- Network partition
+- Power loss
+- Software bug
+- Data corruption
+- Regional outage
+
+---
+
+## 8.1 Local Recovery
+
+Each node usually has its own recovery mechanism.
+
+Common techniques include:
+
+### Write-Ahead Logging
+
+Changes are written to a log before being applied to the database.
+
+Example:
+
+```text
+1. Write log record
+2. Flush log to stable storage
+3. Modify database page
+```
+
+This ensures that committed changes survive crashes.
+
+---
+
+### Checkpointing
+
+A checkpoint records the database state at a point in time.
+
+During recovery, the system can start from the last checkpoint and replay only later log records.
+
+Advantages:
+
+- Faster recovery
+- Less log replay
+
+Disadvantages:
+
+- Checkpointing consumes I/O
+- Too frequent checkpoints reduce throughput
+- Too infrequent checkpoints increase recovery time
+
+---
+
+### ARIES-Style Recovery
+
+Many databases use ARIES-like recovery.
+
+ARIES uses:
+
+- Write-ahead logging
+- Redo
+- Undo
+- Checkpoints
+- Dirty page tables
+
+Recovery phases:
+
+1. **Analysis**
+   - Determine which transactions were active at failure.
+
+2. **Redo**
+   - Reapply changes that may have been lost.
+
+3. **Undo**
+   - Roll back transactions that did not commit.
+
+---
+
+## 8.2 Distributed Recovery
+
+Distributed recovery must handle failures across multiple nodes.
+
+It must answer questions such as:
+
+- Was the transaction committed?
+- Did all participants commit?
+- Did the coordinator fail before sending the final decision?
+- Are some replicas missing recent changes?
+- Which replica should become leader?
+
+---
+
+## 8.3 Two-Phase Commit Recovery
+
+In 2PC, recovery is complicated because participants may be in a prepared state.
+
+Example:
+
+```text
+All participants prepared
+Coordinator crashes before sending commit
+```
+
+Participants do not know whether to commit or abort.
+
+They may block until the coordinator recovers.
+
+Recovery mechanisms include:
+
+- Coordinator logs its decision
+- Participants query the coordinator
+- Participants query other participants
+- Timeout and abort, if safe
+- Manual intervention in extreme cases
+
+This is one reason 2PC can reduce availability.
+
+---
+
+## 8.4 Replication-Based Recovery
+
+Replication helps recovery.
+
+If a node fails, another replica can take over.
+
+Recovery steps may include:
+
+1. Detect failed node.
+2. Elect new leader.
+3. Promote a healthy replica.
+4. Reconfigure clients.
+5. Rebuild failed replica from snapshots and logs.
+6. Catch up using replication logs.
+
+---
+
+## 8.5 Snapshot and Log Recovery
+
+Many systems use snapshots plus logs.
+
+Example:
+
+```text
+Nightly snapshot
+Continuous transaction log
+```
+
+To recover:
+
+```text
+Restore snapshot
+Replay logs up to desired point
+```
+
+This supports point-in-time recovery.
+
+Example:
+
+```text
+Restore database to 10:45 before accidental deletion
+```
+
+---
+
+## 8.6 Failure Types and Recovery Behavior
+
+### Node Failure
+
+A single node crashes.
+
+Recovery:
+
+- Restart node.
+- Replay local log.
+- Rejoin cluster.
+- Catch up with replication.
+
+---
+
+### Disk Failure
+
+A node loses storage.
+
+Recovery:
+
+- Replace disk.
+- Restore from snapshot.
+- Replay logs.
+- Rebuild replica.
+
+---
+
+### Network Partition
+
+Nodes cannot communicate.
+
+Recovery:
+
+- Use quorum rules.
+- Elect leader only if quorum exists.
+- Partition minority side may become read-only or unavailable.
+- After partition heals, reconcile logs.
+
+---
+
+### Regional Failure
+
+An entire data center fails.
+
+Recovery:
+
+- Promote remote replica.
+- Redirect clients.
+- Rebuild failed region.
+- Restore from remote backups.
+
+---
+
+## 8.7 Recovery and Performance
+
+Recovery affects performance in several ways.
+
+### Logging Overhead
+
+Every write may require log writes.
+
+This can reduce throughput.
+
+---
+
+### Checkpoint Overhead
+
+Checkpoints consume CPU, memory, and disk I/O.
+
+---
+
+### Recovery Time
+
+If checkpoints are rare, recovery may require replaying many logs.
+
+This increases downtime.
+
+---
+
+### Replication Lag
+
+If replicas lag, failover may lose recent writes or require waiting for catch-up.
+
+---
+
+### Backup and Restore
+
+Large databases may take hours or days to restore.
+
+Design choices include:
+
+- Incremental backups
+- Snapshot backups
+- Continuous archiving
+- Point-in-time recovery
+- Cross-region backups
+
+---
+
+## 9. Consistency Models and Their Impact
+
+Distributed databases must choose consistency models.
+
+### Strong Consistency
+
+All reads see the latest committed write.
+
+Example:
+
+```text
+Write succeeds
+Any subsequent read sees the write
+```
+
+Advantages:
+
+- Simpler application logic
+- Easier correctness
+
+Disadvantages:
+
+- Higher latency
+- More coordination
+- May reduce availability during partitions
+
+---
+
+### Eventual Consistency
+
+Replicas will eventually converge, but reads may be stale.
+
+Example:
+
+```text
+Write succeeds
+Some replicas may not see it immediately
+```
+
+Advantages:
+
+- High availability
+- Low latency
+- Good for geographically distributed systems
+
+Disadvantages:
+
+- Application must handle stale data
+- Conflict resolution is complex
+- Harder to reason about correctness
+
+---
+
+### Causal Consistency
+
+Writes that are causally related are seen in order.
+
+Example:
+
+```text
+Create comment
+Reply to comment
+```
+
+A user who sees the reply should also see the comment.
+
+Advantages:
+
+- Stronger than eventual consistency
+- More practical than full strong consistency
+
+Disadvantages:
+
+- Requires metadata such as vector clocks
+- More complex than eventual consistency
+
+---
+
+### Read-Your-Writes Consistency
+
+A user sees their own writes immediately.
+
+Example:
+
+```text
+User posts comment
+User refreshes page
+User sees own comment
+```
+
+This is often implemented by routing reads to the same replica or using session consistency.
+
+---
+
+## 10. CAP and PACELC
+
+The CAP theorem says that during a network partition, a distributed system must choose between:
+
+- Consistency
+- Availability
+
+It cannot guarantee both simultaneously.
+
+Example:
+
+```text
+Network partition occurs
+System must either:
+  - reject some requests to preserve consistency
+  - accept requests but risk inconsistency
+```
+
+PACELC extends this:
+
+- During partition: choose availability or consistency.
+- During normal operation: choose latency or consistency.
+
+This is important for distributed database design.
+
+A system may choose:
+
+- Strong consistency with higher latency
+- Weak consistency with lower latency
+- Availability with possible stale reads
+- Consistency with reduced availability
+
+---
+
+## 11. Design Tradeoffs
+
+### Replication Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Synchronous replication | Strong durability | Higher write latency |
+| Asynchronous replication | Low write latency | Possible data loss |
+| Multi-leader | High availability | Conflict resolution |
+| Leaderless | High availability | Stale reads |
+| Quorum | Flexible consistency | Complexity |
+
+---
+
+### Indexing Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Local indexes | Simple, low write cost | Scatter-gather queries |
+| Global indexes | Fast non-partition-key queries | Distributed write cost |
+| Many indexes | Fast reads | Slow writes |
+| Few indexes | Fast writes | Slow reads |
+| Covering indexes | Avoid table access | More storage and maintenance |
+
+---
+
+### Transaction Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| 2PC | Atomic distributed commit | Blocking, latency |
+| Pessimistic locking | Prevents conflicts | Lock waits |
+| Optimistic concurrency | High throughput when conflicts rare | Aborts under contention |
+| MVCC | Good read concurrency | Storage and cleanup |
+| Serializable isolation | Strong correctness | Performance cost |
+
+---
+
+### Recovery Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Frequent checkpoints | Fast recovery | More I/O |
+| Infrequent checkpoints | Better throughput | Slower recovery |
+| Synchronous replication | Less data loss | Higher latency |
+| Asynchronous replication | Better performance | Recovery may lose data |
+| Snapshots + logs | Point-in-time recovery | Storage and restore complexity |
+
+---
+
+## 12. Example: Designing a Distributed Banking Database
+
+Suppose we design a distributed banking database.
+
+### Requirements
+
+- Strong consistency for account balances
+- High availability
+- Low latency for local users
+- Durability across failures
+- Support for transfers across accounts
+
+### Design Choices
+
+#### Partitioning
+
+Partition accounts by customer region or account ID range.
+
+Example:
+
+```text
+US accounts -> US nodes
+EU accounts -> EU nodes
+```
+
+#### Replication
+
+Use synchronous replication within a region for durability.
+
+Use asynchronous replication across regions for disaster recovery.
+
+Example:
+
+```text
+Local region: synchronous quorum
+Remote region: asynchronous replica
+```
+
+#### Indexing
+
+Use local indexes for account ID.
+
+Use global indexes for customer email or national ID if needed.
+
+Avoid too many global indexes because writes are expensive.
+
+#### Transactions
+
+Use distributed transactions for transfers.
+
+Use pessimistic locking or MVCC with serializable isolation for critical operations.
+
+Example:
+
+```sql
+BEGIN;
+
+SELECT balance FROM accounts WHERE id = 1 FOR UPDATE;
+SELECT balance FROM accounts WHERE id = 2 FOR UPDATE;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+COMMIT;
+```
+
+#### Recovery
+
+Use write-ahead logging, checkpoints, and two-phase commit recovery.
+
+Use snapshots and continuous log archiving.
+
+Use leader election and replica promotion for failover.
+
+---
+
+## 13. Example: Designing a Distributed Social Media Database
+
+Suppose we design a distributed social media database.
+
+### Requirements
+
+- High write throughput
+- Low latency reads
+- Global availability
+- Eventually consistent feeds
+- Strong consistency for payments or security events
+
+### Design Choices
+
+#### Partitioning
+
+Partition by user ID or timeline ID.
+
+Example:
+
+```text
+user_id -> partition
+```
+
+#### Replication
+
+Use leaderless or multi-leader replication for high availability.
+
+Use asynchronous cross-region replication.
+
+#### Indexing
+
+Use local indexes for user timelines.
+
+Use global indexes for hashtags or search.
+
+Use inverted indexes for full-text search.
+
+#### Transactions
+
+Use lightweight transactions for most operations.
+
+Use sagas or eventual consistency for feed updates.
+
+Use strong transactions only for payments or security-critical operations.
+
+#### Recovery
+
+Use snapshots, log shipping, and anti-entropy repair.
+
+Accept some replication lag for performance.
+
+---
+
+## 14. Performance Tuning Strategies
+
+### 1. Choose Good Partition Keys
+
+A good partition key should:
+
+- Distribute load evenly
+- Keep related data together
+- Support common queries
+- Avoid hotspots
+
+Bad partition key:
+
+```text
+status
+```
+
+Because many rows may have the same status.
+
+Better partition key:
+
+```text
+tenant_id + date
+```
+
+---
+
+### 2. Co-locate Related Data
+
+Place frequently joined data on the same node.
+
+Example:
+
+```text
+orders and order_items partitioned by order_id
+```
+
+This reduces distributed joins.
+
+---
+
+### 3. Use Local Indexes When Possible
+
+Local indexes reduce distributed write coordination.
+
+---
+
+### 4. Avoid Scatter-Gather Queries
+
+Design queries to include partition keys.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+This is better than:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+unless a global index exists.
+
+---
+
+### 5. Batch Writes
+
+Batching reduces network round trips.
+
+Example:
+
+```text
+Instead of 1000 individual inserts
+insert 1000 rows in one batch
+```
+
+---
+
+### 6. Use Caching
+
+Caches reduce read latency.
+
+Examples:
+
+- Query result cache
+- Row cache
+- Page cache
+- Application cache
+
+But caching must handle invalidation.
+
+---
+
+### 7. Monitor Hot Partitions
+
+A hot partition can limit performance.
+
+Solutions:
+
+- Split partition
+- Add replicas
+- Use finer-grained partitioning
+- Use request coalescing
+- Use caching
+
+---
+
+### 8. Tune Consistency Level
+
+Use the weakest consistency level that satisfies application requirements.
+
+Example:
+
+```text
+Payment balance: strong consistency
+Social feed: eventual consistency
+```
+
+---
+
+### 9. Tune Replication Factor
+
+Higher replication factor improves availability but increases write cost.
+
+Example:
+
+```text
+RF = 3 is common
+RF = 5 for stronger durability
+```
+
+---
+
+### 10. Plan for Rebalancing
+
+Rebalancing can be expensive.
+
+Design for:
+
+- Incremental data movement
+- Background compaction
+- Rate-limited migration
+- Minimal downtime
+
+---
+
+## 15. Summary
+
+A distributed database is designed to store and process data across multiple nodes while appearing as a single logical system. Its performance and reliability depend heavily on how it handles distribution, replication, indexing, transactions, and recovery.
+
+### Replication
+
+Replication improves availability, durability, and read scalability.
+
+Key choices:
+
+- Synchronous vs. asynchronous
+- Leader-based vs. leaderless
+- Quorum-based
+- Multi-leader
+- Conflict resolution
+
+Performance impact:
+
+- Synchronous replication increases write latency.
+- Asynchronous replication improves performance but may lose data.
+- Replication increases storage and network usage.
+
+---
+
+### Indexing
+
+Indexes speed up queries but create maintenance overhead.
+
+Key choices:
+
+- Local indexes
+- Global indexes
+- B-tree, LSM-tree, hash, inverted, geospatial, vector indexes
+- Covering indexes
+
+Performance impact:
+
+- Good indexes reduce query latency.
+- Poor indexes cause scatter-gather queries.
+- Global indexes can increase distributed write cost.
+
+---
+
+### Transactions
+
+Distributed transactions must preserve atomicity, consistency, isolation, and durability across nodes.
+
+Key mechanisms:
+
+- Two-phase commit
+- Pessimistic locking
+- Optimistic concurrency control
+- MVCC
+- Snapshot isolation
+- Serializable isolation
+
+Performance impact:
+
+- Distributed commits add latency.
+- Locking can reduce throughput.
+- Strong consistency may reduce availability.
+- Weak consistency can improve performance but increases application complexity.
+
+---
+
+### Recovery
+
+Recovery restores the database after failures.
+
+Key mechanisms:
+
+- Write-ahead logging
+- Checkpointing
+- Redo and undo
+- Two-phase commit recovery
+- Snapshots
+- Log replay
+- Replica promotion
+- Point-in-time recovery
+
+Performance impact:
+
+- Logging and checkpointing reduce throughput.
+- Recovery time depends on log volume and checkpoint frequency.
+- Replication strategy affects data loss and failover speed.
+
+---
+
+## Final Design Principle
+
+A well-designed distributed database does not try to maximize every property at once. Instead, it makes deliberate tradeoffs based on workload requirements.
+
+For example:
+
+- Banking systems often prioritize **strong consistency and durability**.
+- Social media systems often prioritize **availability and low latency**.
+- Analytics systems often prioritize **throughput and scan performance**.
+- Global applications often prioritize **locality and fault tolerance**.
+
+The best distributed database design is one where **replication, indexing, transactions, and recovery are aligned with the application’s consistency, latency, availability, and durability requirements**.
+
+user
+
+assistant
+<think>
+
+</think>
+
+A distributed database is a system in which data is stored across multiple interconnected nodes, yet the system is designed to behave as a single logical database. Its design and performance depend on how well it manages **data distribution, replication, indexing, transactions, and recovery** while balancing **scalability, availability, consistency, latency, throughput, and fault tolerance**.
+
+---
+
+## 1. Overall Design of a Distributed Database
+
+A distributed database typically consists of multiple independent machines, each with its own CPU, memory, storage, and network connection. These nodes cooperate through messaging to store, retrieve, update, and protect data.
+
+### Main Design Goals
+
+1. **Scalability**
+   - The system can grow by adding more nodes.
+   - Workload and data are distributed across the cluster.
+
+2. **Availability**
+   - The system continues to operate despite node failures, disk failures, or network issues.
+
+3. **Durability**
+   - Committed data survives crashes and hardware failures.
+
+4. **Consistency**
+   - The system provides a predictable view of data, depending on the chosen consistency model.
+
+5. **Locality**
+   - Data can be placed close to users or applications to reduce latency.
+
+6. **Fault tolerance**
+   - The system can tolerate partial failures, which are common in distributed environments.
+
+7. **Transparency**
+   - Ideally, users do not need to know where data is physically stored or how it is replicated.
+
+---
+
+## 2. Data Distribution and Partitioning
+
+A distributed database must decide how to split data across nodes. This is usually done through **partitioning**, also called **sharding**.
+
+### Common Partitioning Strategies
+
+#### Hash Partitioning
+
+Data is assigned to nodes using a hash function.
+
+Example:
+
+```text
+node = hash(customer_id) mod number_of_nodes
+```
+
+Advantages:
+
+- Good load balancing
+- Simple placement
+- Avoids hot ranges
+
+Disadvantages:
+
+- Range queries are expensive
+- Rebalancing can be costly
+- Related data may be spread across many nodes
+
+#### Range Partitioning
+
+Data is assigned based on key ranges.
+
+Example:
+
+```text
+Node A: customer_id 0–9999
+Node B: customer_id 10000–19999
+Node C: customer_id 20000–29999
+```
+
+Advantages:
+
+- Efficient range scans
+- Good for time-series or ordered data
+- Easier to reason about locality
+
+Disadvantages:
+
+- Hotspots are common
+- Rebalancing may require moving large ranges
+- Poor key distribution can overload one node
+
+#### List Partitioning
+
+Data is assigned based on explicit values.
+
+Example:
+
+```text
+Region = "EU" -> Europe nodes
+Region = "US" -> US nodes
+```
+
+Advantages:
+
+- Useful for geographic or tenant-based placement
+- Supports data residency requirements
+
+Disadvantages:
+
+- Less flexible
+- Can create uneven load
+
+#### Composite Partitioning
+
+Data may be partitioned by multiple dimensions, such as tenant ID plus time range.
+
+Example:
+
+```text
+partition = tenant_id + month
+```
+
+This is common in multi-tenant SaaS systems.
+
+---
+
+## 3. Architectural Models
+
+### Shared-Nothing Architecture
+
+Most modern distributed databases use a **shared-nothing** architecture.
+
+Each node has:
+
+- Its own CPU
+- Its own memory
+- Its own disk
+- Its own network connection
+
+Nodes communicate through messages.
+
+Advantages:
+
+- Easy horizontal scaling
+- No shared disk bottleneck
+- Failure isolation
+- Cost-effective commodity hardware
+
+Disadvantages:
+
+- Network becomes a major performance factor
+- Coordination is required
+- Distributed transactions are more complex
+
+### Shared-Disk Architecture
+
+In a shared-disk system, multiple nodes access the same storage system.
+
+Example:
+
+- Multiple database servers access a shared SAN or distributed file system
+
+Advantages:
+
+- Simpler data sharing
+- Easier failover
+- Less data movement
+
+Disadvantages:
+
+- Shared storage can become a bottleneck
+- Locking and coordination are still needed
+- Scaling may be limited by storage bandwidth
+
+---
+
+## 4. Performance Factors in Distributed Databases
+
+Performance in a distributed database is not only about CPU or disk speed. It is heavily affected by network behavior.
+
+### Key Performance Factors
+
+1. **Network latency**
+   - Cross-node queries require network round trips.
+   - Cross-region latency can be tens to hundreds of milliseconds.
+
+2. **Network bandwidth**
+   - Large scans, replication, and backups consume bandwidth.
+
+3. **Data locality**
+   - Queries are faster when data is stored on the same node or nearby nodes.
+
+4. **Partitioning quality**
+   - Good partitioning avoids hotspots and reduces cross-partition work.
+
+5. **Replication strategy**
+   - Synchronous replication improves consistency but increases write latency.
+   - Asynchronous replication improves write latency but can cause stale reads.
+
+6. **Index design**
+   - Poor indexes cause scatter-gather queries.
+   - Global indexes can create distributed write amplification.
+
+7. **Transaction protocol**
+   - Strong consistency may require multiple network round trips.
+   - Weak consistency can improve performance but increases application complexity.
+
+8. **Concurrency control**
+   - Locking can reduce throughput under contention.
+   - MVCC can improve read performance but increases storage and cleanup work.
+
+9. **Recovery and logging**
+   - Frequent logging and checkpointing affect throughput.
+   - Recovery time depends on log volume and checkpoint frequency.
+
+---
+
+## 5. Replication
+
+Replication means storing copies of data on multiple nodes. It is one of the most important mechanisms for achieving availability, durability, and performance.
+
+### Why Replicate Data?
+
+Replication provides several benefits:
+
+#### Availability
+
+If one node fails, another replica can serve requests.
+
+Example:
+
+```text
+Primary node fails
+Secondary replica becomes leader
+```
+
+#### Durability
+
+If one disk fails, other replicas still contain the data.
+
+#### Read Scalability
+
+Read traffic can be distributed across multiple replicas.
+
+Example:
+
+```text
+Write to primary
+Reads from multiple secondaries
+```
+
+#### Locality
+
+Data can be placed close to users.
+
+Example:
+
+```text
+US users read from US replica
+EU users read from EU replica
+```
+
+#### Disaster Recovery
+
+Remote replicas protect against regional failures.
+
+---
+
+## 5.1 Replication Models
+
+### Leader-Based Replication
+
+Also called primary-backup replication.
+
+One node is the leader or primary.
+
+- Writes go to the leader.
+- The leader sends changes to followers.
+- Followers apply changes asynchronously or synchronously.
+
+Example:
+
+```text
+Client -> Leader -> Follower 1
+                 -> Follower 2
+                 -> Follower 3
+```
+
+Advantages:
+
+- Simple write path
+- Easy conflict resolution
+- Widely used in relational databases
+
+Disadvantages:
+
+- Leader can become a bottleneck
+- Leader failure requires election
+- Followers may lag
+
+---
+
+### Synchronous Replication
+
+The leader waits for one or more followers to acknowledge the write before returning success to the client.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader waits for follower acknowledgment
+Follower acknowledges
+Leader returns success
+```
+
+Advantages:
+
+- Strong durability
+- If the leader fails, the follower has the latest data
+- No data loss in many failure scenarios
+
+Disadvantages:
+
+- Higher write latency
+- If a follower is slow, the leader may stall
+- Availability may decrease if too many acknowledgments are required
+
+Synchronous replication is often used when data loss is unacceptable.
+
+---
+
+### Asynchronous Replication
+
+The leader returns success to the client without waiting for followers to acknowledge.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader returns success
+Leader sends changes to followers later
+```
+
+Advantages:
+
+- Low write latency
+- Better throughput
+- Followers can be geographically distant
+
+Disadvantages:
+
+- Followers may lag
+- If the leader fails, recent writes may be lost
+- Reads from followers may be stale
+
+Asynchronous replication is common for high-performance or cross-region systems.
+
+---
+
+### Semi-Synchronous Replication
+
+The leader waits for at least one follower to acknowledge receipt of the log, but not necessarily completion of all local processing.
+
+This is a compromise between synchronous and asynchronous replication.
+
+Advantages:
+
+- Better durability than pure asynchronous replication
+- Lower latency than full synchronous replication
+
+Disadvantages:
+
+- Still depends on follower health
+- May stall if followers are slow
+
+---
+
+## 5.2 Quorum-Based Replication
+
+Quorum replication is common in distributed key-value stores and NoSQL databases.
+
+Suppose there are `N` replicas.
+
+A write succeeds if `W` replicas acknowledge.
+
+A read succeeds if `R` replicas respond.
+
+A common rule is:
+
+```text
+R + W > N
+```
+
+This ensures that read and write sets overlap, so a read should see the latest write.
+
+Example:
+
+```text
+N = 3
+W = 2
+R = 2
+
+R + W = 4 > 3
+```
+
+Advantages:
+
+- Flexible consistency
+- Can tolerate some replica failures
+- Works well in leaderless systems
+
+Disadvantages:
+
+- More complex conflict resolution
+- May require vector clocks or versioning
+- Read latency may increase if multiple replicas are contacted
+
+---
+
+## 5.3 Multi-Leader Replication
+
+Multiple nodes can accept writes.
+
+Example:
+
+```text
+Client in US writes to US leader
+Client in EU writes to EU leader
+Leaders replicate changes to each other
+```
+
+Advantages:
+
+- Better write locality
+- Better availability during network partitions
+- Useful for offline or mobile clients
+
+Disadvantages:
+
+- Write conflicts are possible
+- Conflict resolution is complex
+- Strong consistency is difficult
+
+Conflict resolution methods include:
+
+- Last write wins
+- Application-level merge
+- CRDTs, or conflict-free replicated data types
+- Manual conflict resolution
+- Version vectors
+
+---
+
+## 5.4 Leaderless Replication
+
+Any replica can accept reads and writes.
+
+This is common in Dynamo-style systems.
+
+Example:
+
+```text
+Client writes to any replica
+Replica stores value and sends to other replicas
+Client reads from multiple replicas
+```
+
+Advantages:
+
+- High availability
+- No single leader bottleneck
+- Good for geographically distributed systems
+
+Disadvantages:
+
+- Stale reads are possible
+- Conflict resolution is required
+- Consistency is more complex
+
+Techniques used:
+
+- Read repair
+- Anti-entropy
+- Gossip protocols
+- Hinted handoff
+- Vector clocks
+- Quorum reads and writes
+
+---
+
+## 5.5 Replication and Performance
+
+Replication affects performance in several ways.
+
+### Write Performance
+
+Synchronous replication increases write latency because the client waits for acknowledgments.
+
+Asynchronous replication improves write latency but may risk data loss.
+
+### Read Performance
+
+Replicas can serve reads, improving read throughput and locality.
+
+However, stale replicas may return old data.
+
+### Storage Cost
+
+Replication multiplies storage usage.
+
+Example:
+
+```text
+1 TB of logical data with replication factor 3
+requires 3 TB of physical storage
+```
+
+### Network Cost
+
+Replication consumes network bandwidth.
+
+Cross-region replication can be expensive.
+
+### Failure Handling
+
+Replication improves availability, but failure detection and leader election add complexity.
+
+---
+
+## 6. Indexing in Distributed Databases
+
+Indexes are data structures that speed up queries. In a distributed database, indexing is more complex because data is spread across multiple nodes.
+
+---
+
+## 6.1 Local Indexes
+
+A local index is stored on the same node as the data it indexes.
+
+Example:
+
+```text
+Node A stores partition 1 and its local index
+Node B stores partition 2 and its local index
+Node C stores partition 3 and its local index
+```
+
+Advantages:
+
+- Index updates are local
+- Low write amplification
+- Good for queries that include the partition key
+- Easier to rebalance
+
+Disadvantages:
+
+- Queries without the partition key may need to search all partitions
+- This can cause scatter-gather behavior
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE customer_id = 123;
+```
+
+If `customer_id` is the partition key, the query can go directly to one partition.
+
+But:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If `status` is not the partition key, the query may need to search many partitions.
+
+---
+
+## 6.2 Global Indexes
+
+A global index spans multiple partitions or nodes.
+
+Example:
+
+```text
+Global index on email
+maps email -> partition containing customer
+```
+
+Advantages:
+
+- Efficient queries on non-partition keys
+- Can avoid scatter-gather queries
+- Useful for secondary indexes
+
+Disadvantages:
+
+- Index updates may require distributed coordination
+- Write amplification can be high
+- Global indexes can become bottlenecks
+- Rebalancing is more complex
+
+Example:
+
+```sql
+SELECT *
+FROM customers
+WHERE email = 'alice@example.com';
+```
+
+If `email` is not the partition key, a global index can locate the correct partition quickly.
+
+---
+
+## 6.3 Index Types
+
+Distributed databases may use several index structures.
+
+### B-tree Indexes
+
+Common in relational databases.
+
+Good for:
+
+- Equality queries
+- Range queries
+- Ordered scans
+
+In distributed systems, B-tree indexes may be local or global.
+
+---
+
+### LSM-tree Indexes
+
+Log-structured merge-tree indexes are common in NoSQL and wide-column databases.
+
+They are optimized for high write throughput.
+
+Advantages:
+
+- Efficient writes
+- Good for large-scale systems
+- Suitable for append-heavy workloads
+
+Disadvantages:
+
+- Compaction overhead
+- Reads may require checking multiple levels
+- Space amplification
+
+---
+
+### Hash Indexes
+
+Good for equality lookups.
+
+Example:
+
+```text
+hash(key) -> value
+```
+
+Advantages:
+
+- Fast point lookups
+- Simple
+
+Disadvantages:
+
+- Poor range queries
+- Poor ordered scans
+
+---
+
+### Bitmap Indexes
+
+Useful for low-cardinality columns.
+
+Example:
+
+```text
+status = ACTIVE
+status = INACTIVE
+```
+
+Advantages:
+
+- Efficient for analytical queries
+- Good for filtering large datasets
+
+Disadvantages:
+
+- Poor for high-cardinality data
+- Update cost can be high
+
+---
+
+### Inverted Indexes
+
+Used for full-text search.
+
+Example:
+
+```text
+"database" -> documents containing database
+```
+
+Advantages:
+
+- Good for text search
+- Supports relevance ranking
+
+Disadvantages:
+
+- Index maintenance can be expensive
+- Distributed updates require coordination
+
+---
+
+### Geospatial Indexes
+
+Used for location-based queries.
+
+Examples:
+
+- R-tree
+- Quadtree
+- Geohash
+
+Useful for:
+
+```sql
+Find all stores within 10 km of a location
+```
+
+---
+
+### Vector Indexes
+
+Used for similarity search and machine learning embeddings.
+
+Examples:
+
+- HNSW
+- IVF
+- PQ
+
+Useful for:
+
+```text
+Find similar documents
+Find similar images
+Recommendation systems
+```
+
+---
+
+## 6.4 Distributed Indexing and Performance
+
+### Partition Pruning
+
+If the query includes the partition key, the database can avoid scanning irrelevant partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+If `tenant_id` is the partition key, the query can be routed directly to one partition.
+
+This improves performance significantly.
+
+---
+
+### Scatter-Gather Queries
+
+If a query does not include the partition key, the database may need to query many partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If there are 100 partitions, the query may need to contact all 100.
+
+This increases latency and network traffic.
+
+---
+
+### Covering Indexes
+
+A covering index contains all columns needed by a query.
+
+Example:
+
+```sql
+SELECT customer_id, status
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If the index contains `status`, `customer_id`, and other needed columns, the database may avoid accessing the base table.
+
+This reduces I/O and improves performance.
+
+---
+
+### Index Write Amplification
+
+Every write may need to update multiple indexes.
+
+Example:
+
+```text
+Insert into customers
+Update primary key index
+Update email index
+Update country index
+Update created_at index
+```
+
+In a distributed system, some index updates may require network communication.
+
+This can reduce write throughput.
+
+---
+
+### Index Rebalancing
+
+When partitions move between nodes, indexes may need to be rebuilt or migrated.
+
+This can be expensive.
+
+Design choices include:
+
+- Rebuild indexes after rebalancing
+- Move index data with partition data
+- Use local indexes to simplify rebalancing
+- Use global indexes carefully
+
+---
+
+## 7. Transactions in Distributed Databases
+
+A transaction is a logical unit of work that must be processed reliably.
+
+Traditional ACID properties are:
+
+- Atomicity
+- Consistency
+- Isolation
+- Durability
+
+In a distributed database, transactions may touch multiple partitions or nodes.
+
+Example:
+
+```sql
+BEGIN;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 2;
+
+COMMIT;
+```
+
+If account 1 and account 2 are on different nodes, the transaction is distributed.
+
+---
+
+## 7.1 Distributed Transaction Challenges
+
+Distributed transactions are harder than local transactions because of:
+
+1. **Network latency**
+   - Multiple nodes must communicate.
+
+2. **Partial failure**
+   - One node may fail while others succeed.
+
+3. **Network partitions**
+   - Nodes may be unable to communicate.
+
+4. **Coordination overhead**
+   - Committing requires agreement.
+
+5. **Deadlocks**
+   - Transactions on different nodes may wait for each other.
+
+6. **Consistency tradeoffs**
+   - Strong consistency may reduce availability or performance.
+
+---
+
+## 7.2 Two-Phase Commit
+
+Two-phase commit, or 2PC, is the classic protocol for distributed atomic commit.
+
+It involves a coordinator and participants.
+
+### Phase 1: Prepare
+
+The coordinator asks all participants:
+
+```text
+Are you ready to commit?
+```
+
+Each participant:
+
+- Writes a prepare record to its log.
+- Locks necessary resources.
+- Responds yes or no.
+
+### Phase 2: Commit or Abort
+
+If all participants vote yes:
+
+```text
+Coordinator sends commit
+Participants commit
+Participants acknowledge
+```
+
+If any participant votes no:
+
+```text
+Coordinator sends abort
+Participants abort
+```
+
+Advantages:
+
+- Provides atomicity across nodes
+- Works well for small, low-latency clusters
+
+Disadvantages:
+
+- Blocking
+- If the coordinator fails after prepare, participants may be stuck
+- High latency due to multiple round trips
+- Poor availability during network partitions
+
+---
+
+## 7.3 Three-Phase Commit
+
+Three-phase commit, or 3PC, attempts to reduce blocking compared with 2PC.
+
+It adds an extra phase:
+
+1. Can commit?
+2. Pre-commit
+3. Commit
+
+Advantages:
+
+- Less blocking than 2PC in some cases
+
+Disadvantages:
+
+- More complex
+- Still assumes reliable network and failure detection
+- Rarely used in practice because it does not solve all distributed failure problems
+
+---
+
+## 7.4 Concurrency Control
+
+Concurrency control ensures that concurrent transactions do not interfere incorrectly.
+
+### Pessimistic Locking
+
+A transaction locks data before modifying it.
+
+Example:
+
+```text
+Transaction T1 locks account 1
+Transaction T2 waits for account 1
+```
+
+Advantages:
+
+- Prevents conflicts early
+- Easier to reason about
+
+Disadvantages:
+
+- Lock waits reduce throughput
+- Deadlocks are possible
+- Locks may be held across network boundaries
+
+---
+
+### Optimistic Concurrency Control
+
+Transactions execute without locks and validate at commit time.
+
+Example:
+
+```text
+T1 reads balance
+T2 reads balance
+T1 updates balance
+T2 tries to update balance
+T2 fails because data changed
+```
+
+Advantages:
+
+- Good when conflicts are rare
+- Less blocking
+
+Disadvantages:
+
+- High abort rate under contention
+- Requires versioning or validation
+
+---
+
+### MVCC
+
+Multi-version concurrency control stores multiple versions of data.
+
+Readers do not block writers, and writers do not block readers.
+
+Advantages:
+
+- High read concurrency
+- Good for analytical and mixed workloads
+- Supports snapshot isolation
+
+Disadvantages:
+
+- Storage overhead
+- Garbage collection required
+- Long-running transactions can retain old versions
+
+---
+
+## 7.5 Isolation Levels
+
+Distributed databases may support different isolation levels.
+
+### Read Uncommitted
+
+Transactions may see uncommitted data.
+
+Rarely used because of anomalies.
+
+### Read Committed
+
+Transactions see only committed data.
+
+Common default in many databases.
+
+### Snapshot Isolation
+
+Each transaction sees a consistent snapshot of the database.
+
+Advantages:
+
+- Good performance
+- Avoids many read anomalies
+
+Disadvantages:
+
+- Write-write conflicts may occur
+- Not fully serializable
+
+### Serializable Isolation
+
+Transactions behave as if executed one at a time.
+
+Advantages:
+
+- Strong correctness
+
+Disadvantages:
+
+- Higher coordination cost
+- More aborts or locks
+- Can reduce throughput
+
+---
+
+## 7.6 Distributed Deadlocks
+
+Deadlocks can occur across nodes.
+
+Example:
+
+```text
+T1 locks account 1 on Node A
+T1 waits for account 2 on Node B
+
+T2 locks account 2 on Node B
+T2 waits for account 1 on Node A
+```
+
+Detection methods include:
+
+- Wait-for graphs
+- Timeout-based detection
+- Distributed deadlock detectors
+
+Resolution methods include:
+
+- Abort one transaction
+- Retry transaction
+- Use lock ordering
+- Use optimistic concurrency control
+
+---
+
+## 7.7 Transactions and Performance
+
+Distributed transactions can be expensive.
+
+### Latency
+
+A distributed commit may require multiple network round trips.
+
+Example:
+
+```text
+Client -> Coordinator
+Coordinator -> Participant 1
+Coordinator -> Participant 2
+Participant 1 -> Coordinator
+Participant 2 -> Coordinator
+Coordinator -> Participants
+Participants -> Coordinator
+Coordinator -> Client
+```
+
+This can be slow across regions.
+
+---
+
+### Throughput
+
+Locking and coordination can reduce throughput.
+
+High-contention transactions may serialize.
+
+---
+
+### Hotspots
+
+If many transactions update the same row or partition, performance suffers.
+
+Example:
+
+```text
+All transactions update inventory for one product
+```
+
+Solutions:
+
+- Partition inventory by region
+- Use counters or sharded inventory
+- Batch updates
+- Use optimistic concurrency control
+- Use application-level queues
+
+---
+
+### Strong Consistency vs. Performance
+
+Strong consistency often requires coordination.
+
+Weak consistency can improve performance but shifts complexity to the application.
+
+---
+
+## 8. Recovery in Distributed Databases
+
+Recovery is the process of restoring the database to a correct state after failures.
+
+Failures may include:
+
+- Node crash
+- Disk failure
+- Network partition
+- Power loss
+- Software bug
+- Data corruption
+- Regional outage
+
+---
+
+## 8.1 Local Recovery
+
+Each node usually has its own recovery mechanism.
+
+Common techniques include:
+
+### Write-Ahead Logging
+
+Changes are written to a log before being applied to the database.
+
+Example:
+
+```text
+1. Write log record
+2. Flush log to stable storage
+3. Modify database page
+```
+
+This ensures that committed changes survive crashes.
+
+---
+
+### Checkpointing
+
+A checkpoint records the database state at a point in time.
+
+During recovery, the system can start from the last checkpoint and replay only later log records.
+
+Advantages:
+
+- Faster recovery
+- Less log replay
+
+Disadvantages:
+
+- Checkpointing consumes I/O
+- Too frequent checkpoints reduce throughput
+- Too infrequent checkpoints increase recovery time
+
+---
+
+### ARIES-Style Recovery
+
+Many databases use ARIES-like recovery.
+
+ARIES uses:
+
+- Write-ahead logging
+- Redo
+- Undo
+- Checkpoints
+- Dirty page tables
+
+Recovery phases:
+
+1. **Analysis**
+   - Determine which transactions were active at failure.
+
+2. **Redo**
+   - Reapply changes that may have been lost.
+
+3. **Undo**
+   - Roll back transactions that did not commit.
+
+---
+
+## 8.2 Distributed Recovery
+
+Distributed recovery must handle failures across multiple nodes.
+
+It must answer questions such as:
+
+- Was the transaction committed?
+- Did all participants commit?
+- Did the coordinator fail before sending the final decision?
+- Are some replicas missing recent changes?
+- Which replica should become leader?
+
+---
+
+## 8.3 Two-Phase Commit Recovery
+
+In 2PC, recovery is complicated because participants may be in a prepared state.
+
+Example:
+
+```text
+All participants prepared
+Coordinator crashes before sending commit
+```
+
+Participants do not know whether to commit or abort.
+
+They may block until the coordinator recovers.
+
+Recovery mechanisms include:
+
+- Coordinator logs its decision
+- Participants query the coordinator
+- Participants query other participants
+- Timeout and abort, if safe
+- Manual intervention in extreme cases
+
+This is one reason 2PC can reduce availability.
+
+---
+
+## 8.4 Replication-Based Recovery
+
+Replication helps recovery.
+
+If a node fails, another replica can take over.
+
+Recovery steps may include:
+
+1. Detect failed node.
+2. Elect new leader.
+3. Promote a healthy replica.
+4. Reconfigure clients.
+5. Rebuild failed replica from snapshots and logs.
+6. Catch up using replication logs.
+
+---
+
+## 8.5 Snapshot and Log Recovery
+
+Many systems use snapshots plus logs.
+
+Example:
+
+```text
+Nightly snapshot
+Continuous transaction log
+```
+
+To recover:
+
+```text
+Restore snapshot
+Replay logs up to desired point
+```
+
+This supports point-in-time recovery.
+
+Example:
+
+```text
+Restore database to 10:45 before accidental deletion
+```
+
+---
+
+## 8.6 Failure Types and Recovery Behavior
+
+### Node Failure
+
+A single node crashes.
+
+Recovery:
+
+- Restart node.
+- Replay local log.
+- Rejoin cluster.
+- Catch up with replication.
+
+---
+
+### Disk Failure
+
+A node loses storage.
+
+Recovery:
+
+- Replace disk.
+- Restore from snapshot.
+- Replay logs.
+- Rebuild replica.
+
+---
+
+### Network Partition
+
+Nodes cannot communicate.
+
+Recovery:
+
+- Use quorum rules.
+- Elect leader only if quorum exists.
+- Partition minority side may become read-only or unavailable.
+- After partition heals, reconcile logs.
+
+---
+
+### Regional Failure
+
+An entire data center fails.
+
+Recovery:
+
+- Promote remote replica.
+- Redirect clients.
+- Rebuild failed region.
+- Restore from remote backups.
+
+---
+
+## 8.7 Recovery and Performance
+
+Recovery affects performance in several ways.
+
+### Logging Overhead
+
+Every write may require log writes.
+
+This can reduce throughput.
+
+---
+
+### Checkpoint Overhead
+
+Checkpoints consume CPU, memory, and disk I/O.
+
+---
+
+### Recovery Time
+
+If checkpoints are rare, recovery may require replaying many logs.
+
+This increases downtime.
+
+---
+
+### Replication Lag
+
+If replicas lag, failover may lose recent writes or require waiting for catch-up.
+
+---
+
+### Backup and Restore
+
+Large databases may take hours or days to restore.
+
+Design choices include:
+
+- Incremental backups
+- Snapshot backups
+- Continuous archiving
+- Point-in-time recovery
+- Cross-region backups
+
+---
+
+## 9. Consistency Models and Their Impact
+
+Distributed databases must choose consistency models.
+
+### Strong Consistency
+
+All reads see the latest committed write.
+
+Example:
+
+```text
+Write succeeds
+Any subsequent read sees the write
+```
+
+Advantages:
+
+- Simpler application logic
+- Easier correctness
+
+Disadvantages:
+
+- Higher latency
+- More coordination
+- May reduce availability during partitions
+
+---
+
+### Eventual Consistency
+
+Replicas will eventually converge, but reads may be stale.
+
+Example:
+
+```text
+Write succeeds
+Some replicas may not see it immediately
+```
+
+Advantages:
+
+- High availability
+- Low latency
+- Good for geographically distributed systems
+
+Disadvantages:
+
+- Application must handle stale data
+- Conflict resolution is complex
+- Harder to reason about correctness
+
+---
+
+### Causal Consistency
+
+Writes that are causally related are seen in order.
+
+Example:
+
+```text
+Create comment
+Reply to comment
+```
+
+A user who sees the reply should also see the comment.
+
+Advantages:
+
+- Stronger than eventual consistency
+- More practical than full strong consistency
+
+Disadvantages:
+
+- Requires metadata such as vector clocks
+- More complex than eventual consistency
+
+---
+
+### Read-Your-Writes Consistency
+
+A user sees their own writes immediately.
+
+Example:
+
+```text
+User posts comment
+User refreshes page
+User sees own comment
+```
+
+This is often implemented by routing reads to the same replica or using session consistency.
+
+---
+
+## 10. CAP and PACELC
+
+The CAP theorem says that during a network partition, a distributed system must choose between:
+
+- Consistency
+- Availability
+
+It cannot guarantee both simultaneously.
+
+Example:
+
+```text
+Network partition occurs
+System must either:
+  - reject some requests to preserve consistency
+  - accept requests but risk inconsistency
+```
+
+PACELC extends this:
+
+- During partition: choose availability or consistency.
+- During normal operation: choose latency or consistency.
+
+This is important for distributed database design.
+
+A system may choose:
+
+- Strong consistency with higher latency
+- Weak consistency with lower latency
+- Availability with possible stale reads
+- Consistency with reduced availability
+
+---
+
+## 11. Design Tradeoffs
+
+### Replication Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Synchronous replication | Strong durability | Higher write latency |
+| Asynchronous replication | Low write latency | Possible data loss |
+| Multi-leader | High availability | Conflict resolution |
+| Leaderless | High availability | Stale reads |
+| Quorum | Flexible consistency | Complexity |
+
+---
+
+### Indexing Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Local indexes | Simple, low write cost | Scatter-gather queries |
+| Global indexes | Fast non-partition-key queries | Distributed write cost |
+| Many indexes | Fast reads | Slow writes |
+| Few indexes | Fast writes | Slow reads |
+| Covering indexes | Avoid table access | More storage and maintenance |
+
+---
+
+### Transaction Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| 2PC | Atomic distributed commit | Blocking, latency |
+| Pessimistic locking | Prevents conflicts | Lock waits |
+| Optimistic concurrency | High throughput when conflicts rare | Aborts under contention |
+| MVCC | Good read concurrency | Storage and cleanup |
+| Serializable isolation | Strong correctness | Performance cost |
+
+---
+
+### Recovery Tradeoffs
+
+| Choice | Benefit | Cost |
+|---|---|---|
+| Frequent checkpoints | Fast recovery | More I/O |
+| Infrequent checkpoints | Better throughput | Slower recovery |
+| Synchronous replication | Less data loss | Higher latency |
+| Asynchronous replication | Better performance | Recovery may lose data |
+| Snapshots + logs | Point-in-time recovery | Storage and restore complexity |
+
+---
+
+## 12. Example: Designing a Distributed Banking Database
+
+Suppose we design a distributed banking database.
+
+### Requirements
+
+- Strong consistency for account balances
+- High availability
+- Low latency for local users
+- Durability across failures
+- Support for transfers across accounts
+
+### Design Choices
+
+#### Partitioning
+
+Partition accounts by customer region or account ID range.
+
+Example:
+
+```text
+US accounts -> US nodes
+EU accounts -> EU nodes
+```
+
+#### Replication
+
+Use synchronous replication within a region for durability.
+
+Use asynchronous replication across regions for disaster recovery.
+
+Example:
+
+```text
+Local region: synchronous quorum
+Remote region: asynchronous replica
+```
+
+#### Indexing
+
+Use local indexes for account ID.
+
+Use global indexes for customer email or national ID if needed.
+
+Avoid too many global indexes because writes are expensive.
+
+#### Transactions
+
+Use distributed transactions for transfers.
+
+Use pessimistic locking or MVCC with serializable isolation for critical operations.
+
+Example:
+
+```sql
+BEGIN;
+
+SELECT balance FROM accounts WHERE id = 1 FOR UPDATE;
+SELECT balance FROM accounts WHERE id = 2 FOR UPDATE;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+COMMIT;
+```
+
+#### Recovery
+
+Use write-ahead logging, checkpoints, and two-phase commit recovery.
+
+Use snapshots and continuous log archiving.
+
+Use leader election and replica promotion for failover.
+
+---
+
+## 13. Example: Designing a Distributed Social Media Database
+
+Suppose we design a distributed social media database.
+
+### Requirements
+
+- High write throughput
+- Low latency reads
+- Global availability
+- Eventually consistent feeds
+- Strong consistency for payments or security events
+
+### Design Choices
+
+#### Partitioning
+
+Partition by user ID or timeline ID.
+
+Example:
+
+```text
+user_id -> partition
+```
+
+#### Replication
+
+Use leaderless or multi-leader replication for high availability.
+
+Use asynchronous cross-region replication.
+
+#### Indexing
+
+Use local indexes for user timelines.
+
+Use global indexes for hashtags or search.
+
+Use inverted indexes for full-text search.
+
+#### Transactions
+
+Use lightweight transactions for most operations.
+
+Use sagas or eventual consistency for feed updates.
+
+Use strong transactions only for payments or security-critical operations.
+
+#### Recovery
+
+Use snapshots, log shipping, and anti-entropy repair.
+
+Accept some replication lag for performance.
+
+---
+
+## 14. Performance Tuning Strategies
+
+### 1. Choose Good Partition Keys
+
+A good partition key should:
+
+- Distribute load evenly
+- Keep related data together
+- Support common queries
+- Avoid hotspots
+
+Bad partition key:
+
+```text
+status
+```
+
+Because many rows may have the same status.
+
+Better partition key:
+
+```text
+tenant_id + date
+```
+
+---
+
+### 2. Co-locate Related Data
+
+Place frequently joined data on the same node.
+
+Example:
+
+```text
+orders and order_items partitioned by order_id
+```
+
+This reduces distributed joins.
+
+---
+
+### 3. Use Local Indexes When Possible
+
+Local indexes reduce distributed write coordination.
+
+---
+
+### 4. Avoid Scatter-Gather Queries
+
+Design queries to include partition keys.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+This is better than:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+unless a global index exists.
+
+---
+
+### 5. Batch Writes
+
+Batching reduces network round trips.
+
+Example:
+
+```text
+Instead of 1000 individual inserts
+insert 1000 rows in one batch
+```
+
+---
+
+### 6. Use Caching
+
+Caches reduce read latency.
+
+Examples:
+
+- Query result cache
+- Row cache
+- Page cache
+- Application cache
+
+But caching must handle invalidation.
+
+---
+
+### 7. Monitor Hot Partitions
+
+A hot partition can limit performance.
+
+Solutions:
+
+- Split partition
+- Add replicas
+- Use finer-grained partitioning
+- Use request coalescing
+- Use caching
+
+---
+
+### 8. Tune Consistency Level
+
+Use the weakest consistency level that satisfies application requirements.
+
+Example:
+
+```text
+Payment balance: strong consistency
+Social feed: eventual consistency
+```
+
+---
+
+### 9. Tune Replication Factor
+
+Higher replication factor improves availability but increases write cost.
+
+Example:
+
+```text
+RF = 3 is common
+RF = 5 for stronger durability
+```
+
+---
+
+### 10. Plan for Rebalancing
+
+Rebalancing can be expensive.
+
+Design for:
+
+- Incremental data movement
+- Background compaction
+- Rate-limited migration
+- Minimal downtime
+
+---
+
+## 15. Summary
+
+A distributed database is designed to store and process data across multiple nodes while appearing as a single logical system. Its performance and reliability depend heavily on how it handles distribution, replication, indexing, transactions, and recovery.
+
+### Replication
+
+Replication improves availability, durability, and read scalability.
+
+Key choices:
+
+- Synchronous vs. asynchronous
+- Leader-based vs. leaderless
+- Quorum-based
+- Multi-leader
+- Conflict resolution
+
+Performance impact:
+
+- Synchronous replication increases write latency.
+- Asynchronous replication improves performance but may lose data.
+- Replication increases storage and network usage.
+
+---
+
+### Indexing
+
+Indexes speed up queries but create maintenance overhead.
+
+Key choices:
+
+- Local indexes
+- Global indexes
+- B-tree, LSM-tree, hash, inverted, geospatial, vector indexes
+- Covering indexes
+
+Performance impact:
+
+- Good indexes reduce query latency.
+- Poor indexes cause scatter-gather queries.
+- Global indexes can increase distributed write cost.
+
+---
+
+### Transactions
+
+Distributed transactions must preserve atomicity, consistency, isolation, and durability across nodes.
+
+Key mechanisms:
+
+- Two-phase commit
+- Pessimistic locking
+- Optimistic concurrency control
+- MVCC
+- Snapshot isolation
+- Serializable isolation
+
+Performance impact:
+
+- Distributed commits add latency.
+- Locking can reduce throughput.
+- Strong consistency may reduce availability.
+- Weak consistency can improve performance but increases application complexity.
+
+---
+
+### Recovery
+
+Recovery restores the database after failures.
+
+Key mechanisms:
+
+- Write-ahead logging
+- Checkpointing
+- Redo and undo
+- Two-phase commit recovery
+- Snapshots
+- Log replay
+- Replica promotion
+- Point-in-time recovery
+
+Performance impact:
+
+- Logging and checkpointing reduce throughput.
+- Recovery time depends on log volume and checkpoint frequency.
+- Replication strategy affects data loss and failover speed.
+
+---
+
+## Final Design Principle
+
+A well-designed distributed database does not try to maximize every property at once. Instead, it makes deliberate tradeoffs based on workload requirements.
+
+For example:
+
+- Banking systems often prioritize **strong consistency and durability**.
+- Social media systems often prioritize **availability and low latency**.
+- Analytics systems often prioritize **throughput and scan performance**.
+- Global applications often prioritize **locality and fault tolerance**.
+
+The best distributed database design is one where **replication, indexing, transactions, and recovery are aligned with the application’s consistency, latency, availability, and durability requirements**.
+
+user
+
+assistant
+<think>
+
+</think>
+
+A distributed database is a system in which data is stored across multiple interconnected nodes, yet the system is designed to behave as a single logical database. Its design and performance depend on how well it manages **data distribution, replication, indexing, transactions, and recovery** while balancing **scalability, availability, consistency, latency, throughput, and fault tolerance**.
+
+---
+
+## 1. Overall Design of a Distributed Database
+
+A distributed database typically consists of multiple independent machines, each with its own CPU, memory, storage, and network connection. These nodes cooperate through messaging to store, retrieve, update, and protect data.
+
+### Main Design Goals
+
+1. **Scalability**
+   - The system can grow by adding more nodes.
+   - Workload and data are distributed across the cluster.
+
+2. **Availability**
+   - The system continues to operate despite node failures, disk failures, or network issues.
+
+3. **Durability**
+   - Committed data survives crashes and hardware failures.
+
+4. **Consistency**
+   - The system provides a predictable view of data, depending on the chosen consistency model.
+
+5. **Locality**
+   - Data can be placed close to users or applications to reduce latency.
+
+6. **Fault tolerance**
+   - The system can tolerate partial failures, which are common in distributed environments.
+
+7. **Transparency**
+   - Ideally, users do not need to know where data is physically stored or how it is replicated.
+
+---
+
+## 2. Data Distribution and Partitioning
+
+A distributed database must decide how to split data across nodes. This is usually done through **partitioning**, also called **sharding**.
+
+### Common Partitioning Strategies
+
+#### Hash Partitioning
+
+Data is assigned to nodes using a hash function.
+
+Example:
+
+```text
+node = hash(customer_id) mod number_of_nodes
+```
+
+Advantages:
+
+- Good load balancing
+- Simple placement
+- Avoids hot ranges
+
+Disadvantages:
+
+- Range queries are expensive
+- Rebalancing can be costly
+- Related data may be spread across many nodes
+
+#### Range Partitioning
+
+Data is assigned based on key ranges.
+
+Example:
+
+```text
+Node A: customer_id 0–9999
+Node B: customer_id 10000–19999
+Node C: customer_id 20000–29999
+```
+
+Advantages:
+
+- Efficient range scans
+- Good for time-series or ordered data
+- Easier to reason about locality
+
+Disadvantages:
+
+- Hotspots are common
+- Rebalancing may require moving large ranges
+- Poor key distribution can overload one node
+
+#### List Partitioning
+
+Data is assigned based on explicit values.
+
+Example:
+
+```text
+Region = "EU" -> Europe nodes
+Region = "US" -> US nodes
+```
+
+Advantages:
+
+- Useful for geographic or tenant-based placement
+- Supports data residency requirements
+
+Disadvantages:
+
+- Less flexible
+- Can create uneven load
+
+#### Composite Partitioning
+
+Data may be partitioned by multiple dimensions, such as tenant ID plus time range.
+
+Example:
+
+```text
+partition = tenant_id + month
+```
+
+This is common in multi-tenant SaaS systems.
+
+---
+
+## 3. Architectural Models
+
+### Shared-Nothing Architecture
+
+Most modern distributed databases use a **shared-nothing** architecture.
+
+Each node has:
+
+- Its own CPU
+- Its own memory
+- Its own disk
+- Its own network connection
+
+Nodes communicate through messages.
+
+Advantages:
+
+- Easy horizontal scaling
+- No shared disk bottleneck
+- Failure isolation
+- Cost-effective commodity hardware
+
+Disadvantages:
+
+- Network becomes a major performance factor
+- Coordination is required
+- Distributed transactions are more complex
+
+### Shared-Disk Architecture
+
+In a shared-disk system, multiple nodes access the same storage system.
+
+Example:
+
+- Multiple database servers access a shared SAN or distributed file system
+
+Advantages:
+
+- Simpler data sharing
+- Easier failover
+- Less data movement
+
+Disadvantages:
+
+- Shared storage can become a bottleneck
+- Locking and coordination are still needed
+- Scaling may be limited by storage bandwidth
+
+---
+
+## 4. Performance Factors in Distributed Databases
+
+Performance in a distributed database is not only about CPU or disk speed. It is heavily affected by network behavior.
+
+### Key Performance Factors
+
+1. **Network latency**
+   - Cross-node queries require network round trips.
+   - Cross-region latency can be tens to hundreds of milliseconds.
+
+2. **Network bandwidth**
+   - Large scans, replication, and backups consume bandwidth.
+
+3. **Data locality**
+   - Queries are faster when data is stored on the same node or nearby nodes.
+
+4. **Partitioning quality**
+   - Good partitioning avoids hotspots and reduces cross-partition work.
+
+5. **Replication strategy**
+   - Synchronous replication improves consistency but increases write latency.
+   - Asynchronous replication improves write latency but can cause stale reads.
+
+6. **Index design**
+   - Poor indexes cause scatter-gather queries.
+   - Global indexes can create distributed write amplification.
+
+7. **Transaction protocol**
+   - Strong consistency may require multiple network round trips.
+   - Weak consistency can improve performance but increases application complexity.
+
+8. **Concurrency control**
+   - Locking can reduce throughput under contention.
+   - MVCC can improve read performance but increases storage and cleanup work.
+
+9. **Recovery and logging**
+   - Frequent logging and checkpointing affect throughput.
+   - Recovery time depends on log volume and checkpoint frequency.
+
+---
+
+## 5. Replication
+
+Replication means storing copies of data on multiple nodes. It is one of the most important mechanisms for achieving availability, durability, and performance.
+
+### Why Replicate Data?
+
+Replication provides several benefits:
+
+#### Availability
+
+If one node fails, another replica can serve requests.
+
+Example:
+
+```text
+Primary node fails
+Secondary replica becomes leader
+```
+
+#### Durability
+
+If one disk fails, other replicas still contain the data.
+
+#### Read Scalability
+
+Read traffic can be distributed across multiple replicas.
+
+Example:
+
+```text
+Write to primary
+Reads from multiple secondaries
+```
+
+#### Locality
+
+Data can be placed close to users.
+
+Example:
+
+```text
+US users read from US replica
+EU users read from EU replica
+```
+
+#### Disaster Recovery
+
+Remote replicas protect against regional failures.
+
+---
+
+## 5.1 Replication Models
+
+### Leader-Based Replication
+
+Also called primary-backup replication.
+
+One node is the leader or primary.
+
+- Writes go to the leader.
+- The leader sends changes to followers.
+- Followers apply changes asynchronously or synchronously.
+
+Example:
+
+```text
+Client -> Leader -> Follower 1
+                 -> Follower 2
+                 -> Follower 3
+```
+
+Advantages:
+
+- Simple write path
+- Easy conflict resolution
+- Widely used in relational databases
+
+Disadvantages:
+
+- Leader can become a bottleneck
+- Leader failure requires election
+- Followers may lag
+
+---
+
+### Synchronous Replication
+
+The leader waits for one or more followers to acknowledge the write before returning success to the client.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader waits for follower acknowledgment
+Follower acknowledges
+Leader returns success
+```
+
+Advantages:
+
+- Strong durability
+- If the leader fails, the follower has the latest data
+- No data loss in many failure scenarios
+
+Disadvantages:
+
+- Higher write latency
+- If a follower is slow, the leader may stall
+- Availability may decrease if too many acknowledgments are required
+
+Synchronous replication is often used when data loss is unacceptable.
+
+---
+
+### Asynchronous Replication
+
+The leader returns success to the client without waiting for followers to acknowledge.
+
+Example:
+
+```text
+Client write
+Leader writes log
+Leader returns success
+Leader sends changes to followers later
+```
+
+Advantages:
+
+- Low write latency
+- Better throughput
+- Followers can be geographically distant
+
+Disadvantages:
+
+- Followers may lag
+- If the leader fails, recent writes may be lost
+- Reads from followers may be stale
+
+Asynchronous replication is common for high-performance or cross-region systems.
+
+---
+
+### Semi-Synchronous Replication
+
+The leader waits for at least one follower to acknowledge receipt of the log, but not necessarily completion of all local processing.
+
+This is a compromise between synchronous and asynchronous replication.
+
+Advantages:
+
+- Better durability than pure asynchronous replication
+- Lower latency than full synchronous replication
+
+Disadvantages:
+
+- Still depends on follower health
+- May stall if followers are slow
+
+---
+
+## 5.2 Quorum-Based Replication
+
+Quorum replication is common in distributed key-value stores and NoSQL databases.
+
+Suppose there are `N` replicas.
+
+A write succeeds if `W` replicas acknowledge.
+
+A read succeeds if `R` replicas respond.
+
+A common rule is:
+
+```text
+R + W > N
+```
+
+This ensures that read and write sets overlap, so a read should see the latest write.
+
+Example:
+
+```text
+N = 3
+W = 2
+R = 2
+
+R + W = 4 > 3
+```
+
+Advantages:
+
+- Flexible consistency
+- Can tolerate some replica failures
+- Works well in leaderless systems
+
+Disadvantages:
+
+- More complex conflict resolution
+- May require vector clocks or versioning
+- Read latency may increase if multiple replicas are contacted
+
+---
+
+## 5.3 Multi-Leader Replication
+
+Multiple nodes can accept writes.
+
+Example:
+
+```text
+Client in US writes to US leader
+Client in EU writes to EU leader
+Leaders replicate changes to each other
+```
+
+Advantages:
+
+- Better write locality
+- Better availability during network partitions
+- Useful for offline or mobile clients
+
+Disadvantages:
+
+- Write conflicts are possible
+- Conflict resolution is complex
+- Strong consistency is difficult
+
+Conflict resolution methods include:
+
+- Last write wins
+- Application-level merge
+- CRDTs, or conflict-free replicated data types
+- Manual conflict resolution
+- Version vectors
+
+---
+
+## 5.4 Leaderless Replication
+
+Any replica can accept reads and writes.
+
+This is common in Dynamo-style systems.
+
+Example:
+
+```text
+Client writes to any replica
+Replica stores value and sends to other replicas
+Client reads from multiple replicas
+```
+
+Advantages:
+
+- High availability
+- No single leader bottleneck
+- Good for geographically distributed systems
+
+Disadvantages:
+
+- Stale reads are possible
+- Conflict resolution is required
+- Consistency is more complex
+
+Techniques used:
+
+- Read repair
+- Anti-entropy
+- Gossip protocols
+- Hinted handoff
+- Vector clocks
+- Quorum reads and writes
+
+---
+
+## 5.5 Replication and Performance
+
+Replication affects performance in several ways.
+
+### Write Performance
+
+Synchronous replication increases write latency because the client waits for acknowledgments.
+
+Asynchronous replication improves write latency but may risk data loss.
+
+### Read Performance
+
+Replicas can serve reads, improving read throughput and locality.
+
+However, stale replicas may return old data.
+
+### Storage Cost
+
+Replication multiplies storage usage.
+
+Example:
+
+```text
+1 TB of logical data with replication factor 3
+requires 3 TB of physical storage
+```
+
+### Network Cost
+
+Replication consumes network bandwidth.
+
+Cross-region replication can be expensive.
+
+### Failure Handling
+
+Replication improves availability, but failure detection and leader election add complexity.
+
+---
+
+## 6. Indexing in Distributed Databases
+
+Indexes are data structures that speed up queries. In a distributed database, indexing is more complex because data is spread across multiple nodes.
+
+---
+
+## 6.1 Local Indexes
+
+A local index is stored on the same node as the data it indexes.
+
+Example:
+
+```text
+Node A stores partition 1 and its local index
+Node B stores partition 2 and its local index
+Node C stores partition 3 and its local index
+```
+
+Advantages:
+
+- Index updates are local
+- Low write amplification
+- Good for queries that include the partition key
+- Easier to rebalance
+
+Disadvantages:
+
+- Queries without the partition key may need to search all partitions
+- This can cause scatter-gather behavior
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE customer_id = 123;
+```
+
+If `customer_id` is the partition key, the query can go directly to one partition.
+
+But:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If `status` is not the partition key, the query may need to search many partitions.
+
+---
+
+## 6.2 Global Indexes
+
+A global index spans multiple partitions or nodes.
+
+Example:
+
+```text
+Global index on email
+maps email -> partition containing customer
+```
+
+Advantages:
+
+- Efficient queries on non-partition keys
+- Can avoid scatter-gather queries
+- Useful for secondary indexes
+
+Disadvantages:
+
+- Index updates may require distributed coordination
+- Write amplification can be high
+- Global indexes can become bottlenecks
+- Rebalancing is more complex
+
+Example:
+
+```sql
+SELECT *
+FROM customers
+WHERE email = 'alice@example.com';
+```
+
+If `email` is not the partition key, a global index can locate the correct partition quickly.
+
+---
+
+## 6.3 Index Types
+
+Distributed databases may use several index structures.
+
+### B-tree Indexes
+
+Common in relational databases.
+
+Good for:
+
+- Equality queries
+- Range queries
+- Ordered scans
+
+In distributed systems, B-tree indexes may be local or global.
+
+---
+
+### LSM-tree Indexes
+
+Log-structured merge-tree indexes are common in NoSQL and wide-column databases.
+
+They are optimized for high write throughput.
+
+Advantages:
+
+- Efficient writes
+- Good for large-scale systems
+- Suitable for append-heavy workloads
+
+Disadvantages:
+
+- Compaction overhead
+- Reads may require checking multiple levels
+- Space amplification
+
+---
+
+### Hash Indexes
+
+Good for equality lookups.
+
+Example:
+
+```text
+hash(key) -> value
+```
+
+Advantages:
+
+- Fast point lookups
+- Simple
+
+Disadvantages:
+
+- Poor range queries
+- Poor ordered scans
+
+---
+
+### Bitmap Indexes
+
+Useful for low-cardinality columns.
+
+Example:
+
+```text
+status = ACTIVE
+status = INACTIVE
+```
+
+Advantages:
+
+- Efficient for analytical queries
+- Good for filtering large datasets
+
+Disadvantages:
+
+- Poor for high-cardinality data
+- Update cost can be high
+
+---
+
+### Inverted Indexes
+
+Used for full-text search.
+
+Example:
+
+```text
+"database" -> documents containing database
+```
+
+Advantages:
+
+- Good for text search
+- Supports relevance ranking
+
+Disadvantages:
+
+- Index maintenance can be expensive
+- Distributed updates require coordination
+
+---
+
+### Geospatial Indexes
+
+Used for location-based queries.
+
+Examples:
+
+- R-tree
+- Quadtree
+- Geohash
+
+Useful for:
+
+```sql
+Find all stores within 10 km of a location
+```
+
+---
+
+### Vector Indexes
+
+Used for similarity search and machine learning embeddings.
+
+Examples:
+
+- HNSW
+- IVF
+- PQ
+
+Useful for:
+
+```text
+Find similar documents
+Find similar images
+Recommendation systems
+```
+
+---
+
+## 6.4 Distributed Indexing and Performance
+
+### Partition Pruning
+
+If the query includes the partition key, the database can avoid scanning irrelevant partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE tenant_id = 42
+  AND order_id = 1001;
+```
+
+If `tenant_id` is the partition key, the query can be routed directly to one partition.
+
+This improves performance significantly.
+
+---
+
+### Scatter-Gather Queries
+
+If a query does not include the partition key, the database may need to query many partitions.
+
+Example:
+
+```sql
+SELECT *
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If there are 100 partitions, the query may need to contact all 100.
+
+This increases latency and network traffic.
+
+---
+
+### Covering Indexes
+
+A covering index contains all columns needed by a query.
+
+Example:
+
+```sql
+SELECT customer_id, status
+FROM orders
+WHERE status = 'PENDING';
+```
+
+If the index contains `status`, `customer_id`, and other needed columns, the database may avoid accessing the base table.
+
+This reduces I/O and improves performance.
+
+---
+
+### Index Write Amplification
+
+Every write may need to update multiple indexes.
+
+Example:
+
+```text
+Insert into customers
+Update primary key index
+Update email index
+Update country index
+Update created_at index
+```
+
+In a distributed system, some index updates may require network communication.
+
+This can reduce write throughput.
+
+---
+
+### Index Rebalancing
+
+When partitions move between nodes, indexes may need to be rebuilt or migrated.
+
+This can be expensive.
+
+Design choices include:
+
+- Rebuild indexes after rebalancing
+- Move index data with partition data
+- Use local indexes to simplify rebalancing
+- Use global indexes carefully
+
+---
+
+## 7. Transactions in Distributed Databases
+
+A transaction is a logical unit of work that must be processed reliably.
+
+Traditional ACID properties are:
+
+- Atomicity
+- Consistency
+- Isolation
+- Durability
+
+In a distributed database, transactions may touch multiple partitions or nodes.
+
+Example:
+
+```sql
+BEGIN;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 2;
+
+COMMIT;
+```
+
+If account 1 and account 2 are on different nodes, the transaction is distributed.
+
+---
+
+## 7.1 Distributed Transaction Challenges
+
+Distributed transactions are harder than local transactions because of:
+
+1. **Network latency**
+   - Multiple nodes must communicate.
+
+2. **Partial failure**
+   - One node may fail while others succeed.
+
+3. **Network partitions**
+   - Nodes may be unable to communicate.
+
+4. **Coordination overhead**
+   - Committing requires agreement.
+
+5. **Deadlocks**
+   - Transactions on different nodes may wait for each other.
+
+6. **Consistency tradeoffs**
+   - Strong consistency may reduce availability or performance.
+
+---
+
+## 7.2 Two-Phase Commit
+
+Two-phase commit, or 2PC, is the classic protocol for distributed atomic commit.
+
+It involves a coordinator and participants.
+
+### Phase 1: Prepare
+
+The coordinator asks all participants:
+
+```text
+Are you ready to commit?
+```
+
+Each participant:
+
+- Writes a prepare record to its log.
+- Locks necessary resources.
+- Responds yes or no.
+
+### Phase 2: Commit or Abort
+
+If all participants vote yes:
+
+```text
+Coordinator sends commit
+Participants commit
+Participants acknowledge
+```
+
+If any participant votes no:
+
+```text
+Coordinator sends abort
+Participants abort
+```
+
+Advantages:
+
+- Provides atomicity across nodes
+- Works well for small, low-latency clusters
+
+Disadvantages:
+
+- Blocking
+- If the coordinator fails after prepare, participants may be stuck
+- High latency due to multiple round trips
+- Poor availability during network partitions
+
+---
+
+## 7.3 Three-Phase Commit
+
+Three-phase commit, or 3PC, attempts to reduce blocking compared with 2PC.
+
+It adds an extra phase:
+
+1. Can commit?
+2. Pre-commit
+3. Commit
+
+Advantages:
+
+- Less blocking than 2PC in some cases
+
+Disadvantages:
+
+- More complex
+- Still assumes reliable network and failure detection
+- Rarely used in practice because it does not solve all distributed failure problems
+
+---
+
+## 7.4 Concurrency Control
+
+Concurrency control ensures that concurrent transactions do not interfere incorrectly.
+
+### Pessimistic Locking
+
+A transaction locks data before modifying it.
+
+Example:
+
+```text
+Transaction T1 locks account 1
+Transaction T2 waits for account 1
+```
+
+Advantages:
+
+- Prevents conflicts early
+- Easier to reason about
+
+Disadvantages:
+
+- Lock waits reduce throughput
+- Deadlocks are possible
+- Locks may be held across network boundaries
+
+---
+
+### Optimistic Concurrency Control
+
+Transactions execute without locks and validate at commit time.
+
+Example:
+
+```text
+T1 reads balance
+T2 reads balance
+T1 updates balance
+T2 tries to update balance
+T2 fails because data changed
+```
+
+Advantages:
+
+- Good when conflicts are rare
+- Less blocking
+
+Disadvantages:
+
+- High abort rate under contention
+- Requires versioning or validation
+
+---
+
+### MVCC
+
+Multi-version concurrency control stores multiple versions of data.
+
+Readers do not block writers, and writers do not block readers.
+
+Advantages:
+
+- High read concurrency
+- Good for analytical and mixed workloads
+- Supports snapshot isolation
+
+Disadvantages:
+
+- Storage overhead
+- Garbage collection required
+- Long-running transactions can retain old versions
+
+---
+
+## 7.5 Isolation Levels
+
+Distributed databases may support different isolation levels.
+
+### Read Uncommitted
+
+Transactions may see uncommitted data.
+
+Rarely used because of anomalies.
+
+### Read Committed
+
+Transactions see only committed data.
+
+Common default in many databases.
+
+### Snapshot Isolation
+
+Each transaction sees a consistent snapshot of the database.
+
+Advantages:
+
+- Good performance
+- Avoids many read anomalies
+
+Disadvantages:
+
+- Write-write conflicts may occur
+- Not fully serializable
+
+### Serializable Isolation
+
+Transactions behave as if executed one at a time.
+
+Advantages:
+
+- Strong correctness
+
+Disadvantages:
+
+- Higher coordination cost
+- More aborts or locks
+- Can reduce throughput
+
+---
+
+## 7.6 Distributed Deadlocks
+
+Deadlocks can occur across nodes.
+
+Example:
+
+```text
+T1 locks account 1 on Node A
+T1 waits for account 2 on Node B
+
+T2 locks account 2 on Node B
+T2 waits for account 1 on Node A
+```
+
+Detection methods include:
+
+- Wait-for graphs
+- Timeout-based detection
+- Distributed deadlock detectors
+
+Resolution methods include:
+
+- Abort one transaction
+- Retry transaction
+- Use lock ordering
+- Use optimistic concurrency control
+
+---
+
+## 7.7 Transactions and Performance
+
+Distributed transactions can be expensive.
+
+### Latency
+
+A distributed commit may require multiple network round trips.
+
+Example:
+
+```text
+Client -> Coordinator
+Coordinator -> Participant 1
+Coordinator -> Participant 2
+Participant 1 -> Coordinator
+Participant 2 -> Coordinator
+Coordinator -> Participants
+Participants -> Coordinator
+Coordinator -> Client
+```
+
+This can be slow across regions.
+
+---
+
+### Throughput
+
+Locking and coordination can reduce throughput.
+
+High-contention transactions may serialize.
+
+---
+
+### Hotspots
+
+If many transactions update the same row or partition, performance suffers.
+
+Example:
+
+```text
+All transactions update inventory for one product
+```
+
+Solutions:
+
+- Partition inventory by region
+- Use counters or sharded inventory
+- Batch updates
+- Use optimistic concurrency control
+- Use application-level queues
+
+---
+
+### Strong Consistency vs. Performance
+
+Strong consistency often requires coordination.
+
+Weak consistency can improve performance but shifts complexity to the application.
+
+---
+
+## 8. Recovery in Distributed Databases
+
+Recovery is the process of restoring the database to a correct state after failures.
+
+Failures may include:
+
+- Node crash
+- Disk failure
+- Network partition
+- Power loss
+- Software bug
+- Data corruption
+- Regional outage
+
+---
+
+## 8.1 Local Recovery
+
+Each node usually has its own recovery mechanism.
+
+Common techniques include:
+
+### Write-Ahead Logging
+
+Changes are written to a log before being applied to the database.
+
+Example:
+
+```text
+1. Write log record
+2. Flush log to stable storage
+3. Modify database page
+```
+
+This ensures that committed changes survive crashes.
+
+---
+
+### Checkpointing
+
+A checkpoint records the database state at a point in time.
+
+During recovery, the system can start from the last checkpoint and replay only later log records.
+
+Advantages:
+
+- Faster recovery
+- Less log replay
+
+Disadvantages:
+
+- Checkpointing consumes I/O
+- Too frequent checkpoints reduce throughput
+- Too infrequent checkpoints increase recovery time
+
+---
+
+### ARIES-Style Recovery
+
+Many databases use ARIES-like recovery.
+
+ARIES uses:
+
+- Write-ahead logging
+- Redo
+- Undo
+- Checkpoints
+- Dirty page tables
+
+Recovery phases:
+
+1. **Analysis**
+   - Determine which transactions were active at failure.
+
+2. **Redo**
+   - Reapply changes that may have been lost.
+
+3. **Undo**
+   - Roll back transactions that did not commit.
+
+---
+
+## 8.2 Distributed Recovery
+
+Distributed recovery must handle failures across multiple nodes.
+
+It must answer questions such as:
+
+- Was the transaction committed?
+- Did all participants commit?
+- Did the coordinator fail before sending the final decision?
+- Are some replicas missing recent changes?
+- Which replica should become leader?
+
+---
+
+## 8.3 Two-Phase Commit Recovery
+
+In 2PC, recovery is complicated because participants may be in a prepared state.
+
+Example:
+
+```text
+All participants prepared
+Coordinator crashes before sending commit
+```
+
+Participants do not know whether to commit or abort.
+
+They may block until the coordinator recovers.
+
+Recovery mechanisms include:
+
+- Coordinator logs its decision
+- Participants query the coordinator
+- Participants query other participants
+- Timeout and abort, if safe
+- Manual intervention in extreme cases
+
+This is one reason 2PC can reduce availability.
+
+---
+
+## 8.4 Replication-Based Recovery
+
+Replication helps recovery.
+
+If a node fails, another replica can take over.
+
+Recovery steps may include:
+
+1. Detect failed node.
+2. Elect new leader.
+3. Promote a healthy replica.
+4. Reconfigure clients.
+5. Rebuild failed replica from snapshots and logs.
+6. Catch up using replication logs.
+
+---
+
+## 8.5 Snapshot and Log Recovery
+
+Many systems use snapshots plus logs.
+
+Example:
+
+```text
+Nightly snapshot
+Continuous transaction log
+```
+
+To recover:
+
+```text
+Restore snapshot
+Replay logs up to desired point
+```
+
+This supports point-in-time recovery.
+
+Example:
+
+```text
+Restore database to 10:45 before accidental deletion
+```
+
+---
+
+## 8.6 Failure Types and Recovery Behavior
+
+### Node Failure
+
+A single node crashes.
+
+Recovery:
+
+- Restart node.
+- Replay local log.
+- Rejoin cluster.
+- Catch up with replication.
+
+---
+
+### Disk Failure
+
+A node loses storage.
+
+Recovery:
+
+- Replace disk.
+- Restore from snapshot.
+- Replay logs.
+- Rebuild replica.
+
+---
+
+### Network Partition
+
+Nodes cannot communicate.
+
+Recovery:
+
+- Use quorum rules.
+- Elect leader only if quorum exists.
+- Partition minority side may become read-only or unavailable.
+- After partition heals, reconcile logs.
+
+---
+
+### Regional Failure
+
+An entire data center fails.
+
+Recovery:
+
+- Promote remote replica.
+- Redirect clients.
+- Rebuild failed region.
+- Restore from remote backups.
+
+---
+
+## 8.7 Recovery and Performance
+
+Recovery affects performance in several ways.
+
+### Logging Overhead
+
+Every write may require log writes.
+
+This can reduce throughput.
+
+---
+
+### Checkpoint Overhead
+
+Checkpoints consume CPU, memory, and disk I/O.
+
+---
+
+### Recovery Time
+
+If checkpoints are rare, recovery may require replay

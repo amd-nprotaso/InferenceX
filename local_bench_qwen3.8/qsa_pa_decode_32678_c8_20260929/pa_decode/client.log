@@ -1,0 +1,41 @@
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting 8 simultaneous requests: ISL=32678 OSL=32678
+elapsed=1.872s output_tokens=1 average_output_rate=0.53 tok/s
+elapsed=2.004s output_tokens=1 average_output_rate=0.50 tok/s
+elapsed=2.104s output_tokens=1 average_output_rate=0.48 tok/s
+elapsed=2.200s output_tokens=1 average_output_rate=0.45 tok/s
+elapsed=2.297s output_tokens=1 average_output_rate=0.44 tok/s
+elapsed=2.395s output_tokens=1 average_output_rate=0.42 tok/s
+elapsed=2.490s output_tokens=1 average_output_rate=0.40 tok/s
+elapsed=2.520s output_tokens=1 average_output_rate=0.40 tok/s
+elapsed=182.574s output_tokens=32678 average_output_rate=178.98 tok/s
+elapsed=182.574s output_tokens=32678 average_output_rate=178.98 tok/s
+elapsed=182.577s output_tokens=32678 average_output_rate=178.98 tok/s
+elapsed=182.579s output_tokens=32678 average_output_rate=178.98 tok/selapsed=182.579s output_tokens=32678 average_output_rate=178.98 tok/selapsed=182.579s output_tokens=32678 average_output_rate=178.98 tok/s
+elapsed=182.580s output_tokens=32678 average_output_rate=178.98 tok/s
+
+
+Request 2 complete: 32678 tokens in 182.576s
+Request 1 complete: 32678 tokens in 182.576selapsed=182.581s output_tokens=32678 average_output_rate=178.98 tok/s
+Request 3 complete: 32678 tokens in 182.577s
+Request 4 complete: 32678 tokens in 182.581s
+
+Request 5 complete: 32678 tokens in 182.580sRequest 7 complete: 32678 tokens in 182.581s
+
+Request 0 complete: 32678 tokens in 182.580s
+Request 6 complete: 32678 tokens in 182.581s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 8,
+  "successful_requests": 8,
+  "requested_input_tokens": 32678,
+  "requested_output_tokens": 32678,
+  "batch_wall_s": 182.58435299713165,
+  "output_throughput_tok_s": 1431.7984849671477,
+  "total_throughput_tok_s": 2863.5969699342954,
+  "e2e_s": 182.5778755498468,
+  "ttft_s": 2.235094287258107,
+  "tpot_ms": 5.518951594778857,
+  "decode_interactivity_tok_s": 181.19409446647947
+}

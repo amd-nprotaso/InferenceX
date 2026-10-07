@@ -1,0 +1,45 @@
+QSA three-way serving benchmark — 2026-10-05
+
+Configuration
+Concurrency 8; exact ISL 32768 and OSL 32768; TP1; random seed 42.
+NEXTN: 3 steps, 4 draft tokens, topk 1.
+Simulated acceptance target: 2.32, match-expected, real-draft-token.
+Measured mean acceptance length: 2.324301319336076 in all three arms.
+Current run_server.sh settings otherwise retained.
+Eight distinct deterministic synthetic input-token sequences, identical across arms.
+Fresh server for each arm, 8 x 32768-input/256-output warmup, then cache flush.
+One measured batch per implementation; order CK, Triton, FlyDSL.
+
+Results
+Implementation    Output tokens/s    TPOT ms    Batch seconds
+CK varlen                  634.78     12.457           412.97
+Triton packed decode       754.23     10.462           347.56
+FlyDSL paged decode        757.57     10.415           346.03
+
+Triton vs CK: +18.82% output throughput, -16.02% TPOT.
+FlyDSL vs CK: +19.34% output throughput, -16.40% TPOT.
+FlyDSL vs Triton: +0.44% output throughput, -0.45% TPOT.
+
+Validation
+All 24 requests completed with exactly 32768 input and 32768 output tokens.
+All eight input hashes matched across the three arms; the eight inputs were distinct.
+Server arguments, including seed 42, were identical across the arms.
+Each server log contains the expected QSA_THREEWAY_EXECUTING marker.
+CK used an experiment-local override to bypass the ROCm Triton branch.
+Triton and FlyDSL used their normal current-runtime paths.
+Installed runtime source and original launch script were not edited.
+All experiment servers exited after completion.
+
+Interpretation
+The current Triton path provides nearly all of the end-to-end gain over CK
+in this workload. The 0.44% observed FlyDSL advantage over Triton is too small
+to establish statistically from one batch per implementation.
+This measures model-serving performance with simulated NEXTN acceptance;
+it is not an isolated attention-kernel benchmark or an accuracy evaluation.
+
+Artifacts
+comparison.json: exact metrics, pairwise changes, input hashes, validation.
+provenance.json: SGLang and AITER commits and working-tree differences.
+server_entry.py: explicit arm selection and one-time dispatch logging.
+Each arm directory contains server/client logs, server_info.json, warmup
+metadata, per-request payloads and outputs, and client-exact-result.json.

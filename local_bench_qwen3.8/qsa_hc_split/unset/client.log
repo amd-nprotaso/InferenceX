@@ -1,0 +1,83 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+Starting one request: input_tokens=32768 output_tokens=32768 concurrency=1
+elapsed=1.030s output_tokens=1 average_output_rate=0.97 tok/s
+elapsed=18.493s output_tokens=2201 average_output_rate=119.02 tok/s
+elapsed=38.350s output_tokens=4801 average_output_rate=125.19 tok/s
+elapsed=50.652s output_tokens=6351 average_output_rate=125.39 tok/s
+elapsed=66.539s output_tokens=8201 average_output_rate=123.25 tok/s
+elapsed=86.404s output_tokens=10601 average_output_rate=122.69 tok/s
+elapsed=100.172s output_tokens=12351 average_output_rate=123.30 tok/s
+elapsed=117.325s output_tokens=14451 average_output_rate=123.17 tok/s
+elapsed=133.867s output_tokens=16501 average_output_rate=123.26 tok/s
+elapsed=148.391s output_tokens=18451 average_output_rate=124.34 tok/s
+elapsed=163.767s output_tokens=20501 average_output_rate=125.18 tok/s
+elapsed=181.548s output_tokens=22701 average_output_rate=125.04 tok/s
+elapsed=196.478s output_tokens=24651 average_output_rate=125.46 tok/s
+elapsed=211.999s output_tokens=26901 average_output_rate=126.89 tok/s
+elapsed=226.048s output_tokens=28701 average_output_rate=126.97 tok/s
+elapsed=241.824s output_tokens=30851 average_output_rate=127.58 tok/s
+elapsed=255.215s output_tokens=32768 average_output_rate=128.39 tok/s
+{
+  "model": "amd/Qwen3.8-Flash-Next-Quark-MXFP4",
+  "tp": 1,
+  "concurrency": 1,
+  "requested_input_tokens": 32768,
+  "requested_output_tokens": 32768,
+  "actual_input_tokens": 32768,
+  "actual_output_tokens": 32768,
+  "successful_requests": 1,
+  "ttft_s": 1.0297004003077745,
+  "e2e_s": 255.21519785141572,
+  "client_wall_s": 255.2152984100394,
+  "tpot_ms": 7.757362512622698,
+  "decode_interactivity_tok_s": 128.90979355068305,
+  "output_throughput_tok_s": 128.39355714230572,
+  "total_throughput_tok_s": 256.78711428461145,
+  "stream_chunk_count": 226,
+  "server_meta": {
+    "id": "8fef202fa46446a489fa8bde85137b92",
+    "finish_reason": {
+      "type": "length",
+      "length": 32768
+    },
+    "prompt_tokens": 32768,
+    "weight_version": "default",
+    "num_retractions": 0,
+    "forward_entry_time": 1790601776.6529396,
+    "prefill_finished_time": 1790601777.6654055,
+    "queue_time": 0.00028824806213378906,
+    "reasoning_tokens": 0,
+    "completion_tokens": 32768,
+    "cached_tokens": 0,
+    "cached_tokens_details": null,
+    "dp_rank": null,
+    "e2e_latency": 255.1983757489361,
+    "spec_accept_rate": 0.5747499099398675,
+    "spec_accept_length": 2.724083464959681,
+    "spec_num_correct_drafts": 20741,
+    "spec_num_proposed_drafts": 36087,
+    "spec_verify_ct": 12029,
+    "spec_accepted_drafts": 20741,
+    "spec_proposed_drafts": 36087,
+    "spec_correct_drafts_histogram": [
+      3056,
+      2245,
+      1688,
+      5040
+    ],
+    "spec_accept_histogram": [
+      3056,
+      2245,
+      1688,
+      5040
+    ],
+    "request_received_ts": 1790601776.6516793,
+    "api_server_dispatch_finish_ts": 1790601776.6521947,
+    "response_sent_to_client_ts": 1790601777.6667778,
+    "request_finished_ts": 1790602031.850055,
+    "decode_throughput": 128.91076940871707
+  },
+  "output_preview": "We need answer user's request. User repeated many times: \"Explain the design and performance of a distributed database. Discuss replication, indexing, transactions, and recovery.\" Need provide compreh",
+  "output_tail": "\u80fd\u65e0\u6cd5\u5b89\u5168\u6210\u4e3a leader\n```\n\n---\n\n## 2. Commit Index\n\n```text\nleader commit index\nfollower commit index\n```\n\n\u53ef\u4ee5\u5224\u65ad\u526f\u672c\u662f\u5426\u843d\u540e\u3002\n\n---\n\n## 3. Term / Epoch\n\n```text\ncurrent term\nleader term\nelection count\n```\n\n\u9891\u7e41\u9009\u4e3e\u901a\u5e38\u610f\u5473\u7740"
+}
